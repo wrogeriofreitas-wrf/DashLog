@@ -822,6 +822,7 @@ async function loadData(){
     _D  = payload.d || payload;
     CC  = _D.CC;  CAT = _D.CAT;  TIPO= _D.TIPO;
     MO  = _D.MO;  DRV = _D.DRV;  R   = _D.R;
+    OP_CCS = CC.filter(c=>!EXCL_CC.has(c));
     return true;
   }catch(err){
     console.error('Erro carregando dados.json:', err);
@@ -851,7 +852,7 @@ const STATE = {
 
 // Excluir CCs não operacionais
 const EXCL_CC = new Set(['CONSOLIDADO','DISTRIBUIÇÃO LUCRO','IMOBILIZADO','VERIFICAR']);
-const OP_CCS  = CC.filter(c=>!EXCL_CC.has(c));
+let OP_CCS = []; // populado em loadData() após CC ser carregado
 
 // ═══════════════════════════════════════════════════
 // UTILITIES
