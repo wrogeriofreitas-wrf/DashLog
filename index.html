@@ -1241,18 +1241,79 @@ function initFilters(){
 }
 
 // ═══════════════════════════════════════════════════
-// RENDER OVERVIEW
+// RENDER OVERVIEW — 100% dinâmico, calcula tudo a partir de _D
 // ═══════════════════════════════════════════════════
 function renderOverview(){
-  // ── CARDS ──
-  const REC       =  14280247.62;
-  const DESP      = -11578798.48;
-  const LUCRO_OP  =   2701449.14;
-  const MARGEM_OP =          18.92;
-  const DIST_LUC  =    697428.30;
+  // ----- 1) MAPEAR ÍNDICES DOS TIPOS (robusto a variações de acento/caixa) -----
+  const norm = s => (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  function findTipoIdx(label){
+    const t = norm(label);
+    for(let k=0;k<TIPO.length;k++){ if(norm(TIPO[k])===t) return k; }
+    return -1;
+  }
+  const iRec  = findTipoIdx('Receita');
+  const iDesp = findTipoIdx('Despesa');
+  const iDist = findTipoIdx('Distribuição Lucro');
+  const iJur  = findTipoIdx('Juros');
+  const iCmpV = findTipoIdx('Compra de Veículo');
+  const iVndV = findTipoIdx('Venda De Veículo');
 
-  setText('kpi-rec',     fmtBR(REC));
-  setText('kpi-cst',     fmtBR(Math.abs(DESP)));
+  // ----- 2) VARREDURA ÚNICA DE R -----
+  const yOf = idx => (idx>=0 && idx<MO.length) ? parseInt(MO[idx].substring(0,4),10) : null;
+  const mOf = idx => (idx>=0 && idx<MO.length) ? parseInt(MO[idx].substring(5,7),10) : null;
+  const anoAtual = new Date().getFullYear();
+
+  let REC=0, DESP=0, DIST=0;
+  const rosca = {rec:0,desp:0,dist:0,jur:0,cmp:0,vnd:0};
+  const lucroAno = {};                 // por ano competência (só op_ccs, Rec+Desp)
+  const lucroMes = Array(12).fill(0);  // ano atual, por mês competência
+  const saldoAno = {};                 // soma por ano de PAGAMENTO, todos os tipos
+  let aReceber=0, aPagar=0;
+
+  for(let k=0;k<R.length;k++){
+    const row = R[k];
+    const cc   = CC[row[I_CC]];
+    const ti   = row[I_TIPO];
+    const val  = row[I_VAL];
+    const dci  = row[I_DC];
+    const dpi  = row[I_DP];
+    const isOp = !EXCL_CC.has(cc);
+    const yDC  = yOf(dci), mDC = mOf(dci), yDP = yOf(dpi);
+
+    // KPIs (operacional)
+    if(isOp){
+      if(ti===iRec)  REC  += val;
+      if(ti===iDesp) DESP += val;
+      if(ti===iDist) DIST += val;
+      if((ti===iRec||ti===iDesp) && yDC!==null){
+        lucroAno[yDC] = (lucroAno[yDC]||0) + val;
+        if(yDC===anoAtual && mDC) lucroMes[mDC-1] += val;
+      }
+    }
+    // Rosca (todos os CCs)
+    if(ti===iRec)  rosca.rec  += Math.abs(val);
+    if(ti===iDesp) rosca.desp += Math.abs(val);
+    if(ti===iDist) rosca.dist += Math.abs(val);
+    if(ti===iJur)  rosca.jur  += Math.abs(val);
+    if(ti===iCmpV) rosca.cmp  += Math.abs(val);
+    if(ti===iVndV) rosca.vnd  += Math.abs(val);
+    // Saldo bancário (todos os tipos, ano de pagamento)
+    if(yDP!==null) saldoAno[yDP] = (saldoAno[yDP]||0) + val;
+    // Pendências (sem data de pagamento)
+    if(dpi===-1){
+      if(val>0) aReceber += val;
+      else      aPagar   += Math.abs(val);
+    }
+  }
+
+  // ----- 3) CARDS KPI -----
+  const REC_ABS=Math.abs(REC), DESP_ABS=Math.abs(DESP);
+  const LUCRO_OP = REC_ABS - DESP_ABS;
+  const MARGEM_OP = REC_ABS>0 ? (LUCRO_OP/REC_ABS*100) : 0;
+  const DIST_LUC = Math.abs(DIST);
+
+  setText('kpi-rec',     fmtBR(REC_ABS));
+  setText('kpi-cst',     fmtBR(DESP_ABS));
   const lucEl=document.getElementById('kpi-luc');
   if(lucEl){ lucEl.textContent=fmtBR(LUCRO_OP); lucEl.className='kpi-value '+(LUCRO_OP>=0?'green':'red'); }
   setText('kpi-mar',     MARGEM_OP.toFixed(2).replace('.',',')+' %');
@@ -1262,99 +1323,77 @@ function renderOverview(){
   if(LUCRO_OP<0) alerts.push(['danger','⚠ Resultado operacional negativo!']);
   renderAlerts('ov-alerts', alerts);
 
-  // helpers de cor ajustados por tema
+  // ----- 4) CORES DE TEMA -----
   const isDark=!document.body.classList.contains('light');
   const gC = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)';
   const tC = isDark ? '#5a7090' : '#6a8090';
   const lblC = isDark ? '#e2e8f0' : '#1a2740';
 
-  // ── GRÁFICO 1: Lucro Operacional Anual (2015–2025) ──
-  const g1Anos = ['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'];
-  const g1Vals = [68761.31,108170.65,104245.84,199759.68,221899.92,302121.97,214695.24,313523.01,540155.40,263028.83,341890.49];
+  // ----- 5) GRÁFICO 1: Lucro Anual (anos fechados) -----
+  const anosFech = Object.keys(lucroAno).map(y=>parseInt(y,10)).filter(y=>y<anoAtual).sort();
+  const g1Anos = anosFech.map(String);
+  const g1Vals = anosFech.map(y=>Math.round((lucroAno[y]||0)*100)/100);
   const g1Total = g1Vals.reduce((a,b)=>a+b,0);
   mkChart('ch-lucro-anual',{type:'bar',
-    data:{labels:g1Anos,datasets:[{
-      label:'Lucro',data:g1Vals,
+    data:{labels:g1Anos,datasets:[{label:'Lucro',data:g1Vals,
       backgroundColor:g1Vals.map(v=>v>=0?'rgba(16,217,160,0.78)':'rgba(240,82,82,0.78)'),
-      borderWidth:0,borderRadius:4,
-    }]},
+      borderWidth:0,borderRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{
-        legend:{display:false},
-        tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}},
-        title:{
-          display:true,
-          text:'Total acumulado: '+fmtBR(g1Total),
-          color:lblC,font:{size:11,family:"'IBM Plex Mono',monospace"},
-          padding:{bottom:4},
-        }
-      },
-      scales:{
-        y:{grid:{color:gC},ticks:{callback:v=>fmtK(v),color:tC,font:{size:10}}},
-        x:{grid:{display:false},ticks:{color:tC,font:{size:10},autoSkip:false}}
-      }
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}},
+        title:{display:true,text:'Total acumulado: '+fmtBR(g1Total),
+          color:lblC,font:{size:11,family:"'IBM Plex Mono',monospace"},padding:{bottom:4}}},
+      scales:{y:{grid:{color:gC},ticks:{callback:v=>fmtK(v),color:tC,font:{size:10}}},
+        x:{grid:{display:false},ticks:{color:tC,font:{size:10},autoSkip:false}}}
     }
   });
+  // Subtítulo dinâmico
+  const subEl = document.querySelector('#p-overview .chart-row .chart-card.half .chart-sub');
+  if(subEl && g1Anos.length>0){
+    subEl.textContent = g1Anos[0]+' – '+g1Anos[g1Anos.length-1]+' · anos fechados · Receita − Despesas';
+  }
 
-  // ── GRÁFICO 2: Lucro Operacional Mensal 2026 ──
+  // ----- 6) GRÁFICO 2: Lucro Mensal ano atual -----
   const g2Meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const g2Vals  = [-12515.10,42032.16,33953.11,20425.72,-23163.97,-12680.81,-10833.52,-6529.16,-3625.81,-2464.41,-1401.41,0];
+  const g2Vals = lucroMes.map(v=>Math.round(v*100)/100);
   const g2Total = g2Vals.reduce((a,b)=>a+b,0);
   mkChart('ch-lucro-mensal',{type:'bar',
-    data:{labels:g2Meses,datasets:[{
-      label:'Lucro',data:g2Vals,
+    data:{labels:g2Meses,datasets:[{label:'Lucro',data:g2Vals,
       backgroundColor:g2Vals.map(v=>v>=0?'rgba(16,217,160,0.78)':'rgba(240,82,82,0.78)'),
-      borderWidth:0,borderRadius:4,
-    }]},
+      borderWidth:0,borderRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{
-        legend:{display:false},
-        tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}},
-        title:{
-          display:true,
-          text:'Acumulado 2026: '+fmtBR(g2Total),
-          color:lblC,font:{size:11,family:"'IBM Plex Mono',monospace"},
-          padding:{bottom:4},
-        }
-      },
-      scales:{
-        y:{grid:{color:gC},ticks:{callback:v=>fmtK(v),color:tC,font:{size:10}}},
-        x:{grid:{display:false},ticks:{color:tC,font:{size:10},autoSkip:false}}
-      }
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}},
+        title:{display:true,text:'Acumulado '+anoAtual+': '+fmtBR(g2Total),
+          color:lblC,font:{size:11,family:"'IBM Plex Mono',monospace"},padding:{bottom:4}}},
+      scales:{y:{grid:{color:gC},ticks:{callback:v=>fmtK(v),color:tC,font:{size:10}}},
+        x:{grid:{display:false},ticks:{color:tC,font:{size:10},autoSkip:false}}}
     }
   });
 
-  // ── GRÁFICO 3: Saldo Bancário ──
-  const g3Anos = ['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026'];
-  const g3Vals = [11666.78,120437.24,181660.05,188893.47,286203.70,251376.59,388605.89,714060.06,651114.28,388644.39,312007.32,389873.87];
+  // ----- 7) GRÁFICO 3: Saldo Bancário acumulado -----
+  const anosS = Object.keys(saldoAno).map(y=>parseInt(y,10)).sort();
+  let acc=0; const g3Anos=[], g3Vals=[];
+  anosS.forEach(y=>{ acc += saldoAno[y]; g3Anos.push(String(y)); g3Vals.push(Math.round(acc*100)/100); });
   mkChart('ch-saldo-bancario',{type:'line',
-    data:{labels:g3Anos,datasets:[{
-      label:'Saldo',data:g3Vals,
+    data:{labels:g3Anos,datasets:[{label:'Saldo',data:g3Vals,
       borderColor:'rgba(59,158,255,1)',
       backgroundColor:isDark?'rgba(59,158,255,0.10)':'rgba(59,158,255,0.15)',
-      fill:true,tension:0.4,
-      pointRadius:4,pointHoverRadius:7,
-      pointBackgroundColor:'rgba(59,158,255,1)',
-      borderWidth:2,
-    }]},
+      fill:true,tension:0.4,pointRadius:4,pointHoverRadius:7,
+      pointBackgroundColor:'rgba(59,158,255,1)',borderWidth:2}]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}}},
-      scales:{
-        y:{grid:{color:gC},ticks:{callback:v=>fmtK(v),color:tC,font:{size:10}}},
-        x:{grid:{display:false},ticks:{color:tC,font:{size:10},autoSkip:false}}
-      }
+      scales:{y:{grid:{color:gC},ticks:{callback:v=>fmtK(v),color:tC,font:{size:10}}},
+        x:{grid:{display:false},ticks:{color:tC,font:{size:10},autoSkip:false}}}
     }
   });
 
-  // ── GRÁFICO 4: Rosca — Demonstrativo de Entradas x Saídas ──
-  // Cores distintas para todos os 6 tipos
+  // ----- 8) GRÁFICO 4: Rosca de Tipos -----
   const roscaTipos = [
-    {label:'Receita',        val: 14280247.62, color:'#10d9a0'},  // verde
-    {label:'Despesa',        val: 11578798.48, color:'#f05252'},  // vermelho
-    {label:'Dist. Lucro',    val:   697428.30, color:'#a78bfa'},  // roxo
-    {label:'Juros',          val:   203846.07, color:'#f59e0b'},  // amarelo-ouro (diferente de laranja)
-    {label:'Compra Veículo', val:  2258532.87, color:'#3b9eff'},  // azul (bem diferente de laranja)
-    {label:'Venda Veículo',  val:   325164.57, color:'#f97316'},  // laranja (diferente de roxo)
+    {label:'Receita',        val: rosca.rec,  color:'#10d9a0'},
+    {label:'Despesa',        val: rosca.desp, color:'#f05252'},
+    {label:'Dist. Lucro',    val: rosca.dist, color:'#a78bfa'},
+    {label:'Juros',          val: rosca.jur,  color:'#f59e0b'},
+    {label:'Compra Veículo', val: rosca.cmp,  color:'#3b9eff'},
+    {label:'Venda Veículo',  val: rosca.vnd,  color:'#f97316'},
   ];
   const legEl=document.getElementById('rosca-legend');
   if(legEl){
@@ -1370,33 +1409,23 @@ function renderOverview(){
       backgroundColor:roscaTipos.map(t=>t.color),
       borderWidth:isDark?0:1,
       borderColor:isDark?'transparent':'rgba(255,255,255,0.6)',
-      hoverOffset:10,
-    }]},
+      hoverOffset:10}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'60%',
-      plugins:{
-        legend:{display:false},
-        tooltip:{callbacks:{label:c=>c.label+': '+fmtBR(c.parsed)}}
-      }
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.label+': '+fmtBR(c.parsed)}}}
     }
   });
 
-  // ── GRÁFICO 5: Contas a Pagar x Receber ──
+  // ----- 9) GRÁFICO 5: A Receber / A Pagar -----
   mkChart('ch-pagar-receber',{type:'bar',
-    data:{
-      labels:['A Receber','A Pagar'],
-      datasets:[{
-        label:'Valor',
-        data:[96805.03,218344.95],
+    data:{labels:['A Receber','A Pagar'],
+      datasets:[{label:'Valor',
+        data:[Math.round(aReceber*100)/100, Math.round(aPagar*100)/100],
         backgroundColor:['rgba(16,217,160,0.78)','rgba(240,82,82,0.78)'],
-        borderWidth:0,borderRadius:8,
-      }]
-    },
+        borderWidth:0,borderRadius:8}]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}}},
-      scales:{
-        y:{grid:{color:gC},ticks:{callback:v=>fmtK(v),color:tC,font:{size:10}}},
-        x:{grid:{display:false},ticks:{color:tC,font:{size:13},autoSkip:false}}
-      }
+      scales:{y:{grid:{color:gC},ticks:{callback:v=>fmtK(v),color:tC,font:{size:10}}},
+        x:{grid:{display:false},ticks:{color:tC,font:{size:13},autoSkip:false}}}
     }
   });
 }
