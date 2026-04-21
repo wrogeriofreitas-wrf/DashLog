@@ -1057,7 +1057,7 @@ function precompute(){
   return {byTipoYear, rentByYear, rentByCC, dreData};
 }
 
-const STATIC = precompute();
+let STATIC = null; // computado no boot, após loadData()
 
 // ═══════════════════════════════════════════════════
 // CHART HELPERS
@@ -1921,6 +1921,7 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   const ok = await loadData();
   if(!ok) return; // overlay permanece com mensagem de erro
   try{
+    STATIC = precompute(); // agora R, CC, CAT, etc estão preenchidos
     initFilters();
     initRankingFilter();
     initScoreFilter();
