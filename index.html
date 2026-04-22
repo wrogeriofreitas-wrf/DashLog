@@ -817,8 +817,8 @@ async function loadData(){
   try{
     const resp = await fetch('./dados.json', {cache: 'no-cache'});
     if(!resp.ok) throw new Error('HTTP ' + resp.status);
-    let rawText = await resp.text();
-    if(rawText.charCodeAt(0)===0xFEFF) rawText=rawText.slice(1); // remove BOM do VBA
+    const buf = await resp.arrayBuffer();
+    const rawText = new TextDecoder('windows-1252').decode(buf);
     const payload = JSON.parse(rawText);
     // Aceita dois formatos: {meta,d:{...}} ou o objeto _D cru
     _D  = payload.d || payload;
