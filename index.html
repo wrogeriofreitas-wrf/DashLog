@@ -507,9 +507,43 @@ position:fixed;inset:0;z-index:9999;background:var(--bg1);display:flex;align-ite
 <script>
 var _usuariosJSON=[];
 var _loginFallback=[{u:"ROGERIO",p:"TRICOLOR"},{u:"EMERSON",p:"SEM MUNDIAL"},{u:"MATEUS",p:"BBEZINHO"}];
-function tentarLogin(){var uEl=document.getElementById("l-user"),pEl=document.getElementById("l-pass"),errEl=document.getElementById("l-err");if(!uEl||!pEl)return;var u=uEl.value.trim().toUpperCase(),p=pEl.value.trim().toUpperCase();if(!u||!p){if(errEl)errEl.style.display="block";return;}var lista=_usuariosJSON.length>0?_usuariosJSON:_loginFallback;var ok=lista.some(function(x){return(x.u||"").toUpperCase()===u&&(x.p||"").toUpperCase()===p;});if(ok){sessionStorage.setItem("dashlog_auth","1");var ov=document.getElementById("login-overlay");if(ov){ov.style.opacity="0";ov.style.transition="opacity .3s";setTimeout(function(){ov.remove();},300);}}else{if(errEl)errEl.style.display="block";pEl.value="";pEl.focus();}}
-function encerrarSessao(){sessionStorage.removeItem("dashlog_auth");location.reload();}
-window.addEventListener("load",function(){if(sessionStorage.getItem("dashlog_auth")==="1"){var ov=document.getElementById("login-overlay");if(ov)ov.remove();}var lp=document.getElementById("l-pass");if(lp)lp.addEventListener("keydown",function(e){if(e.key==="Enter")tentarLogin();});var lu=document.getElementById("l-user");if(lu)lu.addEventListener("keydown",function(e){if(e.key==="Enter")document.getElementById("l-pass").focus();});});
+
+function tentarLogin(){
+  var u=(document.getElementById("l-user").value||"").trim().toUpperCase();
+  var p=(document.getElementById("l-pass").value||"").trim().toUpperCase();
+  var errEl=document.getElementById("l-err");
+  var lista=(_usuariosJSON&&_usuariosJSON.length>0)?_usuariosJSON:_loginFallback;
+  var ok=false;
+  for(var i=0;i<lista.length;i++){
+    if((lista[i].u||"").toUpperCase()===u && (lista[i].p||"").toUpperCase()===p){
+      ok=true; break;
+    }
+  }
+  if(ok){
+    sessionStorage.setItem("dashlog_auth","1");
+    document.getElementById("login-overlay").remove();
+  } else {
+    if(errEl){ errEl.style.display="block"; }
+    document.getElementById("l-pass").value="";
+    document.getElementById("l-pass").focus();
+  }
+}
+
+function encerrarSessao(){
+  sessionStorage.removeItem("dashlog_auth");
+  location.reload();
+}
+
+window.addEventListener("load",function(){
+  if(sessionStorage.getItem("dashlog_auth")==="1"){
+    var ov=document.getElementById("login-overlay");
+    if(ov) ov.remove();
+  }
+  var lp=document.getElementById("l-pass");
+  if(lp) lp.addEventListener("keydown",function(e){ if(e.key==="Enter") tentarLogin(); });
+  var lu=document.getElementById("l-user");
+  if(lu) lu.addEventListener("keydown",function(e){ if(e.key==="Enter") document.getElementById("l-pass").focus(); });
+});
 </script>
 <div class="dl-loading" id="dl-loading">
   <div class="dl-spin"><svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DashLog">
