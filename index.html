@@ -126,12 +126,10 @@ body::before{
 .nav-badge{margin-left:auto;font-size:10px;font-family:var(--mono);
   background:var(--red2);color:var(--red);padding:1px 6px;border-radius:20px;}
 .sidebar-footer{margin-top:auto;padding:14px 18px;border-top:0.5px solid var(--border);}
-.mode-toggle{background:var(--bg2);border-radius:var(--radius);padding:4px;display:flex;gap:2px;}
-.mode-btn{flex:1;text-align:center;padding:6px 4px;border-radius:7px;font-size:11px;
-  cursor:pointer;color:var(--text2);transition:all 0.2s;font-family:var(--mono);font-weight:500;}
-.mode-btn.active{background:var(--green);color:#000;font-weight:600;}
-.mode-label{font-size:10px;color:var(--text3);text-align:center;margin-bottom:6px;
-  font-family:var(--mono);text-transform:uppercase;letter-spacing:0.8px;}
+
+
+
+
 
 /* ═══════ MAIN ═══════ */
 .main{margin-left:220px;flex:1;padding:24px;position:relative;z-index:1;min-height:100vh;}
@@ -369,6 +367,75 @@ table.dre td.col-total{
 .yr-hint{font-size:10px;color:var(--text3);font-family:var(--mono);align-self:center;}
 /* sidebar scrollable */
 .sidebar{overflow-y:auto;}
+
+/* ═══════ INFO BUTTON (expansível) ═══════ */
+.info-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border-radius:50%;
+  background:var(--bg3);border:0.5px solid var(--border2);
+  color:var(--text3);font-size:11px;cursor:pointer;
+  transition:all .18s;flex-shrink:0;user-select:none;
+  font-family:var(--mono);font-weight:700;margin-left:8px;
+}
+.info-btn:hover{border-color:var(--green);color:var(--green);background:var(--green2);}
+.info-btn.open{border-color:var(--green);color:var(--green);background:var(--green2);}
+.info-box{
+  display:none;margin-top:10px;padding:10px 14px;
+  background:var(--bg3);border:0.5px solid var(--border2);
+  border-left:2px solid var(--green);border-radius:8px;
+  font-size:12px;color:var(--text2);line-height:1.6;
+  font-family:var(--sans);
+}
+.info-box.open{display:block;}
+
+/* ═══════ LOGIN OVERLAY ═══════ */
+#login-overlay{
+  position:fixed;inset:0;z-index:99999;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+}
+.login-box{
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:20px;padding:40px 36px 36px;
+  width:340px;display:flex;flex-direction:column;
+  align-items:center;gap:18px;
+  box-shadow:0 8px 48px rgba(0,0,0,0.55);
+}
+.login-logo-wrap{width:80px;height:80px;margin-bottom:2px;}
+.login-title{font-size:22px;font-weight:700;color:var(--text);letter-spacing:.5px;}
+.login-sub{font-size:12px;color:var(--text3);margin-top:-12px;font-family:var(--mono);}
+.login-field{width:100%;display:flex;flex-direction:column;gap:6px;}
+.login-field label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-family:var(--mono);}
+.login-field input{
+  width:100%;box-sizing:border-box;
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:8px;padding:10px 14px;
+  font-size:14px;color:var(--text);outline:none;
+  transition:border-color .2s;font-family:var(--sans);
+}
+.login-field input:focus{border-color:var(--green);}
+.login-btn{
+  width:100%;padding:11px;border-radius:8px;border:none;
+  background:var(--green);color:#0d1420;
+  font-size:14px;font-weight:700;cursor:pointer;
+  transition:opacity .2s;letter-spacing:.5px;font-family:var(--sans);
+}
+.login-btn:hover{opacity:.85;}
+.login-error{
+  font-size:12px;font-weight:700;color:var(--red);
+  background:var(--red2);border-radius:8px;
+  padding:10px 14px;width:100%;box-sizing:border-box;
+  text-align:center;display:none;line-height:1.5;
+}
+/* Botão Sair no sidebar */
+.btn-sair{
+  display:flex;align-items:center;gap:8px;width:100%;
+  padding:9px 16px;margin:4px 0;border:none;
+  background:transparent;color:var(--red);
+  font-size:12px;font-family:var(--mono);cursor:pointer;
+  border-radius:8px;transition:background .15s;text-align:left;
+}
+.btn-sair:hover{background:var(--red2);}
 </style>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg%20viewBox%3D%220%200%2064%2064%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20role%3D%22img%22%20aria-label%3D%22DashLog%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22dl-bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23111b2a%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23080d14%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22url%28%23dl-bg%29%22/%3E%0A%20%20%3Crect%20x%3D%220.5%22%20y%3D%220.5%22%20width%3D%2263%22%20height%3D%2263%22%20rx%3D%2213.5%22%20fill%3D%22none%22%20stroke%3D%22rgba%2816%2C217%2C160%2C0.28%29%22/%3E%0A%20%20%3Cpath%20d%3D%22M18%2014%20L18%2050%20L32%2050%20A18%2018%200%200%200%2032%2014%20Z%22%20fill%3D%22%2310d9a0%22/%3E%0A%20%20%3Cpath%20d%3D%22M25%2042%20L31%2036%20L37%2030%20L42%2024%22%20fill%3D%22none%22%20stroke%3D%22%230d1420%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%0A%20%20%3Ccircle%20cx%3D%2225%22%20cy%3D%2242%22%20r%3D%222.2%22%20fill%3D%22%230d1420%22/%3E%0A%20%20%3Ccircle%20cx%3D%2231%22%20cy%3D%2236%22%20r%3D%222.2%22%20fill%3D%22%230d1420%22/%3E%0A%20%20%3Ccircle%20cx%3D%2237%22%20cy%3D%2230%22%20r%3D%222.2%22%20fill%3D%22%230d1420%22/%3E%0A%20%20%3Ccircle%20cx%3D%2242%22%20cy%3D%2224%22%20r%3D%222.2%22%20fill%3D%22%230d1420%22/%3E%0A%3C/svg%3E">
 <style>
@@ -391,7 +458,7 @@ table.dre td.col-total{
 .dl-error{color:var(--red);font-size:13px;font-family:var(--mono);max-width:420px;text-align:center;padding:0 20px;}
 </style>
 <style id="login-style">
-#login-overlay{position:fixed;inset:0;z-index:9999;background:var(--bg1);display:flex;align-items:center;justify-content:center;}
+position:fixed;inset:0;z-index:9999;background:var(--bg1);display:flex;align-items:center;justify-content:center;}
 .login-box{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:40px 36px 36px;width:320px;display:flex;flex-direction:column;align-items:center;gap:16px;box-shadow:0 8px 40px rgba(0,0,0,0.45);}
 .login-field{width:100%;display:flex;flex-direction:column;gap:6px;}
 .login-field label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-family:var(--mono);}
@@ -403,6 +470,88 @@ table.dre td.col-total{
 </style>
 </head>
 <body>
+
+<div id="login-overlay">
+  <div class="login-box">
+    <div class="login-logo-wrap"><svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="login-icon-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#111b2a"/>
+      <stop offset="1" stop-color="#080d14"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#login-icon-bg)"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="rgba(16,217,160,0.28)"/>
+  <path d="M18 14 L18 50 L32 50 A18 18 0 0 0 32 14 Z" fill="#10d9a0"/>
+  <path d="M25 42 L31 36 L37 30 L42 24" fill="none" stroke="#0d1420" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="25" cy="42" r="2.2" fill="#0d1420"/>
+  <circle cx="31" cy="36" r="2.2" fill="#0d1420"/>
+  <circle cx="37" cy="30" r="2.2" fill="#0d1420"/>
+  <circle cx="42" cy="24" r="2.2" fill="#0d1420"/>
+</svg></div>
+    <div class="login-title">DashLog</div>
+    <div class="login-sub">GESTÃO DE FROTA · FINANCEIRO</div>
+    <div class="login-field">
+      <label>Usuário</label>
+      <input type="text" id="l-user" placeholder="Digite seu usuário" autocomplete="username" autocapitalize="characters"/>
+    </div>
+    <div class="login-field">
+      <label>Senha</label>
+      <input type="password" id="l-pass" placeholder="Digite sua senha" autocomplete="current-password"/>
+    </div>
+    <div class="login-error" id="l-err">VOCÊ NÃO TEM ACESSO AO SITE,<br>PROCURE O ADMINISTRADOR.</div>
+    <button class="login-btn" id="login-btn">ENTRAR</button>
+  </div>
+</div>
+
+<script>
+var _usuariosJSON=[];
+var _loginFallback=[{u:"ROGERIO",p:"TRICOLOR"},{u:"EMERSON",p:"SEM MUNDIAL"},{u:"MATEUS",p:"BBEZINHO"}];
+
+function tentarLogin(){
+  var u=(document.getElementById("l-user").value||"").trim().toUpperCase();
+  var p=(document.getElementById("l-pass").value||"").trim().toUpperCase();
+  var errEl=document.getElementById("l-err");
+  var lista=(_usuariosJSON&&_usuariosJSON.length>0)?_usuariosJSON:_loginFallback;
+  var ok=false;
+  for(var i=0;i<lista.length;i++){
+    if((lista[i].u||"").toUpperCase()===u && (lista[i].p||"").toUpperCase()===p){
+      ok=true; break;
+    }
+  }
+  if(ok){
+    sessionStorage.setItem("dashlog_auth","1");
+    document.getElementById("login-overlay").remove();
+  } else {
+    if(errEl){ errEl.style.display="block"; }
+    document.getElementById("l-pass").value="";
+    document.getElementById("l-pass").focus();
+  }
+}
+
+function encerrarSessao(){
+  sessionStorage.removeItem("dashlog_auth");
+  location.reload();
+}
+
+window.addEventListener("load",function(){
+  if(sessionStorage.getItem("dashlog_auth")==="1"){
+    var ov=document.getElementById("login-overlay");
+    if(ov) ov.remove();
+  }
+  // Botão ENTRAR
+  var btn=document.getElementById("login-btn");
+  if(btn) btn.addEventListener("click", tentarLogin);
+  // Botão SAIR
+  var sair=document.getElementById("btn-sair");
+  if(sair) sair.addEventListener("click", encerrarSessao);
+  // Enter nos campos
+  var lp=document.getElementById("l-pass");
+  if(lp) lp.addEventListener("keydown",function(e){ if(e.key==="Enter") tentarLogin(); });
+  var lu=document.getElementById("l-user");
+  if(lu) lu.addEventListener("keydown",function(e){ if(e.key==="Enter") document.getElementById("l-pass").focus(); });
+});
+</script>
 <div class="dl-loading" id="dl-loading">
   <div class="dl-spin"><svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DashLog">
   <defs>
@@ -451,7 +600,7 @@ table.dre td.col-total{
     <div class="login-field"><label>Usuário</label><input type="text" id="l-user" placeholder="Digite seu usuário" autocomplete="username"/></div>
     <div class="login-field"><label>Senha</label><input type="password" id="l-pass" placeholder="Digite sua senha"/></div>
     <div class="login-error" id="l-err">VOCÊ NÃO TEM ACESSO AO SITE,<br>PROCURE O ADMINISTRADOR.</div>
-    <button class="login-btn" onclick="tentarLogin()">ENTRAR</button>
+    <button class="login-btn" id="login-btn">ENTRAR</button>
   </div>
 </div>
 <nav class="sidebar" id="sidebar">
@@ -500,11 +649,10 @@ table.dre td.col-total{
       </div>
     </div>
   </div>
-  <div class="sidebar-footer" style="display:none"></div>
-    <div class="mode-toggle">
-      <div class="mode-btn active" id="btn-comp" onclick="setMode('comp')">COMP</div>
-      <div class="mode-btn" id="btn-cx" onclick="setMode('cx')">CAIXA</div>
-    </div>
+
+
+  <div style="padding:8px 14px 16px;margin-top:auto;border-top:0.5px solid var(--border);">
+    <button class="btn-sair" id="btn-sair">⏻ &nbsp;Sair</button>
   </div>
 </nav>
 
@@ -554,31 +702,31 @@ table.dre td.col-total{
   <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(175px,1fr));margin-bottom:20px;">
     <div class="kpi-card green">
       <div class="kpi-icon">↑</div>
-      <div class="kpi-label">Receita Total</div>
+      <div class="kpi-label" style="display:flex;align-items:center;">Receita Total <button class="info-btn" onclick="toggleInfo('ov-rec')" title="Saiba mais">i</button><div class="info-box" id="info-ov-rec">Soma de todas as receitas operacionais da frota. Inclui fretes e demais entradas da operação.</div></div>
       <div class="kpi-value green" id="kpi-rec">—</div>
       <div class="kpi-delta">Categoria: Receita</div>
     </div>
     <div class="kpi-card red">
       <div class="kpi-icon">↓</div>
-      <div class="kpi-label">Despesa Total</div>
+      <div class="kpi-label" style="display:flex;align-items:center;">Despesa Total <button class="info-btn" onclick="toggleInfo('ov-dep')" title="Saiba mais">i</button><div class="info-box" id="info-ov-dep">Soma de todas as despesas operacionais. Inclui combustível, manutenção, salários e demais custos.</div></div>
       <div class="kpi-value red" id="kpi-cst">—</div>
       <div class="kpi-delta">Categoria: Despesa</div>
     </div>
     <div class="kpi-card blue">
       <div class="kpi-icon">◈</div>
-      <div class="kpi-label">Lucro Operacional</div>
+      <div class="kpi-label" style="display:flex;align-items:center;">Lucro Operacional <button class="info-btn" onclick="toggleInfo('ov-luc')" title="Saiba mais">i</button><div class="info-box" id="info-ov-luc">Receita Total menos Despesa Total. Positivo = lucro, negativo = prejuízo operacional.</div></div>
       <div class="kpi-value" id="kpi-luc">—</div>
       <div class="kpi-delta">Receita − Despesas</div>
     </div>
     <div class="kpi-card amber">
       <div class="kpi-icon">%</div>
-      <div class="kpi-label">Margem de Lucro</div>
+      <div class="kpi-label" style="display:flex;align-items:center;">Margem de Lucro <button class="info-btn" onclick="toggleInfo('ov-mar')" title="Saiba mais">i</button><div class="info-box" id="info-ov-mar">% do lucro sobre a receita. Quanto de cada R$ faturado se converte em resultado líquido.</div></div>
       <div class="kpi-value amber" id="kpi-mar">—</div>
       <div class="kpi-delta">Lucro Operacional / Receita</div>
     </div>
     <div class="kpi-card purple">
       <div class="kpi-icon">◆</div>
-      <div class="kpi-label">Distribuição de Lucro</div>
+      <div class="kpi-label" style="display:flex;align-items:center;">Distribuição de Lucro <button class="info-btn" onclick="toggleInfo('ov-dist')" title="Saiba mais">i</button><div class="info-box" id="info-ov-dist">Total retirado como distribuição de lucros aos sócios da empresa.</div></div>
       <div class="kpi-value purple" id="kpi-distluc">—</div>
       <div class="kpi-delta">Total distribuído</div>
     </div>
@@ -592,6 +740,7 @@ table.dre td.col-total{
           <div class="chart-title">Lucro Operacional Anual</div>
           <div class="chart-sub">2015 – 2025 · anos fechados · Receita − Despesas</div>
         </div>
+        <button class="info-btn" onclick="toggleInfo('ov-lucano')" title="Saiba mais">i</button><div class="info-box" id="info-ov-lucano">Lucro operacional por ano fechado (Receita − Despesas). Barras verdes = lucro positivo, vermelhas = resultado negativo.</div>
       </div>
       <div class="chart-wrap" style="height:260px">
         <canvas id="ch-lucro-anual" role="img" aria-label="Lucro operacional por ano"></canvas>
@@ -600,8 +749,8 @@ table.dre td.col-total{
     <div class="chart-card half">
       <div class="chart-header">
         <div>
-          <div class="chart-title">Lucro Operacional Mensal (Ano Atual)
-            <span style="font-size:10px;font-weight:400;color:var(--amber);font-family:var(--mono);margin-left:6px;">⚠ Resultado Prévio</span>
+          <div class="chart-title" style="display:flex;align-items:center;gap:6px;">Lucro Operacional Mensal (Ano Atual)
+            <span style="font-size:10px;font-weight:400;color:var(--amber);font-family:var(--mono);">⚠ Resultado Prévio</span>
           </div>
           <div class="chart-sub">2026 · mês a mês · ano em andamento</div>
         </div>
@@ -722,21 +871,88 @@ table.dre td.col-total{
 <div id="p-receita" class="page">
   <div class="page-header"><div><div class="page-title">Análise 01 — Receita</div><div class="page-sub">Soma de todos os lançamentos de Receita</div></div></div>
   <div class="kpi-grid">
-    <div class="kpi-card green"><div class="kpi-label">Receita Total (2015–2026)</div><div class="kpi-value green" id="a1-tot">—</div></div>
-    <div class="kpi-card green"><div class="kpi-label">Melhor ano</div><div class="kpi-value green" id="a1-best">—</div></div>
-    <div class="kpi-card amber"><div class="kpi-label">2026 (parcial)</div><div class="kpi-value amber" id="a1-2026">—</div><div class="kpi-delta">Ano em andamento</div></div>
+    <div class="kpi-card green">
+      <div class="kpi-label" style="display:flex;align-items:center;">Receita Total (2015–2026)
+        <button class="info-btn" onclick="toggleInfo('a1-tot')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-a1-tot">Soma de todas as receitas registradas desde 2015. Inclui fretes, comissões e demais entradas da operação.</div>
+      </div>
+      <div class="kpi-value green" id="a1-tot">—</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label" style="display:flex;align-items:center;">Melhor ano
+        <button class="info-btn" onclick="toggleInfo('a1-best')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-a1-best">Ano com o maior volume de receita registrado em toda a série histórica.</div>
+      </div>
+      <div class="kpi-value green" id="a1-best">—</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label" style="display:flex;align-items:center;">2026 (parcial)
+        <button class="info-btn" onclick="toggleInfo('a1-2026')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-a1-2026">Receita acumulada no ano atual. Como o ano ainda está em andamento, o valor é parcial.</div>
+      </div>
+      <div class="kpi-value amber" id="a1-2026">—</div>
+      <div class="kpi-delta">Ano em andamento</div>
+    </div>
   </div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Receita por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a1" role="img" aria-label="Receita anual"></canvas></div></div>
+  <div class="chart-card">
+    <div class="chart-header">
+      <div><div class="chart-title">Receita por ano (R$)</div><div class="chart-sub">Evolução anual de 2015 a 2026</div></div>
+      <button class="info-btn" onclick="toggleInfo('ch-a1')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-ch-a1">Receita total por ano. Barras verdes indicam crescimento, barras vermelhas indicam queda em relação ao esperado.</div>
+    </div>
+    <div class="chart-wrap" style="height:260px"><canvas id="ch-a1" role="img" aria-label="Receita anual"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-header">
+      <div><div class="chart-title">Receita mensal — 2026 <span style="font-size:10px;color:var(--amber);margin-left:6px;">⚠ Parcial</span></div><div class="chart-sub">Mês a mês · ano em andamento</div></div>
+      <button class="info-btn" onclick="toggleInfo('ch-a1-mo')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-ch-a1-mo">Distribuição mensal da receita no ano atual. Permite identificar sazonalidade e meses de melhor desempenho.</div>
+    </div>
+    <div class="chart-wrap" style="height:220px"><canvas id="ch-a1-mo" role="img" aria-label="Receita mensal 2026"></canvas></div>
+  </div>
 </div>
 
 <div id="p-despesa" class="page">
   <div class="page-header"><div><div class="page-title">Análise 02 — Despesas</div><div class="page-sub">Pago + Pendente</div></div></div>
   <div class="kpi-grid">
-    <div class="kpi-card red"><div class="kpi-label">Despesa Total (2015–2026)</div><div class="kpi-value red" id="a2-tot">—</div></div>
-    <div class="kpi-card red"><div class="kpi-label">Maior despesa</div><div class="kpi-value red" id="a2-best">—</div></div>
-    <div class="kpi-card amber"><div class="kpi-label">2026</div><div class="kpi-value amber" id="a2-2026">—</div></div>
+    <div class="kpi-card red">
+      <div class="kpi-label" style="display:flex;align-items:center;">Despesa Total (2015–2026)
+        <button class="info-btn" onclick="toggleInfo('a2-tot')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-a2-tot">Soma de todas as despesas operacionais registradas desde 2015. Inclui pagos e pendentes.</div>
+      </div>
+      <div class="kpi-value red" id="a2-tot">—</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label" style="display:flex;align-items:center;">Maior despesa
+        <button class="info-btn" onclick="toggleInfo('a2-best')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-a2-best">Ano com o maior volume de despesas em toda a série histórica. Útil para identificar anos atípicos.</div>
+      </div>
+      <div class="kpi-value red" id="a2-best">—</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label" style="display:flex;align-items:center;">2026 (parcial)
+        <button class="info-btn" onclick="toggleInfo('a2-2026')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-a2-2026">Despesas acumuladas no ano atual. Valor parcial pois o ano ainda está em andamento.</div>
+      </div>
+      <div class="kpi-value amber" id="a2-2026">—</div>
+    </div>
   </div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Despesas por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a2" role="img" aria-label="Despesas anuais"></canvas></div></div>
+  <div class="chart-card">
+    <div class="chart-header">
+      <div><div class="chart-title">Despesas por ano (R$)</div><div class="chart-sub">Evolução anual de 2015 a 2026</div></div>
+      <button class="info-btn" onclick="toggleInfo('ch-a2')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-ch-a2">Total de despesas por ano. Barras maiores indicam anos com maior custo operacional.</div>
+    </div>
+    <div class="chart-wrap" style="height:260px"><canvas id="ch-a2" role="img" aria-label="Despesas anuais"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-header">
+      <div><div class="chart-title">Despesas mensais — 2026 <span style="font-size:10px;color:var(--amber);margin-left:6px;">⚠ Parcial</span></div><div class="chart-sub">Mês a mês · ano em andamento</div></div>
+      <button class="info-btn" onclick="toggleInfo('ch-a2-mo')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-ch-a2-mo">Distribuição mensal das despesas no ano atual. Ajuda a identificar meses com maior pressão de custo.</div>
+    </div>
+    <div class="chart-wrap" style="height:220px"><canvas id="ch-a2-mo" role="img" aria-label="Despesas mensais 2026"></canvas></div>
+  </div>
 </div>
 
 <div id="p-compra" class="page">
@@ -762,21 +978,88 @@ table.dre td.col-total{
 <div id="p-juros" class="page">
   <div class="page-header"><div><div class="page-title">Análise 05 — Juros</div></div></div>
   <div class="kpi-grid">
-    <div class="kpi-card blue"><div class="kpi-label">Total Juros</div><div class="kpi-value blue" id="a5-tot">—</div></div>
-    <div class="kpi-card blue"><div class="kpi-label">Maior ano</div><div class="kpi-value blue" id="a5-best">—</div></div>
-    <div class="kpi-card red"><div class="kpi-label">2021 (negativo)</div><div class="kpi-value red">-R$ 17.640,63</div><div class="kpi-delta">Verificar lançamentos</div></div>
+    <div class="kpi-card blue">
+      <div class="kpi-label" style="display:flex;align-items:center;">Total Juros
+        <button class="info-btn" onclick="toggleInfo('a5-tot')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-a5-tot">Soma de todos os juros pagos desde 2015. Representa o custo financeiro total da operação.</div>
+      </div>
+      <div class="kpi-value blue" id="a5-tot">—</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label" style="display:flex;align-items:center;">Maior ano
+        <button class="info-btn" onclick="toggleInfo('a5-best')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-a5-best">Ano em que o pagamento de juros foi maior. Pode indicar maior uso de crédito naquele período.</div>
+      </div>
+      <div class="kpi-value blue" id="a5-best">—</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label" style="display:flex;align-items:center;">2026 (parcial)
+        <button class="info-btn" onclick="toggleInfo('a5-2026')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-a5-2026">Juros acumulados no ano atual. Valor parcial pois o ano ainda está em andamento.</div>
+      </div>
+      <div class="kpi-value amber" id="a5-2026">—</div>
+      <div class="kpi-delta">Ano em andamento</div>
+    </div>
   </div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Juros por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a5" role="img" aria-label="Juros"></canvas></div></div>
+  <div class="chart-card">
+    <div class="chart-header">
+      <div><div class="chart-title">Juros por ano (R$)</div><div class="chart-sub">Evolução anual de 2015 a 2026</div></div>
+      <button class="info-btn" onclick="toggleInfo('ch-a5')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-ch-a5">Custo de juros por ano. Valores mais altos indicam maior endividamento ou uso de crédito naquele período.</div>
+    </div>
+    <div class="chart-wrap" style="height:260px"><canvas id="ch-a5" role="img" aria-label="Juros"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-header">
+      <div><div class="chart-title">Juros mensais — 2026 <span style="font-size:10px;color:var(--amber);margin-left:6px;">⚠ Parcial</span></div><div class="chart-sub">Mês a mês · ano em andamento</div></div>
+      <button class="info-btn" onclick="toggleInfo('ch-a5-mo')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-ch-a5-mo">Distribuição mensal dos juros no ano atual. Identifica meses com maior custo financeiro.</div>
+    </div>
+    <div class="chart-wrap" style="height:220px"><canvas id="ch-a5-mo" role="img" aria-label="Juros mensais 2026"></canvas></div>
+  </div>
 </div>
 
 <div id="p-lucro" class="page">
   <div class="page-header"><div><div class="page-title">Análise 06 — Distribuição de Lucros</div></div></div>
   <div class="kpi-grid">
-    <div class="kpi-card purple"><div class="kpi-label">Total Distribuído</div><div class="kpi-value purple" id="a6-tot">—</div></div>
-    <div class="kpi-card purple"><div class="kpi-label">Maior distribuição</div><div class="kpi-value purple" id="a6-best">—</div></div>
-    <div class="kpi-card amber"><div class="kpi-label">2026 (parcial)</div><div class="kpi-value amber" id="a6-2026">—</div></div>
+    <div class="kpi-card purple">
+      <div class="kpi-label" style="display:flex;align-items:center;">Total Distribuído
+        <button class="info-btn" onclick="toggleInfo('a6-tot')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-a6-tot">Valor total distribuído aos sócios desde 2015. Representa o retorno financeiro gerado pela operação.</div>
+      </div>
+      <div class="kpi-value purple" id="a6-tot">—</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label" style="display:flex;align-items:center;">Maior distribuição
+        <button class="info-btn" onclick="toggleInfo('a6-best')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-a6-best">Ano em que houve a maior distribuição de lucros. Indica o melhor desempenho financeiro da empresa.</div>
+      </div>
+      <div class="kpi-value purple" id="a6-best">—</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label" style="display:flex;align-items:center;">2026 (parcial)
+        <button class="info-btn" onclick="toggleInfo('a6-2026')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-a6-2026">Distribuição acumulada no ano atual. Valor parcial pois o ano ainda está em andamento.</div>
+      </div>
+      <div class="kpi-value amber" id="a6-2026">—</div>
+    </div>
   </div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Distribuição de lucros por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a6" role="img" aria-label="Distribuição lucros"></canvas></div></div>
+  <div class="chart-card">
+    <div class="chart-header">
+      <div><div class="chart-title">Distribuição por ano (R$)</div><div class="chart-sub">Evolução anual de 2015 a 2026</div></div>
+      <button class="info-btn" onclick="toggleInfo('ch-a6')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-ch-a6">Distribuição de lucros por ano. Reflete a capacidade da empresa de gerar retorno financeiro aos sócios.</div>
+    </div>
+    <div class="chart-wrap" style="height:260px"><canvas id="ch-a6" role="img" aria-label="Distribuição lucros"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-header">
+      <div><div class="chart-title">Distribuição mensal — 2026 <span style="font-size:10px;color:var(--amber);margin-left:6px;">⚠ Parcial</span></div><div class="chart-sub">Mês a mês · ano em andamento</div></div>
+      <button class="info-btn" onclick="toggleInfo('ch-a6-mo')" title="Saiba mais">i</button>
+    <div class="info-box" id="info-ch-a6-mo">Distribuição mensal de lucros no ano atual. Permite acompanhar o ritmo de distribuição mês a mês.</div>
+    </div>
+    <div class="chart-wrap" style="height:220px"><canvas id="ch-a6-mo" role="img" aria-label="Distribuição mensais 2026"></canvas></div>
+  </div>
 </div>
 
 <!-- RENTABILIDADE -->
@@ -849,30 +1132,6 @@ let CC, CAT, TIPO, MO, DRV, R;
 const I_CC=0,I_CAT=1,I_TIPO=2,I_DC=3,I_DP=4,I_VAL=5,I_KM=6,I_LTS=7;
 
 
-let _usuarios=[];
-function tentarLogin(){
-  const u=(document.getElementById('l-user').value||'').trim().toUpperCase();
-  const p=(document.getElementById('l-pass').value||'').trim().toUpperCase();
-  if(_usuarios.some(x=>x.u.toUpperCase()===u&&x.p.toUpperCase()===p)){
-    sessionStorage.setItem('dashlog_auth','1');
-    document.getElementById('login-overlay').remove();
-    document.getElementById('login-style').remove();
-  } else {
-    document.getElementById('l-err').style.display='block';
-    document.getElementById('l-pass').value='';
-    document.getElementById('l-pass').focus();
-  }
-}
-document.addEventListener('DOMContentLoaded',()=>{
-  if(sessionStorage.getItem('dashlog_auth')==='1'){
-    const ov=document.getElementById('login-overlay');if(ov)ov.remove();
-    const st=document.getElementById('login-style');if(st)st.remove();return;
-  }
-  const lp=document.getElementById('l-pass');
-  if(lp)lp.addEventListener('keydown',e=>{if(e.key==='Enter')tentarLogin();});
-  const lu=document.getElementById('l-user');
-  if(lu)lu.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('l-pass').focus();});
-});
 
 async function loadData(){
   const msgEl = document.getElementById('dl-msg');
@@ -883,7 +1142,7 @@ async function loadData(){
     const rawText = new TextDecoder('windows-1252').decode(buf);
     const payload = JSON.parse(rawText);
     // Aceita dois formatos: {meta,d:{...}} ou o objeto _D cru
-    _usuarios = payload.login || [];
+    _usuariosJSON = payload.login || [];
     _D  = payload.d || payload;
     CC  = _D.CC;  CAT = _D.CAT;  TIPO= _D.TIPO;
     MO  = _D.MO;  DRV = _D.DRV;  R   = _D.R;
@@ -1225,14 +1484,9 @@ function initRankingPills(){
 
 function syncRankPills(){
   document.querySelectorAll('#rank-yr-pills .yr-pill').forEach(p=>{
-    const yr=p.dataset.yr;
-    if(yr===''){
-      p.classList.toggle('yr-all', _rankYrs.size===0);
-      p.classList.remove('yr-sel');
-    } else {
-      p.classList.toggle('yr-sel', _rankYrs.has(yr));
-      p.classList.remove('yr-all');
-    }
+    p.classList.remove('yr-sel','yr-all');
+    if(_rankYrs.size===0 && p.textContent==='Todos') p.classList.add('yr-all');
+    else if(_rankYrs.has(p.textContent)) p.classList.add('yr-sel');
   });
 }
 function toggleSidebar(){
@@ -1258,17 +1512,7 @@ function renderPage(id){
 // ═══════════════════════════════════════════════════
 // MODE TOGGLE
 // ═══════════════════════════════════════════════════
-function setMode(m){
-  STATE.mode=m; _cache=null; _cacheKey='';
-  document.getElementById('btn-comp').classList.toggle('active',m==='comp');
-  document.getElementById('btn-cx').classList.toggle('active',m==='cx');
-  const label=m==='comp'?'Modo Competência':'Modo Caixa';
-  const el=document.getElementById('ov-mode-label');
-  if(el) el.textContent=label+' · Dados filtrados';
-  renderOverview();
-  renderCashflow();
-  renderRanking();
-}
+
 
 // ═══════════════════════════════════════════════════
 // FILTERS
@@ -1617,6 +1861,39 @@ function renderSimple(prefix, tipoName){
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}}},
       scales:{y:{grid:{color:gc},ticks:{callback:v=>fmtK(v),color:tc,font:{size:10}}},x:{grid:{display:false},ticks:{color:tc,font:{size:10},autoSkip:false}}}}
   });
+
+  // Gráfico mensal do ano atual (canvas ch-{prefix}-mo)
+  const moCanvas=document.getElementById('ch-'+prefix+'-mo');
+  if(moCanvas){
+    const anoAtual=new Date().getFullYear().toString();
+    const meses=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const moVals=Array(12).fill(0);
+    const tipoIdx=TIPO.indexOf(tipoName);
+    if(tipoIdx>=0){
+      for(let k=0;k<R.length;k++){
+        const row=R[k];
+        if(row[I_TIPO]!==tipoIdx) continue;
+        const mo=MO[row[I_DC]]||'';
+        if(!mo.startsWith(anoAtual)) continue;
+        const mes=parseInt(mo.slice(5,7),10)-1;
+        if(mes>=0&&mes<12) moVals[mes]+=row[I_VAL];
+      }
+    }
+    const isAbs=['Despesa','Compra de Veículo','Distribuição Lucro'].includes(tipoName);
+    const moDisplay=isAbs?moVals.map(v=>Math.abs(v)):moVals;
+    // Usar mesma cor base do gráfico anual
+    const moColors=moDisplay.map(v=>v>=0?colors[0]||mkRGBA(GREEN,'0.75'):mkRGBA(RED,'0.75'));
+    mkChart('ch-'+prefix+'-mo',{type:'bar',
+      data:{labels:meses,datasets:[{label:'Valor',data:moDisplay,backgroundColor:moColors,borderWidth:0,borderRadius:4}]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}}},
+        scales:{y:{grid:{color:gc},ticks:{callback:v=>fmtK(v),color:tc,font:{size:10}}},
+          x:{grid:{display:false},ticks:{color:tc,font:{size:10},autoSkip:false}}}}
+    });
+    // Atualizar card 2026
+    const tot=moVals.reduce((a,b)=>a+b,0);
+    setText(prefix+'-2026', fmtBR(isAbs?Math.abs(tot):tot));
+  }
 }
 
 // ═══════════════════════════════════════════════════
@@ -1682,8 +1959,10 @@ function renderRent09(){
 // DRE
 // ═══════════════════════════════════════════════════
 const CATS_DRE=(function(){
-  const all=[...new Set(CAT)];
-  return ['FRETE',...all.filter(c=>c!=='FRETE'&&c!=='JUROS').sort(),'JUROS'];
+  const all=[...new Set(CAT)].filter(c=>c&&c.trim()!=='');
+  // FRETE no topo (receita principal), JUROS no final, resto em ordem alfabética
+  const sem=['FRETE','JUROS'];
+  return ['FRETE',...all.filter(c=>!sem.includes(c)).sort(),'JUROS'];
 })();
 
 function initDRE(){
@@ -1800,12 +2079,40 @@ function initRankingFilter(){
 // SCORE YEAR FILTER INIT
 // ═══════════════════════════════════════════════════
 function initScoreFilter(){
-  const sel=document.getElementById('sc-yr');
-  if(!sel) return;
+  const wrap=document.getElementById('sc-yr-pills');
+  const hiddenSel=document.getElementById('sc-yr');
+  if(!wrap) return;
+  // Pill "Todos"
+  const allP=document.createElement('div');
+  allP.className='yr-pill yr-all';
+  allP.textContent='Todos';
+  allP.dataset.val='';
+  allP.onclick=()=>{ setScorePill(''); };
+  wrap.appendChild(allP);
+  // Pills por ano
   ANOS12.forEach(yr=>{
-    const o=document.createElement('option');o.value=yr;o.textContent=yr;sel.appendChild(o);
+    const p=document.createElement('div');
+    p.className='yr-pill';
+    p.textContent=yr;
+    p.dataset.val=yr;
+    p.onclick=()=>{ setScorePill(yr); };
+    wrap.appendChild(p);
   });
-  sel.onchange=()=>renderScore();
+}
+function setScorePill(val){
+  const hiddenSel=document.getElementById('sc-yr');
+  if(hiddenSel) hiddenSel.value=val;
+  document.querySelectorAll('#sc-yr-pills .yr-pill').forEach(p=>{
+    p.classList.remove('yr-sel','yr-all');
+    if(p.dataset.val===val) p.classList.add(val===''?'yr-all':'yr-sel');
+    else if(val===''&&p.dataset.val==='') p.classList.add('yr-all');
+  });
+  // garantir que o "Todos" fica verde quando val===''
+  if(val===''){
+    const allP=document.querySelector('#sc-yr-pills .yr-pill');
+    if(allP) allP.classList.add('yr-all');
+  }
+  renderScore();
 }
 
 // ═══════════════════════════════════════════════════
@@ -1901,6 +2208,18 @@ function renderCtrl(){
   }
 }
 
+
+// ═══════════════════════════════════════════════════
+// INFO BOXES — expande/recolhe ao clicar no botão i
+// ═══════════════════════════════════════════════════
+function toggleInfo(uid){
+  const box=document.getElementById('info-'+uid);
+  const btn=box?box.previousElementSibling:null;
+  if(!box) return;
+  const isOpen=box.classList.contains('open');
+  box.classList.toggle('open',!isOpen);
+  if(btn) btn.classList.toggle('open',!isOpen);
+}
 // ═══════════════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════════════
