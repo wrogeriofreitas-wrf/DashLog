@@ -390,6 +390,49 @@ table.dre td.col-total{
 .dl-loading .dl-msg{font-size:12px;color:var(--text3);font-family:var(--mono);letter-spacing:.5px;}
 .dl-error{color:var(--red);font-size:13px;font-family:var(--mono);max-width:420px;text-align:center;padding:0 20px;}
 </style>
+
+<style id="login-style">
+#login-overlay{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg1);
+  display:flex;align-items:center;justify-content:center;
+}
+.login-box{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:40px 36px 36px;
+  width:340px;
+  display:flex;flex-direction:column;align-items:center;gap:18px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.45);
+}
+.login-logo{width:72px;height:72px;margin-bottom:4px;}
+.login-title{font-size:22px;font-weight:700;color:var(--text1);letter-spacing:.5px;}
+.login-sub{font-size:12px;color:var(--text3);margin-top:-12px;}
+.login-field{width:100%;display:flex;flex-direction:column;gap:6px;}
+.login-field label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-family:var(--mono);}
+.login-field input{
+  width:100%;box-sizing:border-box;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:8px;padding:10px 14px;
+  font-size:14px;color:var(--text1);outline:none;
+  transition:border-color .2s;
+}
+.login-field input:focus{border-color:var(--green);}
+.login-btn{
+  width:100%;padding:11px;border-radius:8px;border:none;
+  background:var(--green);color:#0d1420;
+  font-size:14px;font-weight:700;cursor:pointer;
+  transition:opacity .2s;letter-spacing:.5px;
+}
+.login-btn:hover{opacity:.85;}
+.login-error{
+  font-size:12px;font-weight:700;color:var(--red);
+  background:var(--red2);border-radius:8px;
+  padding:10px 14px;width:100%;box-sizing:border-box;
+  text-align:center;display:none;
+}
+</style>
 </head>
 <body>
 <div class="dl-loading" id="dl-loading">
@@ -417,6 +460,37 @@ table.dre td.col-total{
 <div class="hamburger" onclick="toggleSidebar()" id="ham">☰</div>
 
 <!-- SIDEBAR -->
+
+<div id="login-overlay">
+  <div class="login-box">
+    <svg class="login-logo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="ll-bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#111b2a"/><stop offset="1" stop-color="#080d14"/>
+      </linearGradient></defs>
+      <rect width="64" height="64" rx="14" fill="url(#ll-bg)"/>
+      <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="rgba(16,217,160,0.28)"/>
+      <path d="M18 14 L18 50 L32 50 A18 18 0 0 0 32 14 Z" fill="#10d9a0"/>
+      <path d="M25 42 L31 36 L37 30 L42 24" fill="none" stroke="#0d1420" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="25" cy="42" r="2.2" fill="#0d1420"/>
+      <circle cx="31" cy="36" r="2.2" fill="#0d1420"/>
+      <circle cx="37" cy="30" r="2.2" fill="#0d1420"/>
+      <circle cx="42" cy="24" r="2.2" fill="#0d1420"/>
+    </svg>
+    <div class="login-title">DashLog</div>
+    <div class="login-sub">Gestão de Frota · Financeiro</div>
+    <div class="login-field">
+      <label>Usuário</label>
+      <input type="text" id="l-user" placeholder="Digite seu usuário" autocomplete="username"/>
+    </div>
+    <div class="login-field">
+      <label>Senha</label>
+      <input type="password" id="l-pass" placeholder="Digite sua senha" autocomplete="current-password"/>
+    </div>
+    <div class="login-error" id="l-err">VOCÊ NÃO TEM ACESSO AO SITE,<br>PROCURE O ADMINISTRADOR.</div>
+    <button class="login-btn" onclick="tentarLogin()">ENTRAR</button>
+  </div>
+</div>
+
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-head" style="padding:6px 12px 10px;">
     <div class="theme-btns">
@@ -431,7 +505,7 @@ table.dre td.col-total{
     <div class="nav-label" onclick="toggleNav(this)">Dashboard</div>
     <div class="nav-items">
       <div class="nav-item active" onclick="nav('p-overview',this)"><span class="nav-icon">◈</span>Visão Geral</div>
-      <div class="nav-item" onclick="nav('p-cashflow',this)"><span class="nav-icon">⇄</span>Fluxo de Caixa</div>
+      <div class="nav-item" onclick="nav('p-cashflow',this)"><span class="nav-icon">⇄</span><span style="text-decoration:underline;text-underline-offset:3px;">Fluxo de Caixa</span></div>
       <div class="nav-item" onclick="nav('p-ranking',this)"><span class="nav-icon">▲</span>Ranking Veículos</div>
       <div class="nav-item" onclick="nav('p-score',this)"><span class="nav-icon">◎</span><span style="text-decoration:underline;text-underline-offset:3px;">Score & Alertas</span></div>
     </div>
@@ -463,13 +537,7 @@ table.dre td.col-total{
       </div>
     </div>
   </div>
-  <div class="sidebar-footer">
-    <div class="mode-label">Modo de Análise</div>
-    <div class="mode-toggle">
-      <div class="mode-btn active" id="btn-comp" onclick="setMode('comp')">COMP</div>
-      <div class="mode-btn" id="btn-cx" onclick="setMode('cx')">CAIXA</div>
-    </div>
-  </div>
+  <div class="sidebar-footer" style="display:none"></div>
 </nav>
 
 <!-- MAIN CONTENT -->
@@ -812,6 +880,35 @@ let _D = null;
 let CC, CAT, TIPO, MO, DRV, R;
 const I_CC=0,I_CAT=1,I_TIPO=2,I_DC=3,I_DP=4,I_VAL=5,I_KM=6,I_LTS=7;
 
+
+// ═══════════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════════
+let _usuarios = []; // carregado do JSON
+
+function tentarLogin(){
+  const u = (document.getElementById('l-user').value||'').trim().toUpperCase();
+  const p = (document.getElementById('l-pass').value||'').trim().toUpperCase();
+  const errEl = document.getElementById('l-err');
+  const ok = _usuarios.some(x => x.u.toUpperCase()===u && x.p.toUpperCase()===p);
+  if(ok){
+    document.getElementById('login-overlay').remove();
+    document.getElementById('login-style').remove();
+  } else {
+    errEl.style.display='block';
+    document.getElementById('l-pass').value='';
+    document.getElementById('l-pass').focus();
+  }
+}
+
+// Enter no campo de senha dispara login
+document.addEventListener('DOMContentLoaded',()=>{
+  const passEl = document.getElementById('l-pass');
+  if(passEl) passEl.addEventListener('keydown', e=>{ if(e.key==='Enter') tentarLogin(); });
+  const userEl = document.getElementById('l-user');
+  if(userEl) userEl.addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('l-pass').focus(); });
+});
+
 async function loadData(){
   const msgEl = document.getElementById('dl-msg');
   try{
@@ -821,6 +918,7 @@ async function loadData(){
     const rawText = new TextDecoder('windows-1252').decode(buf);
     const payload = JSON.parse(rawText);
     // Aceita dois formatos: {meta,d:{...}} ou o objeto _D cru
+    _usuarios = payload.login || [];
     _D  = payload.d || payload;
     CC  = _D.CC;  CAT = _D.CAT;  TIPO= _D.TIPO;
     MO  = _D.MO;  DRV = _D.DRV;  R   = _D.R;
@@ -1492,7 +1590,7 @@ function renderRanking(){
       km+=row[I_KM];
     }
     return {cc,rec,cost,luc:rec+cost,km,drv:(DRV[cc]||['—'])[0]};
-  }).sort((a,b)=>b.luc-a.luc);
+  }).filter(c=>Math.abs(c.rec)>0.01||Math.abs(c.cost)>0.01).sort((a,b)=>b.luc-a.luc);
 
   const maxAbs=Math.max(...ccVals.map(c=>Math.abs(c.luc)));
   const el=document.getElementById('rank-list');
@@ -1619,12 +1717,21 @@ function renderSimple(prefix, tipoName){
   setText(prefix+'-best', bestYr+' — '+fmtBR(bestVal));
   setText(prefix+'-2026', fmtBR(byYr['2026']));
 
-  const posC=tipoName==='Receita'||tipoName==='Venda De Veículo'?mkRGBA(GREEN,'0.75'):tipoName==='Distribuição Lucro'?mkRGBA(AMBER,'0.75'):mkRGBA(RED,'0.75');
+  const JUROS_C='rgba(248,171,18,';
+  const VENDA_C='rgba(255,124,36,';
+  const posC=tipoName==='Receita'?mkRGBA(GREEN,'0.75'):
+             tipoName==='Venda De Veículo'?mkRGBA(VENDA_C,'0.75'):
+             tipoName==='Juros'?mkRGBA(JUROS_C,'0.75'):
+             tipoName==='Distribuição Lucro'?mkRGBA(AMBER,'0.75'):mkRGBA(RED,'0.75');
   const negC=mkRGBA(RED,'0.75');
-  const colors=['Receita','Venda De Veículo','Juros'].includes(tipoName)
+  const colors=tipoName==='Receita'
     ? vals.map(v=>v>=0?mkRGBA(GREEN,'0.75'):mkRGBA(RED,'0.75'))
     : tipoName==='Distribuição Lucro'
     ? vals.map(()=>mkRGBA(AMBER,'0.75'))
+    : tipoName==='Juros'
+    ? vals.map(()=>mkRGBA(JUROS_C,'0.75'))
+    : tipoName==='Venda De Veículo'
+    ? vals.map(()=>mkRGBA(VENDA_C,'0.75'))
     : vals.map(()=>posC);
 
   // For negative values (Despesa, Compra), show absolute values going UP
@@ -1905,7 +2012,7 @@ function renderCtrl(){
             <div style="font-size:11px;color:var(--text3);">Deve ser zero</div>
           </div>
         </div>
-        <div style="font-size:20px;font-weight:600;color:${valColor};font-family:var(--mono);">${fmtBR(total)}</div>
+        <div style="font-size:20px;font-weight:700;color:${hasDiverg?'#F8AB12':valColor};font-family:var(--mono);">${hasDiverg?'<span style="color:var(--red);margin-right:4px;">✕</span>':''} ${fmtBR(total)}</div>
         ${hasDiverg ? '<div style="font-size:11px;color:var(--text3);margin-top:4px;">⚠ Revisar base de dados</div>' : ''}
         ${listHTML}
       </div>`;
