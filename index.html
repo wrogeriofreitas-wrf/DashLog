@@ -1241,189 +1241,161 @@ function initFilters(){
 }
 
 // ═══════════════════════════════════════════════════
-// RENDER OVERVIEW — 100% dinâmico, calcula tudo a partir de _D
+// RENDER OVERVIEW — usa STATIC para consistência com demais telas
 // ═══════════════════════════════════════════════════
 function renderOverview(){
-  // ----- 1) MAPEAR ÍNDICES DOS TIPOS (robusto a variações de acento/caixa) -----
-  const norm = s => (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
-  function findTipoIdx(label){
-    const t = norm(label);
-    for(let k=0;k<TIPO.length;k++){ if(norm(TIPO[k])===t) return k; }
-    return -1;
-  }
-  const iRec  = findTipoIdx('Receita');
-  const iDesp = findTipoIdx('Despesa');
-  const iDist = findTipoIdx('Distribuição Lucro');
-  const iJur  = findTipoIdx('Juros');
-  const iCmpV = findTipoIdx('Compra de Veículo');
-  const iVndV = findTipoIdx('Venda De Veículo');
+  // ----- 1) TOTAIS via STATIC (mesma fonte que telas Receita/Despesa/etc.) -----
+  const byTY = STATIC.byTipoYear;
 
-  // ----- 2) VARREDURA ÚNICA DE R -----
-  const yOf = idx => (idx>=0 && idx<MO.length) ? parseInt(MO[idx].substring(0,4),10) : null;
-  const mOf = idx => (idx>=0 && idx<MO.length) ? parseInt(MO[idx].substring(5,7),10) : null;
-  const anoAtual = new Date().getFullYear();
-
-  let REC=0, DESP=0, DIST=0;
-  const rosca = {rec:0,desp:0,dist:0,jur:0,cmp:0,vnd:0};
-  const lucroAno = {};                 // por ano competência (só op_ccs, Rec+Desp)
-  const lucroMes = Array(12).fill(0);  // ano atual, por mês competência
-  const saldoAno = {};                 // soma por ano de PAGAMENTO, todos os tipos
-  let aReceber=0, aPagar=0;
-
-  for(let k=0;k<R.length;k++){
-    const row = R[k];
-    const cc   = CC[row[I_CC]];
-    const ti   = row[I_TIPO];
-    const val  = row[I_VAL];
-    const dci  = row[I_DC];
-    const dpi  = row[I_DP];
-    const isOp = !EXCL_CC.has(cc);
-    const yDC  = yOf(dci), mDC = mOf(dci), yDP = yOf(dpi);
-
-    // KPIs (operacional)
-    if(isOp){
-      if(ti===iRec)  REC  += val;
-      if(ti===iDesp) DESP += val;
-      if(ti===iDist) DIST += val;
-      if((ti===iRec||ti===iDesp) && yDC!==null){
-        lucroAno[yDC] = (lucroAno[yDC]||0) + val;
-        if(yDC===anoAtual && mDC) lucroMes[mDC-1] += val;
-      }
-    }
-    // Rosca (todos os CCs)
-    if(ti===iRec)  rosca.rec  += Math.abs(val);
-    if(ti===iDesp) rosca.desp += Math.abs(val);
-    if(ti===iDist) rosca.dist += Math.abs(val);
-    if(ti===iJur)  rosca.jur  += Math.abs(val);
-    if(ti===iCmpV) rosca.cmp  += Math.abs(val);
-    if(ti===iVndV) rosca.vnd  += Math.abs(val);
-    // Saldo bancário (todos os tipos, ano de pagamento)
-    if(yDP!==null) saldoAno[yDP] = (saldoAno[yDP]||0) + val;
-    // Pendências (sem data de pagamento)
-    if(dpi===-1){
-      if(val>0) aReceber += val;
-      else      aPagar   += Math.abs(val);
-    }
+  function somaTotal(tipo){
+    return Object.values(byTY[tipo]||{}).reduce((a,b)=>a+b,0);
   }
 
-  // ----- 3) CARDS KPI -----
-  const REC_ABS=Math.abs(REC), DESP_ABS=Math.abs(DESP);
+  const REC_RAW  = somaTotal('Receita');
+  const DESP_RAW = somaTotal('Despesa');
+  const DIST_RAW = somaTotal('Distribuição Lucro');
+  const JUR_RAW  = somaTotal('Juros');
+  const CMP_RAW  = somaTotal('Compra de Veículo');
+  const VND_RAW  = somaTotal('Venda De Veículo');
+
+  const REC_ABS  = Math.abs(REC_RAW);
+  const DESP_ABS = Math.abs(DESP_RAW);
   const LUCRO_OP = REC_ABS - DESP_ABS;
-  const MARGEM_OP = REC_ABS>0 ? (LUCRO_OP/REC_ABS*100) : 0;
-  const DIST_LUC = Math.abs(DIST);
+  const MARGEM_OP = REC_ABS > 0 ? (LUCRO_OP / REC_ABS * 100) : 0;
+  const DIST_LUC = Math.abs(DIST_RAW);
 
+  // ----- 2) CARDS KPI -----
   setText('kpi-rec',     fmtBR(REC_ABS));
   setText('kpi-cst',     fmtBR(DESP_ABS));
-  const lucEl=document.getElementById('kpi-luc');
-  if(lucEl){ lucEl.textContent=fmtBR(LUCRO_OP); lucEl.className='kpi-value '+(LUCRO_OP>=0?'green':'red'); }
+  const lucEl = document.getElementById('kpi-luc');
+  if(lucEl){ lucEl.textContent = fmtBR(LUCRO_OP); lucEl.className = 'kpi-value '+(LUCRO_OP>=0?'green':'red'); }
   setText('kpi-mar',     MARGEM_OP.toFixed(2).replace('.',',')+' %');
   setText('kpi-distluc', fmtBR(DIST_LUC));
 
-  const alerts=[];
-  if(LUCRO_OP<0) alerts.push(['danger','⚠ Resultado operacional negativo!']);
+  const alerts = [];
+  if(LUCRO_OP < 0) alerts.push(['danger','⚠ Resultado operacional negativo!']);
   renderAlerts('ov-alerts', alerts);
 
-  // ----- 4) CORES DE TEMA -----
-  const isDark=!document.body.classList.contains('light');
+  // ----- 3) CORES DE TEMA -----
+  const isDark = !document.body.classList.contains('light');
   const gC = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)';
   const tC = isDark ? '#5a7090' : '#6a8090';
   const lblC = isDark ? '#e2e8f0' : '#1a2740';
 
-  // ----- 5) GRÁFICO 1: Lucro Anual (anos fechados) -----
-  const anosFech = Object.keys(lucroAno).map(y=>parseInt(y,10)).filter(y=>y<anoAtual).sort();
-  const g1Anos = anosFech.map(String);
-  const g1Vals = anosFech.map(y=>Math.round((lucroAno[y]||0)*100)/100);
-  const g1Total = g1Vals.reduce((a,b)=>a+b,0);
+  // ----- 4) GRÁFICO 1: Lucro Anual (anos fechados) -----
+  const anoAtual = new Date().getFullYear();
+  const recAnual  = byTY['Receita']  || {};
+  const despAnual = byTY['Despesa']  || {};
+  const g1Anos = ANOS12.filter(y => parseInt(y,10) < anoAtual);
+  const g1Vals = g1Anos.map(y => (recAnual[y]||0) + (despAnual[y]||0));
+  const g1Total = g1Vals.reduce((a,b)=>a+b, 0);
   mkChart('ch-lucro-anual',{type:'bar',
-    data:{labels:g1Anos,datasets:[{label:'Lucro',data:g1Vals,
-      backgroundColor:g1Vals.map(v=>v>=0?'rgba(16,217,160,0.78)':'rgba(240,82,82,0.78)'),
-      borderWidth:0,borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}},
-        title:{display:true,text:'Total acumulado: '+fmtBR(g1Total),
-          color:lblC,font:{size:11,family:"'IBM Plex Mono',monospace"},padding:{bottom:4}}},
+    data:{labels:g1Anos, datasets:[{label:'Lucro', data:g1Vals,
+      backgroundColor: g1Vals.map(v=>v>=0?'rgba(16,217,160,0.78)':'rgba(240,82,82,0.78)'),
+      borderWidth:0, borderRadius:4}]},
+    options:{responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}},
+        title:{display:true, text:'Total acumulado: '+fmtBR(g1Total),
+          color:lblC, font:{size:11,family:"'IBM Plex Mono',monospace"}, padding:{bottom:4}}},
       scales:{y:{grid:{color:gC},ticks:{callback:v=>fmtK(v),color:tC,font:{size:10}}},
         x:{grid:{display:false},ticks:{color:tC,font:{size:10},autoSkip:false}}}
     }
   });
-  // Subtítulo dinâmico
-  const subEl = document.querySelector('#p-overview .chart-row .chart-card.half .chart-sub');
-  if(subEl && g1Anos.length>0){
-    subEl.textContent = g1Anos[0]+' – '+g1Anos[g1Anos.length-1]+' · anos fechados · Receita − Despesas';
-  }
 
-  // ----- 6) GRÁFICO 2: Lucro Mensal ano atual -----
+  // ----- 5) GRÁFICO 2: Lucro Mensal ano atual -----
   const g2Meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const g2Vals = lucroMes.map(v=>Math.round(v*100)/100);
+  const g2Vals = Array(12).fill(0);
+  for(let k=0;k<R.length;k++){
+    const row = R[k];
+    const ti  = TIPO[row[I_TIPO]];
+    const mo  = MO[row[I_DC]] || '';
+    if(!mo.startsWith(String(anoAtual))) continue;
+    if(ti==='Receita'||ti==='Despesa') g2Vals[parseInt(mo.slice(5,7),10)-1] += row[I_VAL];
+  }
   const g2Total = g2Vals.reduce((a,b)=>a+b,0);
   mkChart('ch-lucro-mensal',{type:'bar',
-    data:{labels:g2Meses,datasets:[{label:'Lucro',data:g2Vals,
+    data:{labels:g2Meses, datasets:[{label:'Lucro', data:g2Vals.map(v=>Math.round(v*100)/100),
       backgroundColor:g2Vals.map(v=>v>=0?'rgba(16,217,160,0.78)':'rgba(240,82,82,0.78)'),
-      borderWidth:0,borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}},
-        title:{display:true,text:'Acumulado '+anoAtual+': '+fmtBR(g2Total),
-          color:lblC,font:{size:11,family:"'IBM Plex Mono',monospace"},padding:{bottom:4}}},
+      borderWidth:0, borderRadius:4}]},
+    options:{responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}},
+        title:{display:true, text:'Acumulado '+anoAtual+': '+fmtBR(g2Total),
+          color:lblC, font:{size:11,family:"'IBM Plex Mono',monospace"}, padding:{bottom:4}}},
       scales:{y:{grid:{color:gC},ticks:{callback:v=>fmtK(v),color:tC,font:{size:10}}},
         x:{grid:{display:false},ticks:{color:tC,font:{size:10},autoSkip:false}}}
     }
   });
 
-  // ----- 7) GRÁFICO 3: Saldo Bancário acumulado -----
-  const anosS = Object.keys(saldoAno).map(y=>parseInt(y,10)).sort();
-  let acc=0; const g3Anos=[], g3Vals=[];
-  anosS.forEach(y=>{ acc += saldoAno[y]; g3Anos.push(String(y)); g3Vals.push(Math.round(acc*100)/100); });
+  // ----- 6) GRÁFICO 3: Saldo Bancário acumulado (data de pagamento) -----
+  const saldoAno = {};
+  ANOS12.forEach(y=>saldoAno[y]=0);
+  for(let k=0;k<R.length;k++){
+    const row=R[k]; const dpi=row[I_DP];
+    if(dpi===-1||dpi>=MO.length) continue;
+    const yr=(MO[dpi]||'').slice(0,4);
+    if(saldoAno[yr]!==undefined) saldoAno[yr]+=row[I_VAL];
+  }
+  let acc=0;
+  const g3Anos=[], g3Vals=[];
+  ANOS12.forEach(y=>{ acc+=saldoAno[y]; g3Anos.push(y); g3Vals.push(Math.round(acc*100)/100); });
   mkChart('ch-saldo-bancario',{type:'line',
-    data:{labels:g3Anos,datasets:[{label:'Saldo',data:g3Vals,
+    data:{labels:g3Anos, datasets:[{label:'Saldo', data:g3Vals,
       borderColor:'rgba(59,158,255,1)',
       backgroundColor:isDark?'rgba(59,158,255,0.10)':'rgba(59,158,255,0.15)',
-      fill:true,tension:0.4,pointRadius:4,pointHoverRadius:7,
-      pointBackgroundColor:'rgba(59,158,255,1)',borderWidth:2}]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}}},
+      fill:true, tension:0.4, pointRadius:4, pointHoverRadius:7,
+      pointBackgroundColor:'rgba(59,158,255,1)', borderWidth:2}]},
+    options:{responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}}},
       scales:{y:{grid:{color:gC},ticks:{callback:v=>fmtK(v),color:tC,font:{size:10}}},
         x:{grid:{display:false},ticks:{color:tC,font:{size:10},autoSkip:false}}}
     }
   });
 
-  // ----- 8) GRÁFICO 4: Rosca de Tipos -----
+  // ----- 7) GRÁFICO 4: Rosca de Tipos -----
   const roscaTipos = [
-    {label:'Receita',        val: rosca.rec,  color:'#10d9a0'},
-    {label:'Despesa',        val: rosca.desp, color:'#f05252'},
-    {label:'Dist. Lucro',    val: rosca.dist, color:'#a78bfa'},
-    {label:'Juros',          val: rosca.jur,  color:'#f59e0b'},
-    {label:'Compra Veículo', val: rosca.cmp,  color:'#3b9eff'},
-    {label:'Venda Veículo',  val: rosca.vnd,  color:'#f97316'},
-  ];
-  const legEl=document.getElementById('rosca-legend');
+    {label:'Receita',        val: Math.abs(REC_RAW),  color:'#10d9a0'},
+    {label:'Despesa',        val: Math.abs(DESP_RAW), color:'#f05252'},
+    {label:'Dist. Lucro',    val: Math.abs(DIST_RAW), color:'#a78bfa'},
+    {label:'Juros',          val: Math.abs(JUR_RAW),  color:'#F8AB12'},
+    {label:'Compra Veículo', val: Math.abs(CMP_RAW),  color:'#3b9eff'},
+    {label:'Venda Veículo',  val: Math.abs(VND_RAW),  color:'#FF7C24'},
+  ].filter(t=>t.val>0);
+  const legEl = document.getElementById('rosca-legend');
   if(legEl){
-    legEl.innerHTML=roscaTipos.map(t=>
+    legEl.innerHTML = roscaTipos.map(t=>
       `<span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text2);">
         <span style="width:9px;height:9px;border-radius:2px;background:${t.color};flex-shrink:0;"></span>${t.label}: ${fmtK(t.val)}
       </span>`
     ).join('');
   }
   mkChart('ch-rosca-tipos',{type:'doughnut',
-    data:{labels:roscaTipos.map(t=>t.label),datasets:[{
+    data:{labels:roscaTipos.map(t=>t.label), datasets:[{
       data:roscaTipos.map(t=>t.val),
       backgroundColor:roscaTipos.map(t=>t.color),
       borderWidth:isDark?0:1,
       borderColor:isDark?'transparent':'rgba(255,255,255,0.6)',
       hoverOffset:10}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.label+': '+fmtBR(c.parsed)}}}
+    options:{responsive:true, maintainAspectRatio:false, cutout:'60%',
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>c.label+': '+fmtBR(c.parsed)}}}
     }
   });
 
-  // ----- 9) GRÁFICO 5: A Receber / A Pagar -----
+  // ----- 8) GRÁFICO 5: A Receber / A Pagar -----
+  let aReceber=0, aPagar=0;
+  for(let k=0;k<R.length;k++){
+    const row=R[k];
+    if(row[I_DP]!==-1) continue; // tem data de pagamento = já quitado
+    const val=row[I_VAL];
+    if(val>0) aReceber+=val; else aPagar+=Math.abs(val);
+  }
   mkChart('ch-pagar-receber',{type:'bar',
     data:{labels:['A Receber','A Pagar'],
       datasets:[{label:'Valor',
         data:[Math.round(aReceber*100)/100, Math.round(aPagar*100)/100],
         backgroundColor:['rgba(16,217,160,0.78)','rgba(240,82,82,0.78)'],
-        borderWidth:0,borderRadius:8}]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}}},
+        borderWidth:0, borderRadius:8}]},
+    options:{responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}}},
       scales:{y:{grid:{color:gC},ticks:{callback:v=>fmtK(v),color:tC,font:{size:10}}},
         x:{grid:{display:false},ticks:{color:tC,font:{size:13},autoSkip:false}}}
     }
