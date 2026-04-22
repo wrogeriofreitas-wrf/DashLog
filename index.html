@@ -504,6 +504,13 @@ position:fixed;inset:0;z-index:9999;background:var(--bg1);display:flex;align-ite
   </div>
 </div>
 
+<script>
+var _usuariosJSON=[];
+var _loginFallback=[{u:"ROGERIO",p:"TRICOLOR"},{u:"EMERSON",p:"SEM MUNDIAL"},{u:"MATEUS",p:"BBEZINHO"}];
+function tentarLogin(){var uEl=document.getElementById("l-user"),pEl=document.getElementById("l-pass"),errEl=document.getElementById("l-err");if(!uEl||!pEl)return;var u=uEl.value.trim().toUpperCase(),p=pEl.value.trim().toUpperCase();if(!u||!p){if(errEl)errEl.style.display="block";return;}var lista=_usuariosJSON.length>0?_usuariosJSON:_loginFallback;var ok=lista.some(function(x){return(x.u||"").toUpperCase()===u&&(x.p||"").toUpperCase()===p;});if(ok){sessionStorage.setItem("dashlog_auth","1");var ov=document.getElementById("login-overlay");if(ov){ov.style.opacity="0";ov.style.transition="opacity .3s";setTimeout(function(){ov.remove();},300);}}else{if(errEl)errEl.style.display="block";pEl.value="";pEl.focus();}}
+function encerrarSessao(){sessionStorage.removeItem("dashlog_auth");location.reload();}
+window.addEventListener("load",function(){if(sessionStorage.getItem("dashlog_auth")==="1"){var ov=document.getElementById("login-overlay");if(ov)ov.remove();}var lp=document.getElementById("l-pass");if(lp)lp.addEventListener("keydown",function(e){if(e.key==="Enter")tentarLogin();});var lu=document.getElementById("l-user");if(lu)lu.addEventListener("keydown",function(e){if(e.key==="Enter")document.getElementById("l-pass").focus();});});
+</script>
 <div class="dl-loading" id="dl-loading">
   <div class="dl-spin"><svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DashLog">
   <defs>
@@ -1084,46 +1091,6 @@ let CC, CAT, TIPO, MO, DRV, R;
 const I_CC=0,I_CAT=1,I_TIPO=2,I_DC=3,I_DP=4,I_VAL=5,I_KM=6,I_LTS=7;
 
 
-// Fallback: usuários definidos aqui caso o JSON não tenha a aba Login
-const _usuariosFallback=[
-  {u:"ROGERIO",p:"TRICOLOR"},
-  {u:"EMERSON",p:"SEM MUNDIAL"},
-  {u:"MATEUS",p:"BBEZINHO"}
-];
-function tentarLogin(){
-  const u=(document.getElementById('l-user').value||'').trim().toUpperCase();
-  const p=(document.getElementById('l-pass').value||'').trim().toUpperCase();
-  if(!u||!p) return;
-  // Usa usuários do JSON; se vazio, usa fallback da planilha Login
-  const lista=_usuarios.length>0?_usuarios:_usuariosFallback;
-  const ok=lista.some(x=>(x.u||'').toUpperCase()===u&&(x.p||'').toUpperCase()===p);
-  if(ok){
-    sessionStorage.setItem('dashlog_auth','1');
-    const ov=document.getElementById('login-overlay');
-    if(ov) ov.remove();
-  } else {
-    const errEl=document.getElementById('l-err');
-    if(errEl) errEl.style.display='block';
-    document.getElementById('l-pass').value='';
-    document.getElementById('l-pass').focus();
-  }
-}
-function encerrarSessao(){
-  sessionStorage.removeItem('dashlog_auth');
-  location.reload();
-}
-document.addEventListener('DOMContentLoaded',()=>{
-  // Sessão ativa: remove overlay sem precisar logar novamente
-  if(sessionStorage.getItem('dashlog_auth')==='1'){
-    const ov=document.getElementById('login-overlay');
-    if(ov) ov.remove();
-  }
-  // Enter nos campos
-  const lp=document.getElementById('l-pass');
-  if(lp)lp.addEventListener('keydown',e=>{if(e.key==='Enter')tentarLogin();});
-  const lu=document.getElementById('l-user');
-  if(lu)lu.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('l-pass').focus();});
-});
 
 async function loadData(){
   const msgEl = document.getElementById('dl-msg');
@@ -1134,7 +1101,7 @@ async function loadData(){
     const rawText = new TextDecoder('windows-1252').decode(buf);
     const payload = JSON.parse(rawText);
     // Aceita dois formatos: {meta,d:{...}} ou o objeto _D cru
-    _usuarios = payload.login || [];
+    _usuariosJSON = payload.login || [];
     _D  = payload.d || payload;
     CC  = _D.CC;  CAT = _D.CAT;  TIPO= _D.TIPO;
     MO  = _D.MO;  DRV = _D.DRV;  R   = _D.R;
