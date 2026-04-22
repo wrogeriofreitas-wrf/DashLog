@@ -448,46 +448,19 @@ if(sessionStorage.getItem('dashlog_auth')==='1'){
 <div class="dl-loading" id="dl-loading">
   <div class="dl-spin"><svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DashLog">
   <defs>
-    <linearGradient id="dls_bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0f1e30"/><stop offset="100%" stop-color="#070d18"/>
+    <linearGradient id="dl-bg-spin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#111b2a"/>
+      <stop offset="1" stop-color="#080d14"/>
     </linearGradient>
-    <linearGradient id="dls_ln" x1="0" y1="1" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0891b2"/><stop offset="100%" stop-color="#10d9a0"/>
-    </linearGradient>
-    <linearGradient id="dls_br" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0%" stop-color="#10d9a0" stop-opacity="0.45"/><stop offset="100%" stop-color="#10d9a0"/>
-    </linearGradient>
-    <filter id="dls_gw">
-      <feGaussianBlur stdDeviation="1.2" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
   </defs>
-  <rect width="64" height="64" rx="14" fill="url(#dls_bg)"/>
-  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="rgba(16,217,160,0.22)" stroke-width="1"/>
-  <g opacity="0.07" stroke="#10d9a0" stroke-width="0.4">
-    <line x1="14" y1="14" x2="14" y2="50"/><line x1="24" y1="14" x2="24" y2="50"/>
-    <line x1="34" y1="14" x2="34" y2="50"/><line x1="44" y1="14" x2="44" y2="50"/>
-    <line x1="8" y1="22" x2="56" y2="22"/><line x1="8" y1="32" x2="56" y2="32"/>
-    <line x1="8" y1="42" x2="56" y2="42"/>
-  </g>
-  <rect x="10" y="39" width="7" height="11" rx="1.5" fill="url(#dls_br)" opacity="0.8"/>
-  <rect x="20" y="32" width="7" height="18" rx="1.5" fill="url(#dls_br)" opacity="0.9"/>
-  <rect x="30" y="24" width="7" height="26" rx="1.5" fill="url(#dls_br)"/>
-  <polyline points="10,44 20,37 30,29 42,19 51,14" fill="none" stroke="url(#dls_ln)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" filter="url(#dls_gw)"/>
-  <circle cx="10" cy="44" r="2" fill="#10d9a0" opacity="0.65"/>
-  <circle cx="20" cy="37" r="2" fill="#10d9a0" opacity="0.8"/>
-  <circle cx="30" cy="29" r="2.2" fill="#10d9a0"/>
-  <circle cx="42" cy="19" r="2.4" fill="#10d9a0" filter="url(#dls_gw)"/>
-  <g transform="translate(39,6)">
-    <rect x="0" y="2.5" width="13" height="6.5" rx="1.5" fill="#10d9a0"/>
-    <rect x="9.5" y="0" width="5" height="9" rx="1.5" fill="#10d9a0"/>
-    <rect x="10.2" y="0.8" width="3.2" height="3" rx="0.7" fill="#070d18" opacity="0.75"/>
-    <circle cx="3" cy="9.5" r="1.5" fill="#0d1a28"/>
-    <circle cx="3" cy="9.5" r="0.55" fill="#10d9a0" opacity="0.6"/>
-    <circle cx="11" cy="9.5" r="1.5" fill="#0d1a28"/>
-    <circle cx="11" cy="9.5" r="0.55" fill="#10d9a0" opacity="0.6"/>
-  </g>
-  <polyline points="48,17 51,14 54,17" fill="none" stroke="#10d9a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" filter="url(#dls_gw)"/>
+  <rect width="64" height="64" rx="14" fill="url(#dl-bg-spin)"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="rgba(16,217,160,0.28)"/>
+  <path d="M18 14 L18 50 L32 50 A18 18 0 0 0 32 14 Z" fill="#10d9a0"/>
+  <path d="M25 42 L31 36 L37 30 L42 24" fill="none" stroke="#0d1420" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="25" cy="42" r="2.2" fill="#0d1420"/>
+  <circle cx="31" cy="36" r="2.2" fill="#0d1420"/>
+  <circle cx="37" cy="30" r="2.2" fill="#0d1420"/>
+  <circle cx="42" cy="24" r="2.2" fill="#0d1420"/>
 </svg></div>
   <div class="dl-msg" id="dl-msg">Carregando dados…</div>
 </div>
@@ -502,46 +475,19 @@ if(sessionStorage.getItem('dashlog_auth')==='1'){
   <div class="login-box">
     <svg class="login-logo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="dll_bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0f1e30"/><stop offset="100%" stop-color="#070d18"/>
+    <linearGradient id="dl-bg-login" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#111b2a"/>
+      <stop offset="1" stop-color="#080d14"/>
     </linearGradient>
-    <linearGradient id="dll_ln" x1="0" y1="1" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0891b2"/><stop offset="100%" stop-color="#10d9a0"/>
-    </linearGradient>
-    <linearGradient id="dll_br" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0%" stop-color="#10d9a0" stop-opacity="0.45"/><stop offset="100%" stop-color="#10d9a0"/>
-    </linearGradient>
-    <filter id="dll_gw">
-      <feGaussianBlur stdDeviation="1.2" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
   </defs>
-  <rect width="64" height="64" rx="14" fill="url(#dll_bg)"/>
-  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="rgba(16,217,160,0.22)" stroke-width="1"/>
-  <g opacity="0.07" stroke="#10d9a0" stroke-width="0.4">
-    <line x1="14" y1="14" x2="14" y2="50"/><line x1="24" y1="14" x2="24" y2="50"/>
-    <line x1="34" y1="14" x2="34" y2="50"/><line x1="44" y1="14" x2="44" y2="50"/>
-    <line x1="8" y1="22" x2="56" y2="22"/><line x1="8" y1="32" x2="56" y2="32"/>
-    <line x1="8" y1="42" x2="56" y2="42"/>
-  </g>
-  <rect x="10" y="39" width="7" height="11" rx="1.5" fill="url(#dll_br)" opacity="0.8"/>
-  <rect x="20" y="32" width="7" height="18" rx="1.5" fill="url(#dll_br)" opacity="0.9"/>
-  <rect x="30" y="24" width="7" height="26" rx="1.5" fill="url(#dll_br)"/>
-  <polyline points="10,44 20,37 30,29 42,19 51,14" fill="none" stroke="url(#dll_ln)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" filter="url(#dll_gw)"/>
-  <circle cx="10" cy="44" r="2" fill="#10d9a0" opacity="0.65"/>
-  <circle cx="20" cy="37" r="2" fill="#10d9a0" opacity="0.8"/>
-  <circle cx="30" cy="29" r="2.2" fill="#10d9a0"/>
-  <circle cx="42" cy="19" r="2.4" fill="#10d9a0" filter="url(#dll_gw)"/>
-  <g transform="translate(39,6)">
-    <rect x="0" y="2.5" width="13" height="6.5" rx="1.5" fill="#10d9a0"/>
-    <rect x="9.5" y="0" width="5" height="9" rx="1.5" fill="#10d9a0"/>
-    <rect x="10.2" y="0.8" width="3.2" height="3" rx="0.7" fill="#070d18" opacity="0.75"/>
-    <circle cx="3" cy="9.5" r="1.5" fill="#0d1a28"/>
-    <circle cx="3" cy="9.5" r="0.55" fill="#10d9a0" opacity="0.6"/>
-    <circle cx="11" cy="9.5" r="1.5" fill="#0d1a28"/>
-    <circle cx="11" cy="9.5" r="0.55" fill="#10d9a0" opacity="0.6"/>
-  </g>
-  <polyline points="48,17 51,14 54,17" fill="none" stroke="#10d9a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" filter="url(#dll_gw)"/>
+  <rect width="64" height="64" rx="14" fill="url(#dl-bg-login)"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="rgba(16,217,160,0.28)"/>
+  <path d="M18 14 L18 50 L32 50 A18 18 0 0 0 32 14 Z" fill="#10d9a0"/>
+  <path d="M25 42 L31 36 L37 30 L42 24" fill="none" stroke="#0d1420" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="25" cy="42" r="2.2" fill="#0d1420"/>
+  <circle cx="31" cy="36" r="2.2" fill="#0d1420"/>
+  <circle cx="37" cy="30" r="2.2" fill="#0d1420"/>
+  <circle cx="42" cy="24" r="2.2" fill="#0d1420"/>
 </svg>
     <div class="login-title">DashLog</div>
     <div class="login-sub">Gestão de Frota · Financeiro</div>
@@ -565,48 +511,21 @@ if(sessionStorage.getItem('dashlog_auth')==='1'){
       <button class="theme-btn t-light" id="btn-light" onclick="setTheme('light')" title="Tema Claro">○ Claro</button>
     </div>
     <div class="sidebar-logo" onclick="goHome()" title="Visão Geral" style="cursor:pointer;user-select:none;display:flex;justify-content:center;">
-      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DashLog" style="width:72px;height:72px;">
+      <svg viewBox="0 0 64 64" style="width:72px;height:72px;" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DashLog">
   <defs>
-    <linearGradient id="dli_bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0f1e30"/><stop offset="100%" stop-color="#070d18"/>
+    <linearGradient id="dl-bg-icon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#111b2a"/>
+      <stop offset="1" stop-color="#080d14"/>
     </linearGradient>
-    <linearGradient id="dli_ln" x1="0" y1="1" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0891b2"/><stop offset="100%" stop-color="#10d9a0"/>
-    </linearGradient>
-    <linearGradient id="dli_br" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0%" stop-color="#10d9a0" stop-opacity="0.45"/><stop offset="100%" stop-color="#10d9a0"/>
-    </linearGradient>
-    <filter id="dli_gw">
-      <feGaussianBlur stdDeviation="1.2" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
   </defs>
-  <rect width="64" height="64" rx="14" fill="url(#dli_bg)"/>
-  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="rgba(16,217,160,0.22)" stroke-width="1"/>
-  <g opacity="0.07" stroke="#10d9a0" stroke-width="0.4">
-    <line x1="14" y1="14" x2="14" y2="50"/><line x1="24" y1="14" x2="24" y2="50"/>
-    <line x1="34" y1="14" x2="34" y2="50"/><line x1="44" y1="14" x2="44" y2="50"/>
-    <line x1="8" y1="22" x2="56" y2="22"/><line x1="8" y1="32" x2="56" y2="32"/>
-    <line x1="8" y1="42" x2="56" y2="42"/>
-  </g>
-  <rect x="10" y="39" width="7" height="11" rx="1.5" fill="url(#dli_br)" opacity="0.8"/>
-  <rect x="20" y="32" width="7" height="18" rx="1.5" fill="url(#dli_br)" opacity="0.9"/>
-  <rect x="30" y="24" width="7" height="26" rx="1.5" fill="url(#dli_br)"/>
-  <polyline points="10,44 20,37 30,29 42,19 51,14" fill="none" stroke="url(#dli_ln)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" filter="url(#dli_gw)"/>
-  <circle cx="10" cy="44" r="2" fill="#10d9a0" opacity="0.65"/>
-  <circle cx="20" cy="37" r="2" fill="#10d9a0" opacity="0.8"/>
-  <circle cx="30" cy="29" r="2.2" fill="#10d9a0"/>
-  <circle cx="42" cy="19" r="2.4" fill="#10d9a0" filter="url(#dli_gw)"/>
-  <g transform="translate(39,6)">
-    <rect x="0" y="2.5" width="13" height="6.5" rx="1.5" fill="#10d9a0"/>
-    <rect x="9.5" y="0" width="5" height="9" rx="1.5" fill="#10d9a0"/>
-    <rect x="10.2" y="0.8" width="3.2" height="3" rx="0.7" fill="#070d18" opacity="0.75"/>
-    <circle cx="3" cy="9.5" r="1.5" fill="#0d1a28"/>
-    <circle cx="3" cy="9.5" r="0.55" fill="#10d9a0" opacity="0.6"/>
-    <circle cx="11" cy="9.5" r="1.5" fill="#0d1a28"/>
-    <circle cx="11" cy="9.5" r="0.55" fill="#10d9a0" opacity="0.6"/>
-  </g>
-  <polyline points="48,17 51,14 54,17" fill="none" stroke="#10d9a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" filter="url(#dli_gw)"/>
+  <rect width="64" height="64" rx="14" fill="url(#dl-bg-icon)"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="rgba(16,217,160,0.28)"/>
+  <path d="M18 14 L18 50 L32 50 A18 18 0 0 0 32 14 Z" fill="#10d9a0"/>
+  <path d="M25 42 L31 36 L37 30 L42 24" fill="none" stroke="#0d1420" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="25" cy="42" r="2.2" fill="#0d1420"/>
+  <circle cx="31" cy="36" r="2.2" fill="#0d1420"/>
+  <circle cx="37" cy="30" r="2.2" fill="#0d1420"/>
+  <circle cx="42" cy="24" r="2.2" fill="#0d1420"/>
 </svg><stop offset="100%" stop-color="#060e1a"/>
   </linearGradient>
   <linearGradient id="lb-bar" x1="0" y1="1" x2="0" y2="0">
