@@ -1605,13 +1605,15 @@ function renderSimple(prefix, tipoName){
   ANOS12.forEach(y=>byYr[y]=0);
   Object.entries(STATIC.byTipoYear[tipoName]||{}).forEach(([y,v])=>byYr[y]=v);
   const vals=ANOS12.map(y=>byYr[y]);
-  const total=vals.reduce((a,b)=>a+b,0);
+  const rawTotal=vals.reduce((a,b)=>a+b,0);
+  const total=['Despesa','Compra de Veículo','Distribuição Lucro'].includes(tipoName) ? Math.abs(rawTotal) : rawTotal;
   const isPos=total>=0;
   const absVals=vals.map(v=>Math.abs(v));
 
   // Best year
   let bestYr='—',bestVal=0;
   ANOS12.forEach((y,i)=>{ if(Math.abs(vals[i])>Math.abs(bestVal)){bestVal=vals[i];bestYr=y;} });
+  if(['Despesa','Compra de Veículo','Distribuição Lucro'].includes(tipoName)) bestVal=Math.abs(bestVal);
 
   setText(prefix+'-tot', fmtBR(total));
   setText(prefix+'-best', bestYr+' — '+fmtBR(bestVal));
@@ -1626,7 +1628,7 @@ function renderSimple(prefix, tipoName){
     : vals.map(()=>posC);
 
   // For negative values (Despesa, Compra), show absolute values going UP
-  const chartData = ['Despesa','Compra de Veículo'].includes(tipoName) ? vals.map(v=>Math.abs(v)) : vals;
+  const chartData = ['Despesa','Compra de Veículo','Distribuição Lucro'].includes(tipoName) ? vals.map(v=>Math.abs(v)) : vals;
   mkChart('ch-'+prefix,{type:'bar',
     data:{labels:ANOS12,datasets:[{label:'Valor',data:chartData,backgroundColor:colors,borderWidth:0,borderRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,
