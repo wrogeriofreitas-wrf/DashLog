@@ -817,7 +817,9 @@ async function loadData(){
   try{
     const resp = await fetch('./dados.json', {cache: 'no-cache'});
     if(!resp.ok) throw new Error('HTTP ' + resp.status);
-    const payload = await resp.json();
+    let rawText = await resp.text();
+    if(rawText.charCodeAt(0)===0xFEFF) rawText=rawText.slice(1); // remove BOM do VBA
+    const payload = JSON.parse(rawText);
     // Aceita dois formatos: {meta,d:{...}} ou o objeto _D cru
     _D  = payload.d || payload;
     CC  = _D.CC;  CAT = _D.CAT;  TIPO= _D.TIPO;
