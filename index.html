@@ -475,12 +475,12 @@ position:fixed;inset:0;z-index:9999;background:var(--bg1);display:flex;align-ite
   <div class="login-box">
     <div class="login-logo-wrap"><svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="ll-bg" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="login-icon-bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#111b2a"/>
       <stop offset="1" stop-color="#080d14"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="14" fill="url(#ll-bg)"/>
+  <rect width="64" height="64" rx="14" fill="url(#login-icon-bg)"/>
   <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="rgba(16,217,160,0.28)"/>
   <path d="M18 14 L18 50 L32 50 A18 18 0 0 0 32 14 Z" fill="#10d9a0"/>
   <path d="M25 42 L31 36 L37 30 L42 24" fill="none" stroke="#0d1420" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1084,16 +1084,26 @@ let CC, CAT, TIPO, MO, DRV, R;
 const I_CC=0,I_CAT=1,I_TIPO=2,I_DC=3,I_DP=4,I_VAL=5,I_KM=6,I_LTS=7;
 
 
+// Fallback: usuários definidos aqui caso o JSON não tenha a aba Login
+const _usuariosFallback=[
+  {u:"ROGERIO",p:"TRICOLOR"},
+  {u:"EMERSON",p:"SEM MUNDIAL"},
+  {u:"MATEUS",p:"BBEZINHO"}
+];
 function tentarLogin(){
   const u=(document.getElementById('l-user').value||'').trim().toUpperCase();
   const p=(document.getElementById('l-pass').value||'').trim().toUpperCase();
-  const ok=_usuarios.some(x=>(x.u||'').toUpperCase()===u&&(x.p||'').toUpperCase()===p);
+  if(!u||!p) return;
+  // Usa usuários do JSON; se vazio, usa fallback da planilha Login
+  const lista=_usuarios.length>0?_usuarios:_usuariosFallback;
+  const ok=lista.some(x=>(x.u||'').toUpperCase()===u&&(x.p||'').toUpperCase()===p);
   if(ok){
     sessionStorage.setItem('dashlog_auth','1');
     const ov=document.getElementById('login-overlay');
     if(ov) ov.remove();
   } else {
-    document.getElementById('l-err').style.display='block';
+    const errEl=document.getElementById('l-err');
+    if(errEl) errEl.style.display='block';
     document.getElementById('l-pass').value='';
     document.getElementById('l-pass').focus();
   }
