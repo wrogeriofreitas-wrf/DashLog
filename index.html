@@ -435,22 +435,62 @@ table.dre td.col-total{
 </style>
 </head>
 <body>
+<script>
+if(sessionStorage.getItem('dashlog_auth')==='1'){
+  document.addEventListener('DOMContentLoaded',function(){
+    var ov=document.getElementById('login-overlay');
+    if(ov) ov.remove();
+    var st=document.getElementById('login-style');
+    if(st) st.remove();
+  });
+}
+</script>
 <div class="dl-loading" id="dl-loading">
   <div class="dl-spin"><svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DashLog">
   <defs>
-    <linearGradient id="dl-bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#111b2a"/>
-      <stop offset="1" stop-color="#080d14"/>
+    <linearGradient id="dlspin_bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f1e30"/>
+      <stop offset="100%" stop-color="#070d18"/>
     </linearGradient>
+    <linearGradient id="dlspin_line" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0891b2"/>
+      <stop offset="100%" stop-color="#10d9a0"/>
+    </linearGradient>
+    <linearGradient id="dlspin_bar" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#10d9a0" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#10d9a0"/>
+    </linearGradient>
+    <filter id="dlspin_glow">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
   </defs>
-  <rect width="64" height="64" rx="14" fill="url(#dl-bg)"/>
-  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="rgba(16,217,160,0.28)"/>
-  <path d="M18 14 L18 50 L32 50 A18 18 0 0 0 32 14 Z" fill="#10d9a0"/>
-  <path d="M25 42 L31 36 L37 30 L42 24" fill="none" stroke="#0d1420" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="25" cy="42" r="2.2" fill="#0d1420"/>
-  <circle cx="31" cy="36" r="2.2" fill="#0d1420"/>
-  <circle cx="37" cy="30" r="2.2" fill="#0d1420"/>
-  <circle cx="42" cy="24" r="2.2" fill="#0d1420"/>
+  <rect width="64" height="64" rx="14" fill="url(#dlspin_bg)"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="rgba(16,217,160,0.22)" stroke-width="1"/>
+  <g opacity="0.07" stroke="#10d9a0" stroke-width="0.4">
+    <line x1="14" y1="14" x2="14" y2="50"/><line x1="24" y1="14" x2="24" y2="50"/>
+    <line x1="34" y1="14" x2="34" y2="50"/><line x1="44" y1="14" x2="44" y2="50"/>
+    <line x1="8" y1="22" x2="56" y2="22"/><line x1="8" y1="32" x2="56" y2="32"/>
+    <line x1="8" y1="42" x2="56" y2="42"/>
+  </g>
+  <rect x="10" y="39" width="7" height="11" rx="1.5" fill="url(#dlspin_bar)" opacity="0.8"/>
+  <rect x="20" y="32" width="7" height="18" rx="1.5" fill="url(#dlspin_bar)" opacity="0.9"/>
+  <rect x="30" y="24" width="7" height="26" rx="1.5" fill="url(#dlspin_bar)"/>
+  <polyline points="10,44 20,37 30,29 42,19 51,14" fill="none" stroke="url(#dlspin_line)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" filter="url(#dlspin_glow)"/>
+  <circle cx="10" cy="44" r="2" fill="#10d9a0" opacity="0.65"/>
+  <circle cx="20" cy="37" r="2" fill="#10d9a0" opacity="0.8"/>
+  <circle cx="30" cy="29" r="2.2" fill="#10d9a0"/>
+  <circle cx="42" cy="19" r="2.4" fill="#10d9a0" filter="url(#dlspin_glow)"/>
+  <g transform="translate(39,6)">
+    <rect x="0" y="2.5" width="13" height="6.5" rx="1.5" fill="#10d9a0"/>
+    <rect x="9.5" y="0" width="5" height="9" rx="1.5" fill="#10d9a0"/>
+    <rect x="10.2" y="0.8" width="3.2" height="3" rx="0.7" fill="#070d18" opacity="0.75"/>
+    <circle cx="3" cy="9.5" r="1.5" fill="#0d1a28"/>
+    <circle cx="3" cy="9.5" r="0.55" fill="#10d9a0" opacity="0.6"/>
+    <circle cx="11" cy="9.5" r="1.5" fill="#0d1a28"/>
+    <circle cx="11" cy="9.5" r="0.55" fill="#10d9a0" opacity="0.6"/>
+  </g>
+  <polyline points="48,17 51,14 54,17" fill="none" stroke="#10d9a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" filter="url(#dlspin_glow)"/>
 </svg></div>
   <div class="dl-msg" id="dl-msg">Carregando dados…</div>
 </div>
@@ -464,18 +504,51 @@ table.dre td.col-total{
 <div id="login-overlay">
   <div class="login-box">
     <svg class="login-logo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-      <defs><linearGradient id="ll-bg" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#111b2a"/><stop offset="1" stop-color="#080d14"/>
-      </linearGradient></defs>
-      <rect width="64" height="64" rx="14" fill="url(#ll-bg)"/>
-      <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="rgba(16,217,160,0.28)"/>
-      <path d="M18 14 L18 50 L32 50 A18 18 0 0 0 32 14 Z" fill="#10d9a0"/>
-      <path d="M25 42 L31 36 L37 30 L42 24" fill="none" stroke="#0d1420" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="25" cy="42" r="2.2" fill="#0d1420"/>
-      <circle cx="31" cy="36" r="2.2" fill="#0d1420"/>
-      <circle cx="37" cy="30" r="2.2" fill="#0d1420"/>
-      <circle cx="42" cy="24" r="2.2" fill="#0d1420"/>
-    </svg>
+  <defs>
+    <linearGradient id="dllogin_bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f1e30"/>
+      <stop offset="100%" stop-color="#070d18"/>
+    </linearGradient>
+    <linearGradient id="dllogin_line" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0891b2"/>
+      <stop offset="100%" stop-color="#10d9a0"/>
+    </linearGradient>
+    <linearGradient id="dllogin_bar" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#10d9a0" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#10d9a0"/>
+    </linearGradient>
+    <filter id="dllogin_glow">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#dllogin_bg)"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="rgba(16,217,160,0.22)" stroke-width="1"/>
+  <g opacity="0.07" stroke="#10d9a0" stroke-width="0.4">
+    <line x1="14" y1="14" x2="14" y2="50"/><line x1="24" y1="14" x2="24" y2="50"/>
+    <line x1="34" y1="14" x2="34" y2="50"/><line x1="44" y1="14" x2="44" y2="50"/>
+    <line x1="8" y1="22" x2="56" y2="22"/><line x1="8" y1="32" x2="56" y2="32"/>
+    <line x1="8" y1="42" x2="56" y2="42"/>
+  </g>
+  <rect x="10" y="39" width="7" height="11" rx="1.5" fill="url(#dllogin_bar)" opacity="0.8"/>
+  <rect x="20" y="32" width="7" height="18" rx="1.5" fill="url(#dllogin_bar)" opacity="0.9"/>
+  <rect x="30" y="24" width="7" height="26" rx="1.5" fill="url(#dllogin_bar)"/>
+  <polyline points="10,44 20,37 30,29 42,19 51,14" fill="none" stroke="url(#dllogin_line)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" filter="url(#dllogin_glow)"/>
+  <circle cx="10" cy="44" r="2" fill="#10d9a0" opacity="0.65"/>
+  <circle cx="20" cy="37" r="2" fill="#10d9a0" opacity="0.8"/>
+  <circle cx="30" cy="29" r="2.2" fill="#10d9a0"/>
+  <circle cx="42" cy="19" r="2.4" fill="#10d9a0" filter="url(#dllogin_glow)"/>
+  <g transform="translate(39,6)">
+    <rect x="0" y="2.5" width="13" height="6.5" rx="1.5" fill="#10d9a0"/>
+    <rect x="9.5" y="0" width="5" height="9" rx="1.5" fill="#10d9a0"/>
+    <rect x="10.2" y="0.8" width="3.2" height="3" rx="0.7" fill="#070d18" opacity="0.75"/>
+    <circle cx="3" cy="9.5" r="1.5" fill="#0d1a28"/>
+    <circle cx="3" cy="9.5" r="0.55" fill="#10d9a0" opacity="0.6"/>
+    <circle cx="11" cy="9.5" r="1.5" fill="#0d1a28"/>
+    <circle cx="11" cy="9.5" r="0.55" fill="#10d9a0" opacity="0.6"/>
+  </g>
+  <polyline points="48,17 51,14 54,17" fill="none" stroke="#10d9a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" filter="url(#dllogin_glow)"/>
+</svg>
     <div class="login-title">DashLog</div>
     <div class="login-sub">Gestão de Frota · Financeiro</div>
     <div class="login-field">
@@ -515,8 +588,8 @@ table.dre td.col-total{
     <div class="nav-items">
       <div class="nav-item" onclick="nav('p-receita',this)"><span class="nav-icon">↑</span><span style="text-decoration:underline;text-underline-offset:3px;">Receita</span></div>
       <div class="nav-item" onclick="nav('p-despesa',this)"><span class="nav-icon">↓</span><span style="text-decoration:underline;text-underline-offset:3px;">Despesas</span></div>
-      <div class="nav-item" onclick="nav('p-compra',this)"><span class="nav-icon">🚗</span><span style="text-decoration:underline;text-underline-offset:3px;">Compra Veículos</span></div>
-      <div class="nav-item" onclick="nav('p-venda',this)"><span class="nav-icon">💰</span><span style="text-decoration:underline;text-underline-offset:3px;">Venda Veículos</span></div>
+      <div class="nav-item" onclick="nav('p-compra',this)"><span class="nav-icon">⇩</span><span style="text-decoration:underline;text-underline-offset:3px;">Compra Veículos</span></div>
+      <div class="nav-item" onclick="nav('p-venda',this)"><span class="nav-icon">⇧</span><span style="text-decoration:underline;text-underline-offset:3px;">Venda Veículos</span></div>
       <div class="nav-item" onclick="nav('p-juros',this)"><span class="nav-icon">%</span><span style="text-decoration:underline;text-underline-offset:3px;">Juros</span></div>
       <div class="nav-item" onclick="nav('p-lucro',this)"><span class="nav-icon">◆</span><span style="text-decoration:underline;text-underline-offset:3px;">Dist. Lucros</span></div>
       <div class="nav-item" onclick="nav('p-rent',this)"><span class="nav-icon">≈</span><span style="text-decoration:underline;text-underline-offset:3px;">Rentabilidade</span></div>
@@ -550,19 +623,49 @@ table.dre td.col-total{
   <div class="dashlog-brand">
   <div class="dl-icon"><svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DashLog">
   <defs>
-    <linearGradient id="dl-bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#111b2a"/>
-      <stop offset="1" stop-color="#080d14"/>
+    <linearGradient id="dlicon_bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f1e30"/>
+      <stop offset="100%" stop-color="#070d18"/>
     </linearGradient>
+    <linearGradient id="dlicon_line" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0891b2"/>
+      <stop offset="100%" stop-color="#10d9a0"/>
+    </linearGradient>
+    <linearGradient id="dlicon_bar" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#10d9a0" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#10d9a0"/>
+    </linearGradient>
+    <filter id="dlicon_glow">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
   </defs>
-  <rect width="64" height="64" rx="14" fill="url(#dl-bg)"/>
-  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="rgba(16,217,160,0.28)"/>
-  <path d="M18 14 L18 50 L32 50 A18 18 0 0 0 32 14 Z" fill="#10d9a0"/>
-  <path d="M25 42 L31 36 L37 30 L42 24" fill="none" stroke="#0d1420" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="25" cy="42" r="2.2" fill="#0d1420"/>
-  <circle cx="31" cy="36" r="2.2" fill="#0d1420"/>
-  <circle cx="37" cy="30" r="2.2" fill="#0d1420"/>
-  <circle cx="42" cy="24" r="2.2" fill="#0d1420"/>
+  <rect width="64" height="64" rx="14" fill="url(#dlicon_bg)"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="rgba(16,217,160,0.22)" stroke-width="1"/>
+  <g opacity="0.07" stroke="#10d9a0" stroke-width="0.4">
+    <line x1="14" y1="14" x2="14" y2="50"/><line x1="24" y1="14" x2="24" y2="50"/>
+    <line x1="34" y1="14" x2="34" y2="50"/><line x1="44" y1="14" x2="44" y2="50"/>
+    <line x1="8" y1="22" x2="56" y2="22"/><line x1="8" y1="32" x2="56" y2="32"/>
+    <line x1="8" y1="42" x2="56" y2="42"/>
+  </g>
+  <rect x="10" y="39" width="7" height="11" rx="1.5" fill="url(#dlicon_bar)" opacity="0.8"/>
+  <rect x="20" y="32" width="7" height="18" rx="1.5" fill="url(#dlicon_bar)" opacity="0.9"/>
+  <rect x="30" y="24" width="7" height="26" rx="1.5" fill="url(#dlicon_bar)"/>
+  <polyline points="10,44 20,37 30,29 42,19 51,14" fill="none" stroke="url(#dlicon_line)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" filter="url(#dlicon_glow)"/>
+  <circle cx="10" cy="44" r="2" fill="#10d9a0" opacity="0.65"/>
+  <circle cx="20" cy="37" r="2" fill="#10d9a0" opacity="0.8"/>
+  <circle cx="30" cy="29" r="2.2" fill="#10d9a0"/>
+  <circle cx="42" cy="19" r="2.4" fill="#10d9a0" filter="url(#dlicon_glow)"/>
+  <g transform="translate(39,6)">
+    <rect x="0" y="2.5" width="13" height="6.5" rx="1.5" fill="#10d9a0"/>
+    <rect x="9.5" y="0" width="5" height="9" rx="1.5" fill="#10d9a0"/>
+    <rect x="10.2" y="0.8" width="3.2" height="3" rx="0.7" fill="#070d18" opacity="0.75"/>
+    <circle cx="3" cy="9.5" r="1.5" fill="#0d1a28"/>
+    <circle cx="3" cy="9.5" r="0.55" fill="#10d9a0" opacity="0.6"/>
+    <circle cx="11" cy="9.5" r="1.5" fill="#0d1a28"/>
+    <circle cx="11" cy="9.5" r="0.55" fill="#10d9a0" opacity="0.6"/>
+  </g>
+  <polyline points="48,17 51,14 54,17" fill="none" stroke="#10d9a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" filter="url(#dlicon_glow)"/>
 </svg></div>
   <div class="dl-wordmark">
     <div class="dl-name">DashLog</div>
@@ -733,13 +836,9 @@ table.dre td.col-total{
     <div><div class="page-title">Score & Alertas</div><div class="page-sub">Avaliação automática por veículo</div></div>
   </div>
   <div class="alert-bar" id="sc-alerts"></div>
-  <div class="filter-bar" style="margin-bottom:16px;">
-    <div class="filter-group">
-      <span class="filter-label">Análise</span>
-      <select id="sc-yr" onchange="renderScore()">
-        <option value="">Total Acumulado</option>
-      </select>
-    </div>
+  <div style="margin-bottom:16px;">
+    <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-family:var(--mono);margin-bottom:8px;">Período</div>
+    <input type="hidden" id="sc-yr-val" value=""/><div id="sc-pills" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
   </div>
   <div class="score-grid" id="score-grid"></div>
   <div class="chart-card">
@@ -758,7 +857,10 @@ table.dre td.col-total{
     <div class="kpi-card green"><div class="kpi-label">Melhor ano</div><div class="kpi-value green" id="a1-best">—</div></div>
     <div class="kpi-card amber"><div class="kpi-label">2026 (parcial)</div><div class="kpi-value amber" id="a1-2026">—</div><div class="kpi-delta">Ano em andamento</div></div>
   </div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Receita por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a1" role="img" aria-label="Receita anual"></canvas></div></div>
+  <div class="chart-row">
+    <div class="chart-card half"><div class="chart-title" style="margin-bottom:14px">Receita por ano (R$)</div><div class="chart-wrap" style="height:260px"><canvas id="ch-a1" role="img" aria-label="Receita anual"></canvas></div></div>
+    <div class="chart-card half"><div class="chart-title" style="margin-bottom:14px">Receita mensal 2026 (R$)</div><div class="chart-wrap" style="height:260px"><canvas id="ch-a1-mo" role="img" aria-label="Receita mensal"></canvas></div></div>
+  </div>
 </div>
 
 <div id="p-despesa" class="page">
@@ -768,7 +870,10 @@ table.dre td.col-total{
     <div class="kpi-card red"><div class="kpi-label">Maior despesa</div><div class="kpi-value red" id="a2-best">—</div></div>
     <div class="kpi-card amber"><div class="kpi-label">2026</div><div class="kpi-value amber" id="a2-2026">—</div></div>
   </div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Despesas por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a2" role="img" aria-label="Despesas anuais"></canvas></div></div>
+  <div class="chart-row">
+    <div class="chart-card half"><div class="chart-title" style="margin-bottom:14px">Despesas por ano (R$)</div><div class="chart-wrap" style="height:260px"><canvas id="ch-a2" role="img" aria-label="Despesas anuais"></canvas></div></div>
+    <div class="chart-card half"><div class="chart-title" style="margin-bottom:14px">Despesas mensais 2026 (R$)</div><div class="chart-wrap" style="height:260px"><canvas id="ch-a2-mo" role="img" aria-label="Despesas mensais"></canvas></div></div>
+  </div>
 </div>
 
 <div id="p-compra" class="page">
@@ -796,9 +901,12 @@ table.dre td.col-total{
   <div class="kpi-grid">
     <div class="kpi-card blue"><div class="kpi-label">Total Juros</div><div class="kpi-value blue" id="a5-tot">—</div></div>
     <div class="kpi-card blue"><div class="kpi-label">Maior ano</div><div class="kpi-value blue" id="a5-best">—</div></div>
-    <div class="kpi-card red"><div class="kpi-label">2021 (negativo)</div><div class="kpi-value red">-R$ 17.640,63</div><div class="kpi-delta">Verificar lançamentos</div></div>
+    <div class="kpi-card amber"><div class="kpi-label">2026 (parcial)</div><div class="kpi-value amber" id="a5-2026">—</div><div class="kpi-delta">Ano em andamento</div></div>
   </div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Juros por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a5" role="img" aria-label="Juros"></canvas></div></div>
+  <div class="chart-row">
+    <div class="chart-card half"><div class="chart-title" style="margin-bottom:14px">Juros por ano (R$)</div><div class="chart-wrap" style="height:260px"><canvas id="ch-a5" role="img" aria-label="Juros"></canvas></div></div>
+    <div class="chart-card half"><div class="chart-title" style="margin-bottom:14px">Juros mensais 2026 (R$)</div><div class="chart-wrap" style="height:260px"><canvas id="ch-a5-mo" role="img" aria-label="Juros mensais"></canvas></div></div>
+  </div>
 </div>
 
 <div id="p-lucro" class="page">
@@ -808,7 +916,10 @@ table.dre td.col-total{
     <div class="kpi-card purple"><div class="kpi-label">Maior distribuição</div><div class="kpi-value purple" id="a6-best">—</div></div>
     <div class="kpi-card amber"><div class="kpi-label">2026 (parcial)</div><div class="kpi-value amber" id="a6-2026">—</div></div>
   </div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Distribuição de lucros por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a6" role="img" aria-label="Distribuição lucros"></canvas></div></div>
+  <div class="chart-row">
+    <div class="chart-card half"><div class="chart-title" style="margin-bottom:14px">Distribuição por ano (R$)</div><div class="chart-wrap" style="height:260px"><canvas id="ch-a6" role="img" aria-label="Distribuição lucros"></canvas></div></div>
+    <div class="chart-card half"><div class="chart-title" style="margin-bottom:14px">Distribuição mensal 2026 (R$)</div><div class="chart-wrap" style="height:260px"><canvas id="ch-a6-mo" role="img" aria-label="Distribuição mensais"></canvas></div></div>
+  </div>
 </div>
 
 <!-- RENTABILIDADE -->
@@ -886,12 +997,16 @@ const I_CC=0,I_CAT=1,I_TIPO=2,I_DC=3,I_DP=4,I_VAL=5,I_KM=6,I_LTS=7;
 // ═══════════════════════════════════════════════════
 let _usuarios = []; // carregado do JSON
 
+function verificarSessao(){
+  return sessionStorage.getItem('dashlog_auth')==='1';
+}
 function tentarLogin(){
   const u = (document.getElementById('l-user').value||'').trim().toUpperCase();
   const p = (document.getElementById('l-pass').value||'').trim().toUpperCase();
   const errEl = document.getElementById('l-err');
   const ok = _usuarios.some(x => x.u.toUpperCase()===u && x.p.toUpperCase()===p);
   if(ok){
+    sessionStorage.setItem('dashlog_auth','1');
     document.getElementById('login-overlay').remove();
     document.getElementById('login-style').remove();
   } else {
@@ -1263,6 +1378,7 @@ function syncRankPills(){
     const yr=p.dataset.yr;
     if(yr===''){
       p.classList.toggle('yr-all', _rankYrs.size===0);
+      if(_rankYrs.size===0) p.style.fontWeight='700'; else p.style.fontWeight='';
       p.classList.remove('yr-sel');
     } else {
       p.classList.toggle('yr-sel', _rankYrs.has(yr));
@@ -1620,7 +1736,7 @@ function renderRanking(){
 // RENDER SCORE
 // ═══════════════════════════════════════════════════
 function renderScore(){
-  const scYrSel=document.getElementById('sc-yr');
+  const scYrSel=document.getElementById('sc-yr-val');
   const scYr=scYrSel?scYrSel.value:'';
   const ccVals=OP_CCS.map(cc=>{
     let rec=0,cost=0,km=0,lts=0,months=new Set();
@@ -1742,6 +1858,37 @@ function renderSimple(prefix, tipoName){
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}}},
       scales:{y:{grid:{color:gc},ticks:{callback:v=>fmtK(v),color:tc,font:{size:10}}},x:{grid:{display:false},ticks:{color:tc,font:{size:10},autoSkip:false}}}}
   });
+
+  // Gráfico mensal do ano atual (se canvas existir)
+  const moCanvas = document.getElementById('ch-'+prefix+'-mo');
+  if(moCanvas){
+    const anoAtual = new Date().getFullYear();
+    const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const moVals = Array(12).fill(0);
+    const isAbsType = ['Despesa','Compra de Veículo','Distribuição Lucro'].includes(tipoName);
+    const tipoIdx = TIPO.indexOf(tipoName);
+    if(tipoIdx >= 0){
+      for(let k=0;k<R.length;k++){
+        const row=R[k];
+        if(row[I_TIPO]!==tipoIdx) continue;
+        const mo=MO[row[I_DC]]||'';
+        if(!mo.startsWith(String(anoAtual))) continue;
+        const mes=parseInt(mo.slice(5,7),10)-1;
+        if(mes>=0&&mes<12) moVals[mes]+=row[I_VAL];
+      }
+    }
+    const moDisplay = isAbsType ? moVals.map(v=>Math.abs(v)) : moVals;
+    const moColors = moDisplay.map(v=>v>=0?colors[0]:mkRGBA(RED,'0.75'));
+    mkChart('ch-'+prefix+'-mo',{type:'bar',
+      data:{labels:meses,datasets:[{label:'Valor',data:moDisplay,backgroundColor:moColors,borderWidth:0,borderRadius:4}]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}}},
+        scales:{y:{grid:{color:gc},ticks:{callback:v=>fmtK(v),color:tc,font:{size:10}}},x:{grid:{display:false},ticks:{color:tc,font:{size:10},autoSkip:false}}}}
+    });
+    // Atualizar card 2026
+    const tot2026 = moVals.reduce((a,b)=>a+b,0);
+    setText(prefix+'-2026', fmtBR(isAbsType ? Math.abs(tot2026) : tot2026));
+  }
 }
 
 // ═══════════════════════════════════════════════════
@@ -1924,6 +2071,27 @@ function initRankingFilter(){
 // ═══════════════════════════════════════════════════
 // SCORE YEAR FILTER INIT
 // ═══════════════════════════════════════════════════
+function initScorePills(){
+  const el = document.getElementById('sc-pills');
+  if(!el) return;
+  el.innerHTML='';
+  const anos = ['', ...ANOS12].map(y=>({val:y, label:y||'Todos'}));
+  anos.forEach(({val,label})=>{
+    const p = document.createElement('div');
+    p.className = 'yr-pill' + (val===''?' yr-all':'');
+    p.textContent = label;
+    p.dataset.yr = val;
+    p.onclick = ()=>{
+      document.querySelectorAll('#sc-pills .yr-pill').forEach(x=>{
+        x.classList.remove('yr-sel','yr-all');
+      });
+      p.classList.add(val===''?'yr-all':'yr-sel');
+      document.getElementById('sc-yr-val').value = val;
+      renderScore();
+    };
+    el.appendChild(p);
+  });
+}
 function initScoreFilter(){
   const sel=document.getElementById('sc-yr');
   if(!sel) return;
@@ -2037,6 +2205,7 @@ window.addEventListener('DOMContentLoaded', async ()=>{
     initFilters();
     initRankingFilter();
     initScoreFilter();
+    initScorePills();
     renderOverview();
     renderCashflow();
     renderRanking();
