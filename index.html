@@ -500,7 +500,7 @@ position:fixed;inset:0;z-index:9999;background:var(--bg1);display:flex;align-ite
       <input type="password" id="l-pass" placeholder="Digite sua senha" autocomplete="current-password"/>
     </div>
     <div class="login-error" id="l-err">VOCÊ NÃO TEM ACESSO AO SITE,<br>PROCURE O ADMINISTRADOR.</div>
-    <button class="login-btn" onclick="tentarLogin()">ENTRAR</button>
+    <button class="login-btn" id="login-btn">ENTRAR</button>
   </div>
 </div>
 
@@ -539,6 +539,13 @@ window.addEventListener("load",function(){
     var ov=document.getElementById("login-overlay");
     if(ov) ov.remove();
   }
+  // Botão ENTRAR
+  var btn=document.getElementById("login-btn");
+  if(btn) btn.addEventListener("click", tentarLogin);
+  // Botão SAIR
+  var sair=document.getElementById("btn-sair");
+  if(sair) sair.addEventListener("click", encerrarSessao);
+  // Enter nos campos
   var lp=document.getElementById("l-pass");
   if(lp) lp.addEventListener("keydown",function(e){ if(e.key==="Enter") tentarLogin(); });
   var lu=document.getElementById("l-user");
@@ -593,7 +600,7 @@ window.addEventListener("load",function(){
     <div class="login-field"><label>Usuário</label><input type="text" id="l-user" placeholder="Digite seu usuário" autocomplete="username"/></div>
     <div class="login-field"><label>Senha</label><input type="password" id="l-pass" placeholder="Digite sua senha"/></div>
     <div class="login-error" id="l-err">VOCÊ NÃO TEM ACESSO AO SITE,<br>PROCURE O ADMINISTRADOR.</div>
-    <button class="login-btn" onclick="tentarLogin()">ENTRAR</button>
+    <button class="login-btn" id="login-btn">ENTRAR</button>
   </div>
 </div>
 <nav class="sidebar" id="sidebar">
@@ -645,7 +652,7 @@ window.addEventListener("load",function(){
 
 
   <div style="padding:8px 14px 16px;margin-top:auto;border-top:0.5px solid var(--border);">
-    <button class="btn-sair" onclick="encerrarSessao()">⏻ &nbsp;Sair</button>
+    <button class="btn-sair" id="btn-sair">⏻ &nbsp;Sair</button>
   </div>
 </nav>
 
