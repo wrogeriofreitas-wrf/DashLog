@@ -130,6 +130,11 @@ body::before{
 .mode-btn{flex:1;text-align:center;padding:6px 4px;border-radius:7px;font-size:11px;
   cursor:pointer;color:var(--text2);transition:all 0.2s;font-family:var(--mono);font-weight:500;}
 .mode-btn.active{background:var(--green);color:#000;font-weight:600;}
+.logout-btn{background:var(--bg2);border-radius:var(--radius);padding:10px 12px;text-align:center;
+  cursor:pointer;color:var(--red);font-size:12px;font-family:var(--mono);font-weight:600;
+  letter-spacing:0.5px;transition:all 0.2s;border:1px solid transparent;display:flex;
+  align-items:center;justify-content:center;gap:6px;}
+.logout-btn:hover{background:var(--red2);border-color:var(--red);}
 .mode-label{font-size:10px;color:var(--text3);text-align:center;margin-bottom:6px;
   font-family:var(--mono);text-transform:uppercase;letter-spacing:0.8px;}
 
@@ -365,7 +370,7 @@ table.dre td.col-total{
 }
 .yr-pill:hover{border-color:var(--green);color:var(--green);}
 .yr-pill.yr-sel{background:rgba(59,158,255,0.18);border-color:var(--blue);color:var(--blue);}
-.yr-pill.yr-all{background:rgba(59,158,255,0.18);border-color:var(--blue);color:var(--blue);}
+.yr-pill.yr-all{background:rgba(16,217,160,0.15);border-color:var(--green);color:var(--green);}
 .yr-hint{font-size:10px;color:var(--text3);font-family:var(--mono);align-self:center;}
 /* sidebar scrollable */
 .sidebar{overflow-y:auto;}
@@ -491,13 +496,13 @@ table.dre td.col-total{
   <div class="nav-group">
     <div class="nav-label" onclick="toggleNav(this)">Análises</div>
     <div class="nav-items">
-      <div class="nav-item" onclick="nav('p-receita',this)"><span class="nav-icon">↑</span><span style="text-decoration:underline;text-underline-offset:3px;">Receita</span></div>
+      <div class="nav-item" onclick="nav('p-receita',this)"><span class="nav-icon">↑</span><span style="text-decoration:underline;text-underline-offset:3px;">Receitas</span></div>
       <div class="nav-item" onclick="nav('p-despesa',this)"><span class="nav-icon">↓</span><span style="text-decoration:underline;text-underline-offset:3px;">Despesas</span></div>
       <div class="nav-item" onclick="nav('p-compra',this)"><span class="nav-icon">⇩</span><span style="text-decoration:underline;text-underline-offset:3px;">Compra Veículos</span></div>
       <div class="nav-item" onclick="nav('p-venda',this)"><span class="nav-icon">⇧</span><span style="text-decoration:underline;text-underline-offset:3px;">Venda Veículos</span></div>
       <div class="nav-item" onclick="nav('p-juros',this)"><span class="nav-icon">%</span><span style="text-decoration:underline;text-underline-offset:3px;">Juros</span></div>
       <div class="nav-item" onclick="nav('p-lucro',this)"><span class="nav-icon">◆</span><span style="text-decoration:underline;text-underline-offset:3px;">Dist. Lucros</span></div>
-      <div class="nav-item" onclick="nav('p-rent',this)"><span class="nav-icon">≈</span><span style="text-decoration:underline;text-underline-offset:3px;">Rentabilidade</span></div>
+      <div class="nav-item" onclick="nav('p-rent',this)"><span class="nav-icon">≈</span><span style="text-decoration:underline;text-underline-offset:3px;">Rentabilidades</span></div>
     </div>
   </div>
   <div class="nav-group">
@@ -516,9 +521,8 @@ table.dre td.col-total{
     </div>
   </div>
   <div class="sidebar-footer" style="display:none"></div>
-    <div class="mode-toggle">
-      <div class="mode-btn active" id="btn-comp" onclick="setMode('comp')">COMP</div>
-      <div class="mode-btn" id="btn-cx" onclick="setMode('cx')">CAIXA</div>
+    <div class="logout-btn" onclick="logout()" title="Sair do sistema">
+      <span style="font-size:13px;">⎋</span> Sair
     </div>
   </div>
 </nav>
@@ -735,13 +739,14 @@ table.dre td.col-total{
      ANÁLISE SIMPLES (01-06 + RENT)
 ════════════════════════════════ -->
 <div id="p-receita" class="page">
-  <div class="page-header"><div><div class="page-title">Análise 01 — Receita</div><div class="page-sub">Soma de todos os lançamentos de Receita</div></div></div>
+  <div class="page-header"><div><div class="page-title">Análise 01 — Receitas</div><div class="page-sub">Soma de todos os lançamentos de Receita</div></div></div>
   <div class="kpi-grid">
     <div class="kpi-card green"><div class="kpi-label">Receita Total (2015–2026)</div><div class="kpi-value green" id="a1-tot">—</div></div>
     <div class="kpi-card green"><div class="kpi-label">Melhor ano</div><div class="kpi-value green" id="a1-best">—</div></div>
     <div class="kpi-card amber"><div class="kpi-label">2026 (parcial)</div><div class="kpi-value amber" id="a1-2026">—</div><div class="kpi-delta">Ano em andamento</div></div>
   </div>
   <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Receita por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a1" role="img" aria-label="Receita anual"></canvas></div></div>
+  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Receitas por mês — ano atual</div><div class="chart-wrap" style="height:220px"><canvas id="ch-a1-mo" role="img" aria-label="Receita mensal ano atual"></canvas></div></div>
 </div>
 
 <div id="p-despesa" class="page">
@@ -752,6 +757,7 @@ table.dre td.col-total{
     <div class="kpi-card amber"><div class="kpi-label">2026</div><div class="kpi-value amber" id="a2-2026">—</div></div>
   </div>
   <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Despesas por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a2" role="img" aria-label="Despesas anuais"></canvas></div></div>
+  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Despesas por mês — ano atual</div><div class="chart-wrap" style="height:220px"><canvas id="ch-a2-mo" role="img" aria-label="Despesas mensais ano atual"></canvas></div></div>
 </div>
 
 <div id="p-compra" class="page">
@@ -762,6 +768,7 @@ table.dre td.col-total{
     <div class="kpi-card green"><div class="kpi-label">2026</div><div class="kpi-value green" id="a3-2026">—</div></div>
   </div>
   <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Compra de veículos por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a3" role="img" aria-label="Compra veículos"></canvas></div></div>
+  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Compra de veículos por mês — ano atual</div><div class="chart-wrap" style="height:220px"><canvas id="ch-a3-mo" role="img" aria-label="Compra veículos mensal ano atual"></canvas></div></div>
 </div>
 
 <div id="p-venda" class="page">
@@ -772,6 +779,7 @@ table.dre td.col-total{
     <div class="kpi-card green"><div class="kpi-label">2026</div><div class="kpi-value green" id="a4-2026">—</div></div>
   </div>
   <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Venda de veículos por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a4" role="img" aria-label="Venda veículos"></canvas></div></div>
+  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Venda de veículos por mês — ano atual</div><div class="chart-wrap" style="height:220px"><canvas id="ch-a4-mo" role="img" aria-label="Venda veículos mensal ano atual"></canvas></div></div>
 </div>
 
 <div id="p-juros" class="page">
@@ -782,6 +790,7 @@ table.dre td.col-total{
     <div class="kpi-card red"><div class="kpi-label">2021 (negativo)</div><div class="kpi-value red">-R$ 17.640,63</div><div class="kpi-delta">Verificar lançamentos</div></div>
   </div>
   <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Juros por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a5" role="img" aria-label="Juros"></canvas></div></div>
+  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Juros por mês — ano atual</div><div class="chart-wrap" style="height:220px"><canvas id="ch-a5-mo" role="img" aria-label="Juros mensais ano atual"></canvas></div></div>
 </div>
 
 <div id="p-lucro" class="page">
@@ -792,11 +801,12 @@ table.dre td.col-total{
     <div class="kpi-card amber"><div class="kpi-label">2026 (parcial)</div><div class="kpi-value amber" id="a6-2026">—</div></div>
   </div>
   <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Distribuição de lucros por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a6" role="img" aria-label="Distribuição lucros"></canvas></div></div>
+  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Distribuição de lucros por mês — ano atual</div><div class="chart-wrap" style="height:220px"><canvas id="ch-a6-mo" role="img" aria-label="Distribuição lucros mensal ano atual"></canvas></div></div>
 </div>
 
 <!-- RENTABILIDADE -->
 <div id="p-rent" class="page">
-  <div class="page-header"><div><div class="page-title">Rentabilidade</div><div class="page-sub">Exclui: Consolidado, Dist. Lucro, Imobilizado, Verificar</div></div></div>
+  <div class="page-header"><div><div class="page-title">Rentabilidades</div><div class="page-sub">Exclui: Consolidado, Dist. Lucro, Imobilizado, Verificar</div></div></div>
   <div class="kpi-grid">
     <div class="kpi-card green"><div class="kpi-label">Acumulado 2015–2025</div><div class="kpi-value green" id="r7-tot">—</div></div>
     <div class="kpi-card green"><div class="kpi-label">Melhor ano</div><div class="kpi-value green" id="r7-best">—</div></div>
@@ -1275,14 +1285,21 @@ function renderPage(id){
 // ═══════════════════════════════════════════════════
 function setMode(m){
   STATE.mode=m; _cache=null; _cacheKey='';
-  document.getElementById('btn-comp').classList.toggle('active',m==='comp');
-  document.getElementById('btn-cx').classList.toggle('active',m==='cx');
+  const bc=document.getElementById('btn-comp');if(bc)bc.classList.toggle('active',m==='comp');
+  const bx=document.getElementById('btn-cx');if(bx)bx.classList.toggle('active',m==='cx');
   const label=m==='comp'?'Modo Competência':'Modo Caixa';
   const el=document.getElementById('ov-mode-label');
   if(el) el.textContent=label+' · Dados filtrados';
   renderOverview();
   renderCashflow();
   renderRanking();
+}
+
+function logout(){
+  if(confirm('Deseja sair do DashLog?')){
+    sessionStorage.removeItem('dashlog_auth');
+    location.reload();
+  }
 }
 
 // ═══════════════════════════════════════════════════
@@ -1628,6 +1645,33 @@ function renderSimple(prefix, tipoName){
   const chartData = ['Despesa','Compra de Veículo','Distribuição Lucro'].includes(tipoName) ? vals.map(v=>Math.abs(v)) : vals;
   mkChart('ch-'+prefix,{type:'bar',
     data:{labels:ANOS12,datasets:[{label:'Valor',data:chartData,backgroundColor:colors,borderWidth:0,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}}},
+      scales:{y:{grid:{color:gc},ticks:{callback:v=>fmtK(v),color:tc,font:{size:10}}},x:{grid:{display:false},ticks:{color:tc,font:{size:10},autoSkip:false}}}}
+  });
+
+  // Gráfico mensal — ano atual
+  const anoAtualStr = String(new Date().getFullYear());
+  const meses=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const moVals = [0,0,0,0,0,0,0,0,0,0,0,0];
+  for(let i=0;i<R.length;i++){
+    const row=R[i];
+    if(TIPO[row[I_TIPO]]!==tipoName) continue;
+    const mo=MO[row[I_DC]]||'';
+    if(!mo.startsWith(anoAtualStr)) continue;
+    const mIdx=parseInt(mo.slice(5,7),10)-1;
+    if(mIdx>=0 && mIdx<12) moVals[mIdx]+=row[I_VAL];
+  }
+  const moColor = tipoName==='Receita'||tipoName==='Venda De Veículo'
+    ? moVals.map(v=>v>=0?mkRGBA(GREEN,'0.75'):mkRGBA(RED,'0.75'))
+    : tipoName==='Juros'
+    ? moVals.map(v=>v>=0?mkRGBA(GREEN,'0.75'):mkRGBA(RED,'0.75'))
+    : tipoName==='Distribuição Lucro'
+    ? moVals.map(()=>mkRGBA(AMBER,'0.75'))
+    : moVals.map(()=>posC);
+  const moChart = ['Despesa','Compra de Veículo','Distribuição Lucro'].includes(tipoName) ? moVals.map(v=>Math.abs(v)) : moVals;
+  mkChart('ch-'+prefix+'-mo',{type:'bar',
+    data:{labels:meses,datasets:[{label:'Valor',data:moChart,backgroundColor:moColor,borderWidth:0,borderRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}}},
       scales:{y:{grid:{color:gc},ticks:{callback:v=>fmtK(v),color:tc,font:{size:10}}},x:{grid:{display:false},ticks:{color:tc,font:{size:10},autoSkip:false}}}}
