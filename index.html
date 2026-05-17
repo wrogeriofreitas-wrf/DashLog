@@ -218,8 +218,8 @@ body::before{
 .chart-row{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap;}
 .chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .chart-title{font-size:13px;font-weight:500;color:var(--text);}
-.info-btn{font-size:10px;font-family:var(--mono);color:var(--blue);background:var(--blue2);border:1px solid var(--blue);border-radius:5px;padding:3px 9px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;line-height:1.6;}
-.info-btn:hover{background:rgba(59,158,255,0.25);}
+.info-btn{font-size:10px;font-family:var(--mono);color:#F8AB12;background:rgba(248,171,18,0.12);border:1px solid #F8AB12;border-radius:5px;padding:3px 9px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;line-height:1.6;}
+.info-btn:hover{background:rgba(248,171,18,0.28);}
 .info-panel{display:none;background:rgba(59,158,255,0.05);border:1px solid rgba(59,158,255,0.18);border-radius:7px;padding:10px 13px;margin-top:8px;font-size:11px;color:var(--text2);line-height:1.65;}
 .info-panel.open{display:block;}
 .chart-sub{font-size:11px;color:var(--text3);font-family:var(--mono);}
@@ -372,9 +372,9 @@ table.dre td.col-total{
   border:0.5px solid var(--border2);background:var(--bg3);color:var(--text2);
   transition:all .18s;font-family:var(--mono);user-select:none;
 }
-.yr-pill:hover{border-color:var(--green);color:var(--green);}
+.yr-pill:hover{border-color:var(--green);color:var(--green);background:var(--green2);}
 .yr-pill.yr-sel{background:rgba(59,158,255,0.18);border-color:var(--blue);color:var(--blue);}
-.yr-pill.yr-all{background:rgba(16,217,160,0.15);border-color:var(--green);color:var(--green);}
+.yr-pill.yr-all{background:rgba(59,158,255,0.18);border-color:var(--blue);color:var(--blue);}
 .yr-hint{font-size:10px;color:var(--text3);font-family:var(--mono);align-self:center;}
 /* sidebar scrollable */
 .sidebar{overflow-y:auto;}
@@ -500,19 +500,17 @@ table.dre td.col-total{
   <div class="nav-group">
     <div class="nav-label" onclick="toggleNav(this)">Análises</div>
     <div class="nav-items">
-      <div class="nav-item" onclick="nav('p-receita',this)"><span class="nav-icon">↑</span><span>Receitas</span></div>
-      <div class="nav-item" onclick="nav('p-despesa',this)"><span class="nav-icon">↓</span><span>Despesas</span></div>
-      <div class="nav-item" onclick="nav('p-compra',this)"><span class="nav-icon">⇩</span><span>Compra Veículos</span></div>
-      <div class="nav-item" onclick="nav('p-venda',this)"><span class="nav-icon">⇧</span><span>Venda Veículos</span></div>
-      <div class="nav-item" onclick="nav('p-juros',this)"><span class="nav-icon">%</span><span>Juros</span></div>
-      <div class="nav-item" onclick="nav('p-lucro',this)"><span class="nav-icon">◆</span><span>Dist. Lucros</span></div>
-      <div class="nav-item" onclick="nav('p-rent',this)"><span class="nav-icon">≈</span><span>Rentabilidades</span></div>
+      <div class="nav-item" onclick="nav('p-analise',this)"><span class="nav-icon">◫</span>Resultado Financeiro</div>
+      <div class="nav-item" onclick="nav('p-compravenda',this)"><span class="nav-icon">⇅</span>Compras x Vendas</div>
+      <div class="nav-item" onclick="nav('p-lucro',this)"><span class="nav-icon">◆</span>Dist. Lucros</div>
+      <div class="nav-item" onclick="nav('p-rent',this)"><span class="nav-icon">≈</span>Rentabilidades</div>
+      <div class="nav-item" onclick="nav('p-roe',this)"><span class="nav-icon">◉</span>ROE por Veículo</div>
     </div>
   </div>
   <div class="nav-group">
     <div class="nav-label" onclick="toggleNav(this)">DRE</div>
     <div class="nav-items">
-      <div class="nav-item" onclick="nav('p-dre',this)"><span class="nav-icon">≡</span><span style="text-decoration:underline;text-underline-offset:3px;">DRE por Placa</span></div>
+      <div class="nav-item" onclick="nav('p-dre',this)"><span class="nav-icon">≡</span>DRE por Placa</div>
     </div>
   </div>
   <div class="nav-group">
@@ -524,12 +522,18 @@ table.dre td.col-total{
       </div>
     </div>
   </div>
-  <div class="sidebar-footer">
+  <div class="nav-group" id="nav-group-patrimonio">
+    <div class="nav-label" onclick="toggleNav(this)">Patrimônio</div>
+    <div class="nav-items">
+      <div class="nav-item" onclick="nav('p-fichas',this)"><span class="nav-icon">📋</span>Fichas dos Veículos</div>
+    </div>
+  </div>
+  </div><!-- /nav-groups -->
     <div class="logout-btn" onclick="logout()" title="Sair do sistema">
       <span style="font-size:13px;">⎋</span> Sair
     </div>
     <div style="text-align:center;margin-top:8px;font-size:10px;color:var(--text3);font-family:var(--mono);">
-      <div>Versão 1.0.1</div>
+      <div>Versão 1.0.2 Teste</div>
     </div>
   </div>
   </div>
@@ -576,10 +580,7 @@ table.dre td.col-total{
     <span id="f-summary"></span>
   </div>
   <div class="alert-bar" id="ov-alerts"></div>
-  <!-- FILTRO DE ANO -->
   <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;align-items:center;" id="ov-yr-pills"></div>
-
-  <!-- 5 CARDS -->
   <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(175px,1fr));margin-bottom:20px;">
     <div class="kpi-card green">
       <div class="kpi-icon">↑</div>
@@ -601,7 +602,7 @@ table.dre td.col-total{
     </div>
     <div class="kpi-card amber">
       <div class="kpi-icon">%</div>
-      <div class="kpi-label">Margem de Lucro</div>
+      <div class="kpi-label">Margem Operacional</div>
       <div class="kpi-value amber" id="kpi-mar">—</div>
       <div class="kpi-delta">Lucro Operacional / Receita</div>
     </div>
@@ -629,10 +630,10 @@ table.dre td.col-total{
     <div class="chart-card half">
       <div class="chart-header">
         <div>
-          <div class="chart-title">Lucro Operacional Mensal (Ano Atual)
-            <span style="font-size:10px;font-weight:400;color:var(--amber);font-family:var(--mono);margin-left:6px;">⚠ Resultado Prévio</span>
+          <div class="chart-title">Lucro Operacional Mensal
+            <span id="ov-previo-tag" style="font-size:10px;font-weight:400;color:var(--amber);font-family:var(--mono);margin-left:6px;display:none;">⚠ Resultado Prévio</span>
           </div>
-          <div class="chart-sub">2026 · mês a mês · ano em andamento</div>
+          <div class="chart-sub">Mês a mês · de acordo com a seleção</div>
         </div>
       </div>
       <div class="chart-wrap" style="height:260px">
@@ -641,20 +642,7 @@ table.dre td.col-total{
     </div>
   </div>
 
-  <!-- GRÁFICO 3: Saldo Bancário -->
-  <div class="chart-card" style="margin-bottom:16px;">
-    <div class="chart-header">
-      <div>
-        <div class="chart-title">Saldo Bancário</div>
-        <div class="chart-sub">Evolução acumulada do saldo</div>
-      </div>
-    </div>
-    <div class="chart-wrap" style="height:240px">
-      <canvas id="ch-saldo-bancario" role="img" aria-label="Saldo bancário acumulado por ano"></canvas>
-    </div>
-  </div>
-
-  <!-- GRÁFICO 4 + 5: Rosca e Contas -->
+  <!-- GRÁFICO 3 + 4: Rosca e Contas -->
   <div class="chart-row">
     <div class="chart-card half">
       <div class="chart-header">
@@ -680,6 +668,19 @@ table.dre td.col-total{
       </div>
     </div>
   </div>
+
+  <!-- GRÁFICO 5: Saldo Bancário — estático, sempre todos os anos -->
+  <div class="chart-card" style="margin-top:16px;">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Saldo Bancário Acumulado</div>
+        <div class="chart-sub">Evolução histórica — independente dos filtros de ano</div>
+      </div>
+    </div>
+    <div class="chart-wrap" style="height:240px">
+      <canvas id="ch-saldo-bancario" role="img" aria-label="Saldo bancário acumulado por ano"></canvas>
+    </div>
+  </div>
 </div>
 
 <!-- ════════════════════════════════
@@ -687,23 +688,22 @@ table.dre td.col-total{
 ════════════════════════════════ -->
 <div id="p-cashflow" class="page">
   <div class="page-header">
-    <div><div class="page-title">Fluxo de Caixa</div><div class="page-sub">Comparativo Caixa vs Competência</div></div>
+    <div><div class="page-title">Fluxo de Caixa</div><div class="page-sub">Entradas e saídas pagas por período</div></div>
   </div>
-  <div class="alert-bar" id="cf-alerts"></div>
-  <div class="kpi-grid">
-    <div class="kpi-card green"><div class="kpi-label">Saldo Caixa (total)</div><div class="kpi-value green" id="cf-kpi-cx">—</div><div class="kpi-delta">Pelo pagamento</div></div>
-    <div class="kpi-card blue"><div class="kpi-label">Resultado Competência</div><div class="kpi-value blue" id="cf-kpi-comp">—</div><div class="kpi-delta">Pelo accrual</div></div>
-    <div class="kpi-card amber"><div class="kpi-label">Diferença C/C</div><div class="kpi-value amber" id="cf-kpi-diff">—</div><div class="kpi-delta">Caixa − Competência</div></div>
-    <div class="kpi-card purple"><div class="kpi-label">PMR (Recebimento)</div><div class="kpi-value purple" id="cf-pmr">—</div><div class="kpi-delta">Prazo médio dias</div></div>
-    <div class="kpi-card red"><div class="kpi-label">PMP (Pagamento)</div><div class="kpi-value white" id="cf-pmp">—</div><div class="kpi-delta">Prazo médio dias</div></div>
-    <div class="kpi-card amber"><div class="kpi-label">Nec. Capital Giro</div><div class="kpi-value amber" id="cf-ncg">—</div><div class="kpi-delta">PMR − PMP (dias)</div></div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;align-items:center;">
+    <span style="font-size:11px;color:var(--text3);font-family:var(--mono);">Ano:</span>
+    <div id="cf-yr-pills" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
   </div>
-  <div class="chart-card">
-    <div class="chart-header"><div><div class="chart-title">Fluxo de Caixa vs Competência</div><div class="chart-sub">Evolução mensal comparativa</div></div></div>
-    <div class="chart-wrap" style="height:280px"><canvas id="ch-cashflow" role="img" aria-label="Fluxo de caixa"></canvas></div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;align-items:center;">
+    <span style="font-size:11px;color:var(--text3);font-family:var(--mono);">Período:</span>
+    <div id="cf-period-pills" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
   </div>
   <div class="chart-card">
-    <div class="chart-header"><div><div class="chart-title">Saldo Acumulado</div><div class="chart-sub">Caixa acumulado ao longo do tempo</div></div></div>
+    <div class="chart-header"><div><div class="chart-title">Fluxo de Caixa</div><div class="chart-sub" id="cf-chart-sub">Entradas · Saídas · Compras · Vendas de Veículos — valores pagos/lançados</div></div></div>
+    <div class="chart-wrap" style="height:320px"><canvas id="ch-cashflow" role="img" aria-label="Fluxo de caixa"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-header"><div><div class="chart-title">Saldo Acumulado</div><div class="chart-sub">Saldo financeiro acumulado ao longo do tempo</div></div></div>
     <div class="chart-wrap" style="height:220px"><canvas id="ch-saldo" role="img" aria-label="Saldo acumulado"></canvas></div>
   </div>
 </div>
@@ -719,6 +719,15 @@ table.dre td.col-total{
   <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;align-items:center;" id="rank-yr-pills">
     <!-- pills inserted by JS -->
   </div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;align-items:center;">
+    <span style="font-size:11px;color:var(--text3);font-family:var(--mono);">Período:</span>
+    <div id="rank-period-pills" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+  </div>
+  <div class="kpi-grid" style="margin-bottom:16px;">
+    <div class="kpi-card green"><div class="kpi-label">Total Receitas</div><div class="kpi-value green" id="rank-tot-rec">—</div></div>
+    <div class="kpi-card red"><div class="kpi-label">Total Despesas</div><div class="kpi-value red" id="rank-tot-cost">—</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Resultado Total</div><div class="kpi-value" id="rank-tot-luc">—</div></div>
+  </div>
   <div class="rank-list" id="rank-list"></div>
 </div>
 
@@ -727,96 +736,91 @@ table.dre td.col-total{
 ════════════════════════════════ -->
 <div id="p-score" class="page">
   <div class="page-header">
-    <div><div class="page-title">Score & Alertas</div><div class="page-sub">Avaliação automática por veículo</div></div>
+    <div><div class="page-title">Score & Alertas</div><div class="page-sub">Score Operacional de Frota — SOF 2.0</div></div>
   </div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;align-items:center;" id="sc-yr-pills"></div>
   <div class="alert-bar" id="sc-alerts"></div>
-  <div class="filter-bar" style="margin-bottom:16px;">
-    <div class="filter-group">
-      <span class="filter-label">Análise</span>
-      <select id="sc-yr" onchange="renderScore()">
-        <option value="">Total Acumulado</option>
-      </select>
-    </div>
+  <!-- 6 cards de destaque da frota -->
+  <div class="kpi-grid" style="margin-bottom:16px;">
+    <div class="kpi-card green"><div class="kpi-label">🏆 Melhor km/l</div><div class="kpi-value green" id="sc-best-kml">—</div><div class="kpi-delta" id="sc-best-kml-placa">—</div></div>
+    <div class="kpi-card red"><div class="kpi-label">⚠ Pior km/l</div><div class="kpi-value red" id="sc-worst-kml">—</div><div class="kpi-delta" id="sc-worst-kml-placa">—</div></div>
+    <div class="kpi-card green"><div class="kpi-label">💰 Maior receita/km</div><div class="kpi-value green" id="sc-best-rpkm">—</div><div class="kpi-delta" id="sc-best-rpkm-placa">—</div></div>
+    <div class="kpi-card red"><div class="kpi-label">📉 Menor receita/km</div><div class="kpi-value red" id="sc-worst-rpkm">—</div><div class="kpi-delta" id="sc-worst-rpkm-placa">—</div></div>
+    <div class="kpi-card green"><div class="kpi-label">✅ Menor custo/km</div><div class="kpi-value green" id="sc-best-cpkm">—</div><div class="kpi-delta" id="sc-best-cpkm-placa">—</div></div>
+    <div class="kpi-card red"><div class="kpi-label">❌ Maior custo/km</div><div class="kpi-value red" id="sc-worst-cpkm">—</div><div class="kpi-delta" id="sc-worst-cpkm-placa">—</div></div>
   </div>
+  <!-- Cards por veículo -->
   <div class="score-grid" id="score-grid"></div>
-  <div class="chart-card">
-    <div class="chart-header"><div><div class="chart-title">Lucro por Placa</div><div class="chart-sub">Resultado acumulado total</div></div></div>
-    <div class="chart-wrap" style="height:280px"><canvas id="ch-placa-lucro" role="img" aria-label="Lucro por placa"></canvas></div>
+  <!-- Gráficos comparativos -->
+  <div class="chart-card" style="margin-top:16px;">
+    <div class="chart-header"><div><div class="chart-title">Custo por KM por veículo (R$/km)</div><div class="chart-sub">Verde = abaixo da média · Vermelho = acima da média</div></div></div>
+    <div class="chart-wrap" style="height:260px"><canvas id="ch-cpkm" role="img" aria-label="Custo por km"></canvas></div>
+  </div>
+  <div class="chart-card" style="margin-top:16px;">
+    <div class="chart-header"><div><div class="chart-title">Consumo (km/litro) por veículo</div><div class="chart-sub">Verde = acima da média · Vermelho = abaixo da média</div></div></div>
+    <div class="chart-wrap" style="height:260px"><canvas id="ch-kml" role="img" aria-label="Consumo km/litro"></canvas></div>
+  </div>
+  <div class="chart-card" style="margin-top:16px;">
+    <div class="chart-header"><div><div class="chart-title">Lucro operacional por veículo (R$)</div><div class="chart-sub">Verde = lucro · Vermelho = prejuízo</div></div></div>
+    <div class="chart-wrap" style="height:260px"><canvas id="ch-placa-lucro" role="img" aria-label="Lucro por placa"></canvas></div>
   </div>
 </div>
 
 <!-- ════════════════════════════════
      ANÁLISE SIMPLES (01-06 + RENT)
 ════════════════════════════════ -->
-<div id="p-receita" class="page">
-  <div class="page-header"><div><div class="page-title">Análise 01 — Receitas</div><div class="page-sub">Soma de todos os lançamentos de Receita</div></div></div>
+<div id="p-analise" class="page">
+  <div class="page-header"><div><div class="page-title">Resultado Financeiro</div><div class="page-sub">Receitas, Despesas e Juros — visão comparativa</div></div></div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;align-items:center;" id="an-yr-pills"></div>
   <div class="kpi-grid">
-    <div class="kpi-card green"><div class="kpi-label">Receita Total (2015–2026)</div><div class="kpi-value green" id="a1-tot">—</div></div>
-    <div class="kpi-card green"><div class="kpi-label">Melhor ano</div><div class="kpi-value green" id="a1-best">—</div></div>
-    <div class="kpi-card amber"><div class="kpi-label">2026 (parcial)</div><div class="kpi-value amber" id="a1-2026">—</div><div class="kpi-delta">Ano em andamento</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Total Receitas</div><div class="kpi-value green" id="an-rec">—</div></div>
+    <div class="kpi-card red"><div class="kpi-label">Total Despesas</div><div class="kpi-value red" id="an-desp">—</div></div>
+    <div class="kpi-card amber"><div class="kpi-label">Total Juros</div><div class="kpi-value amber" id="an-jur">—</div></div>
+    <div class="kpi-card blue"><div class="kpi-label">Lucro Financeiro</div><div class="kpi-value" id="an-luc">—</div></div>
+    <div class="kpi-card amber"><div class="kpi-label">Margem Líquida</div><div class="kpi-value amber" id="an-marg">—</div></div>
   </div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Receita por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a1" role="img" aria-label="Receita anual"></canvas></div></div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Receitas por mês — ano atual</div><div class="chart-wrap" style="height:220px"><canvas id="ch-a1-mo" role="img" aria-label="Receita mensal ano atual"></canvas></div></div>
+  <div class="chart-card">
+    <div class="chart-title" style="margin-bottom:14px">Resultado Financeiro — Mês a Mês</div>
+    <div class="chart-wrap" style="height:240px"><canvas id="ch-analise-mo" role="img" aria-label="Resultado financeiro mensal"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title" style="margin-bottom:14px">Resultado Financeiro — Ano a Ano</div>
+    <div class="chart-wrap" style="height:300px"><canvas id="ch-analise-yr" role="img" aria-label="Resultado financeiro anual"></canvas></div>
+  </div>
 </div>
 
-<div id="p-despesa" class="page">
-  <div class="page-header"><div><div class="page-title">Análise 02 — Despesas</div><div class="page-sub">Pago + Pendente</div></div></div>
+<div id="p-compravenda" class="page">
+  <div class="page-header"><div><div class="page-title">Compras x Vendas</div><div class="page-sub">Aquisições e desinvestimentos de veículos</div></div></div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;align-items:center;" id="cv-yr-pills"></div>
   <div class="kpi-grid">
-    <div class="kpi-card red"><div class="kpi-label">Despesa Total (2015–2026)</div><div class="kpi-value red" id="a2-tot">—</div></div>
-    <div class="kpi-card red"><div class="kpi-label">Maior despesa</div><div class="kpi-value red" id="a2-best">—</div></div>
-    <div class="kpi-card amber"><div class="kpi-label">2026</div><div class="kpi-value amber" id="a2-2026">—</div></div>
+    <div class="kpi-card red"><div class="kpi-label">Total Compras (2015–2026)</div><div class="kpi-value red" id="cv-tot-cmp">—</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Total Vendas (2015–2026)</div><div class="kpi-value green" id="cv-tot-vnd">—</div></div>
   </div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Despesas por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a2" role="img" aria-label="Despesas anuais"></canvas></div></div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Despesas por mês — ano atual</div><div class="chart-wrap" style="height:220px"><canvas id="ch-a2-mo" role="img" aria-label="Despesas mensais ano atual"></canvas></div></div>
-</div>
-
-<div id="p-compra" class="page">
-  <div class="page-header"><div><div class="page-title">Análise 03 — Compra de Veículos</div></div></div>
-  <div class="kpi-grid">
-    <div class="kpi-card red"><div class="kpi-label">Total Investido</div><div class="kpi-value red" id="a3-tot">—</div></div>
-    <div class="kpi-card red"><div class="kpi-label">Maior aquisição</div><div class="kpi-value red" id="a3-best">—</div></div>
-    <div class="kpi-card green"><div class="kpi-label">2026</div><div class="kpi-value green" id="a3-2026">—</div></div>
+  <div class="chart-card">
+    <div class="chart-title" style="margin-bottom:14px">Compras × Vendas — Mês a Mês</div>
+    <div class="chart-wrap" style="height:220px"><canvas id="ch-cv-mo" role="img" aria-label="Compras e vendas mensais"></canvas></div>
   </div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Compra de veículos por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a3" role="img" aria-label="Compra veículos"></canvas></div></div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Compra de veículos por mês — ano atual</div><div class="chart-wrap" style="height:220px"><canvas id="ch-a3-mo" role="img" aria-label="Compra veículos mensal ano atual"></canvas></div></div>
-</div>
-
-<div id="p-venda" class="page">
-  <div class="page-header"><div><div class="page-title">Análise 04 — Venda de Veículos</div></div></div>
-  <div class="kpi-grid">
-    <div class="kpi-card green"><div class="kpi-label">Total Recebido</div><div class="kpi-value green" id="a4-tot">—</div></div>
-    <div class="kpi-card green"><div class="kpi-label">Melhor venda</div><div class="kpi-value green" id="a4-best">—</div></div>
-    <div class="kpi-card green"><div class="kpi-label">2026</div><div class="kpi-value green" id="a4-2026">—</div></div>
+  <div class="chart-card">
+    <div class="chart-title" style="margin-bottom:14px">Compras × Vendas — Ano a Ano</div>
+    <div class="chart-wrap" style="height:280px"><canvas id="ch-cv-yr" role="img" aria-label="Compras e vendas anuais"></canvas></div>
   </div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Venda de veículos por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a4" role="img" aria-label="Venda veículos"></canvas></div></div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Venda de veículos por mês — ano atual</div><div class="chart-wrap" style="height:220px"><canvas id="ch-a4-mo" role="img" aria-label="Venda veículos mensal ano atual"></canvas></div></div>
 </div>
-
-<div id="p-juros" class="page">
-  <div class="page-header"><div><div class="page-title">Análise 05 — Juros</div></div></div>
-  <div class="kpi-grid">
-    <div class="kpi-card blue"><div class="kpi-label">Total Juros</div><div class="kpi-value blue" id="a5-tot">—</div></div>
-    <div class="kpi-card blue"><div class="kpi-label">Maior ano</div><div class="kpi-value blue" id="a5-best">—</div></div>
-    <div class="kpi-card red"><div class="kpi-label">2021 (negativo)</div><div class="kpi-value red">-R$ 17.640,63</div><div class="kpi-delta">Verificar lançamentos</div></div>
-  </div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Juros por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a5" role="img" aria-label="Juros"></canvas></div></div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Juros por mês — ano atual</div><div class="chart-wrap" style="height:220px"><canvas id="ch-a5-mo" role="img" aria-label="Juros mensais ano atual"></canvas></div></div>
-</div>
-
 <div id="p-lucro" class="page">
-  <div class="page-header"><div><div class="page-title">Análise 06 — Distribuição de Lucros</div></div></div>
+  <div class="page-header"><div><div class="page-title">Distribuição de Lucros</div></div></div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;align-items:center;" id="luc-filter-pills"></div>
   <div class="kpi-grid">
     <div class="kpi-card purple"><div class="kpi-label">Total Distribuído</div><div class="kpi-value purple" id="a6-tot">—</div></div>
     <div class="kpi-card purple"><div class="kpi-label">Maior distribuição</div><div class="kpi-value purple" id="a6-best">—</div></div>
     <div class="kpi-card amber"><div class="kpi-label">2026 (parcial)</div><div class="kpi-value amber" id="a6-2026">—</div></div>
   </div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Distribuição de lucros por ano (R$)</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a6" role="img" aria-label="Distribuição lucros"></canvas></div></div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Distribuição de lucros por mês — ano atual</div><div class="chart-wrap" style="height:220px"><canvas id="ch-a6-mo" role="img" aria-label="Distribuição lucros mensal ano atual"></canvas></div></div>
+  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Distribuição de lucros por ano (R$) — estático</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a6" role="img" aria-label="Distribuição lucros"></canvas></div></div>
+  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Distribuição de lucros por mês — <span id="luc-mo-label">ano atual</span></div><div class="chart-wrap" style="height:220px"><canvas id="ch-a6-mo" role="img" aria-label="Distribuição lucros mensal"></canvas></div></div>
 </div>
 
 <!-- RENTABILIDADE -->
 <div id="p-rent" class="page">
   <div class="page-header"><div><div class="page-title">Rentabilidades</div><div class="page-sub">Exclui: Consolidado, Dist. Lucro, Imobilizado, Verificar</div></div></div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;align-items:center;" id="rent-yr-pills"></div>
   <div class="kpi-grid">
     <div class="kpi-card green"><div class="kpi-label">Acumulado 2015–2025</div><div class="kpi-value green" id="r7-tot">—</div></div>
     <div class="kpi-card green"><div class="kpi-label">Melhor ano</div><div class="kpi-value green" id="r7-best">—</div></div>
@@ -874,6 +878,36 @@ table.dre td.col-total{
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;" id="ctrl-cards"></div>
 </div>
 
+<!-- ════════════════════════════════
+     FICHAS DOS VEÍCULOS
+════════════════════════════════ -->
+<div id="p-fichas" class="page">
+  <div class="page-header"><div><div class="page-title">Fichas dos Veículos</div><div class="page-sub">Participação econômica e diretrizes de transferência</div></div></div>
+  <div id="fichas-aviso" style="background:var(--amber2);border:1px solid rgba(240,180,41,0.25);border-radius:var(--radius);padding:10px 16px;font-size:11px;color:var(--amber);margin-bottom:20px;font-family:var(--mono);line-height:1.6;"></div>
+  <div class="kpi-grid" style="margin-bottom:24px;" id="fichas-total-grid"></div>
+  <div id="fichas-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;"></div>
+</div>
+
+<!-- ════════════════════════════════
+     ROE POR VEÍCULO
+════════════════════════════════ -->
+<div id="p-roe" class="page">
+  <div class="page-header"><div><div class="page-title">ROE por Veículo</div><div class="page-sub">Retorno sobre o valor de mercado por ano</div></div></div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;align-items:center;" id="roe-yr-pills"></div>
+  <div id="roe-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(460px,1fr));gap:16px;margin-bottom:24px;"></div>
+  <div>
+    <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);" id="roe-rank-title">Ranking ROE</div>
+    <div id="roe-ranking"></div>
+  </div>
+  <div style="margin-top:28px;">
+    <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;padding-bottom:8px;border-bottom:1px solid var(--border);">
+      Análise de Decisão — Manter ou Vender?
+      <span style="font-size:10px;font-weight:400;color:var(--text3);margin-left:8px;">ROE vs Depreciação real · baseado no histórico de valores</span>
+    </div>
+    <div id="roe-decisao-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:14px;"></div>
+  </div>
+</div>
+
 </div><!-- /main -->
 <script>
 // ═══════════════════════════════════════════════════
@@ -885,13 +919,24 @@ const I_CC=0,I_CAT=1,I_TIPO=2,I_DC=3,I_DP=4,I_VAL=5,I_KM=6,I_LTS=7;
 
 
 let _usuarios=[];
-function tentarLogin(){
+async function sha256(texto){
+  // Converter para maiúsculas antes de hash (case-insensitive)
+  const upper=texto.toUpperCase();
+  const msgBuffer=new TextEncoder().encode(upper);
+  const hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);
+  const hashArray=Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function tentarLogin(){
   const u=(document.getElementById('l-user').value||'').trim().toUpperCase();
-  const p=(document.getElementById('l-pass').value||'').trim().toUpperCase();
-  if(_usuarios.some(x=>x.u.toUpperCase()===u&&x.p.toUpperCase()===p)){
+  const p=(document.getElementById('l-pass').value||'').trim();
+  const pHash=await sha256(p);
+  if(_usuarios.some(x=>x.u.toUpperCase()===u&&x.p===pHash)){
     sessionStorage.setItem('dashlog_auth','1');
+    sessionStorage.setItem('dashlog_user',u);
     document.getElementById('login-overlay').remove();
     document.getElementById('login-style').remove();
+    aplicarPermissoes();
   } else {
     document.getElementById('l-err').style.display='block';
     document.getElementById('l-pass').value='';
@@ -923,16 +968,18 @@ async function loadData(){
     CC  = _D.CC;  CAT = _D.CAT;  TIPO= _D.TIPO;
     MO  = _D.MO;  DRV = _D.DRV;  R   = _D.R;
     OP_CCS = CC.filter(c=>!EXCL_CC.has(c));
-
-    // Data do JSON → injeta em todos os page-title e sidebar
+    // Injetar data do JSON em todos os page-sub de todas as telas
     if(payload.meta && payload.meta.gerado){
-      const partes = payload.meta.gerado.split(' ')[0].split('-'); // "2026-04-21"
-      const dataFmt = `${partes[2]}/${partes[1]}/${partes[0]}`;
-      document.querySelectorAll('.page-title').forEach(el=>{
-        el.innerHTML = el.textContent + ` <em style="font-size:12px;font-weight:400;color:var(--text3);"> — Atualizado em: ${dataFmt}</em>`;
+      const partes=payload.meta.gerado.split(' ')[0].split('-');
+      const dataFmt=partes[2]+'/'+partes[1]+'/'+partes[0];
+      const hora=payload.meta.gerado.split(' ')[1]?payload.meta.gerado.split(' ')[1].slice(0,5):'';
+      const dataHora=dataFmt+(hora?' às '+hora:'');
+      document.querySelectorAll('.page-sub').forEach(el=>{
+        if(!el.id&&!el.dataset.nodate){
+          el.dataset.origText=el.dataset.origText||el.innerHTML;
+          el.innerHTML=el.dataset.origText+' <em style="font-size:10px;color:var(--text3);font-weight:400;"> · Dados atualizados em: '+dataHora+'</em>';
+        }
       });
-      const sbData = document.getElementById('sb-data-json');
-      if(sbData) sbData.textContent = ``;
     }
     return true;
   }catch(err){
@@ -1143,6 +1190,9 @@ function precompute(){
     });
   });
 
+  const now=new Date();
+  const limSupStatic=now.getFullYear()*12+now.getMonth()+1; // usado só no rentByYear/dreData
+
   for(let i=0;i<R.length;i++){
     const row=R[i];
     const cc  = CC[row[I_CC]];
@@ -1153,10 +1203,15 @@ function precompute(){
     const yr  = mo.slice(0,4);
     const mes = parseInt(mo.slice(5,7))-1; // 0-indexed
 
-    if(tipos.includes(tipo) && byTipoYear[tipo][yr]!==undefined)
+    // byTipoYear e rentByYear: sem limite superior — mostra todos os lançamentos
+    const isFuturo = false; // sem restrição de data futura
+
+    // byTipoYear: COM limite superior — exclui meses futuros
+    if(!isFuturo && tipos.includes(tipo) && byTipoYear[tipo][yr]!==undefined)
       byTipoYear[tipo][yr]+=val;
 
-    if(!EXCL_RENT.has(cc) && mo && rentByYear[yr]!==undefined){
+    // rentByYear e rentByCC: também com limite superior
+    if(!isFuturo && !EXCL_RENT.has(cc) && mo && rentByYear[yr]!==undefined){
       rentByYear[yr]+=val;
       if(rentByCC[cc] && rentByCC[cc][yr]!==undefined) rentByCC[cc][yr]+=val;
     }
@@ -1205,6 +1260,30 @@ function nav(id, el){
   renderPage(id);
 }
 function goHome(){
+  // Limpar todos os filtros de todas as telas
+  _ovYrs.clear();
+  _rankYrs.clear(); _rankPeriod='';
+  _cfPeriod='mensal'; _cfYrs.clear(); _cfYrPeriod='';
+  _anYrs.clear(); _anPeriod='';
+  _lucYrs.clear(); _lucPeriod='';
+  _roeYrs.clear(); _roePeriod='';
+  _cvAnoSel=null;
+  // Esconder cards de ano das Compras x Vendas
+  const cvCards=document.getElementById('cv-ano-cards');
+  if(cvCards) cvCards.style.display='none';
+  // Resetar pills visuais
+  syncOvPills();
+  syncRankPills();
+  syncAnPills();
+  // Resetar período cashflow
+  document.querySelectorAll('#cf-period-pills .yr-pill').forEach((p,i)=>{
+    p.classList.remove('yr-all','yr-sel');
+    if(i===0) p.classList.add('yr-all');
+  });
+  // Resetar renderizações cacheadas para forçar re-render
+  _rendered['p-analise']=0;
+  _rendered['p-compravenda']=0;
+  // Ir para visão geral
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const pg=document.getElementById('p-overview');
@@ -1222,6 +1301,7 @@ function setTheme(t){
   document.getElementById('btn-light').classList.toggle('t-active-light', t==='light');
   document.getElementById('btn-dark').classList.toggle('t-dark', true);
   document.getElementById('btn-light').classList.toggle('t-light', true);
+  localStorage.setItem('dashlog_theme', t);
   // re-render charts for color update
   _cache=null; _cacheKey='';
   renderOverview();
@@ -1232,11 +1312,122 @@ function toggleNav(labelEl){
   labelEl.classList.toggle('collapsed');
   const items=labelEl.nextElementSibling;
   if(items) items.classList.toggle('collapsed');
+  // Salvar estado dos menus
+  const estados={};
+  document.querySelectorAll('.nav-label').forEach(l=>{
+    estados[l.textContent.trim()]=l.classList.contains('collapsed')?'0':'1';
+  });
+  localStorage.setItem('dashlog_nav', JSON.stringify(estados));
 }
 
 // ── MULTI-YEAR RANKING PILLS ──
 const _rankYrs = new Set(); // empty = tudo
 const _ovYrs   = new Set(); // empty = tudo (Visão Geral)
+let _rankPeriod = ''; // '' = todos, 'ult12', 'ult6'
+let _ovPeriod   = ''; // '' = todos, 'ult12'
+const _anYrs = new Set(); // Resultado Financeiro filter
+const _lucYrs = new Set(); // Dist. Lucros filter
+let _lucPeriod = ''; // '' | 'ult3' | 'ult6' | 'ult12'
+let _anPeriod  = ''; // '' | 'ult3' | 'ult6' | 'ult12'
+
+// ── Função genérica de filtro pills + período ──────────────
+function createPeriodFilter({
+  wrapId,       // id do div container
+  yrsSet,       // Set de anos selecionados
+  periodVar,    // string com nome da variável de período ex: '_anPeriod'
+  onApply,      // callback chamado após seleção
+  meses3:has3=true, meses6:has6=true, meses12:has12=true
+}){
+  const wrap=document.getElementById(wrapId);
+  if(!wrap||wrap.children.length>0) return;
+
+  const getPeriod=()=>window[periodVar]||'';
+  const setPeriod=(v)=>{window[periodVar]=v;};
+
+  function syncVisual(){
+    wrap.querySelectorAll('.yr-pill').forEach(p=>{
+      const yr=p.dataset.yr, pd=p.dataset.pd;
+      p.classList.remove('yr-all','yr-sel');
+      if(pd){
+        if(getPeriod()===pd) p.classList.add('yr-all');
+      } else if(yr===''){
+        if(yrsSet.size===0&&getPeriod()==='') p.classList.add('yr-all');
+      } else {
+        if(yrsSet.has(yr)&&getPeriod()==='') p.classList.add('yr-sel');
+      }
+    });
+  }
+
+  // Pill Todos
+  const allP=document.createElement('div');
+  allP.className='yr-pill yr-all'; allP.textContent='Todos'; allP.dataset.yr='';
+  allP.onclick=()=>{ yrsSet.clear(); setPeriod(''); syncVisual(); onApply(); };
+  wrap.appendChild(allP);
+
+  // Pills período
+  const periodos=[];
+  if(has3) periodos.push(['ult3','Últ. 3m']);
+  if(has6) periodos.push(['ult6','Últ. 6m']);
+  if(has12) periodos.push(['ult12','Últ. 12m']);
+  periodos.forEach(([pd,lbl])=>{
+    const p=document.createElement('div');
+    p.className='yr-pill'; p.textContent=lbl; p.dataset.pd=pd;
+    p.onclick=()=>{ yrsSet.clear(); setPeriod(pd); syncVisual(); onApply(); };
+    wrap.appendChild(p);
+  });
+
+  // Pills por ano
+  ANOS12.forEach(yr=>{
+    const p=document.createElement('div');
+    p.className='yr-pill'; p.textContent=yr; p.dataset.yr=yr;
+    p.onclick=(e)=>{
+      setPeriod('');
+      if(e.ctrlKey||e.metaKey){
+        if(yrsSet.has(yr)) yrsSet.delete(yr); else yrsSet.add(yr);
+      } else { yrsSet.clear(); yrsSet.add(yr); }
+      syncVisual(); onApply();
+    };
+    wrap.appendChild(p);
+  });
+
+  syncVisual();
+}
+
+// ── Helper: calcular meses para período ───────────────────
+function getMosPeriod(periodVal, yrsSet){
+  // Retorna função de filtro de mês (mo string 'YYYY-MM')
+  if(!periodVal && yrsSet.size===0) return null; // todos
+  if(periodVal){
+    const n=parseInt(periodVal.replace('ult',''));
+    const now=new Date();
+    const limitAno=now.getFullYear(), limitMes=now.getMonth()+1;
+    const limitSeq=limitAno*12+limitMes;
+    return (mo)=>{
+      const [y,m]=mo.split('-').map(Number);
+      return (y*12+m)>(limitSeq-n);
+    };
+  }
+  return (mo)=>yrsSet.has(mo.slice(0,4));
+}
+
+function initRankingPeriodPills(){
+  const wrap=document.getElementById('rank-period-pills');
+  if(!wrap||wrap.children.length>0) return;
+  [['','Todos'],['ult3','Últ. 3m'],['ult6','Últ. 6m'],['ult12','Últ. 12m']].forEach(([val,lbl])=>{
+    const p=document.createElement('div');
+    p.className='yr-pill'+(val===_rankPeriod?' yr-all':'');
+    p.textContent=lbl;
+    p.onclick=()=>{
+      _rankPeriod=val;
+      wrap.querySelectorAll('.yr-pill').forEach(x=>x.classList.remove('yr-all','yr-sel'));
+      p.classList.add('yr-all');
+      // Period e anos são mutuamente exclusivos
+      if(val!==''){_rankYrs.clear();syncRankPills();}
+      renderRanking();
+    };
+    wrap.appendChild(p);
+  });
+}
 
 function initRankingPills(){
   const wrap=document.getElementById('rank-yr-pills');
@@ -1253,12 +1444,18 @@ function initRankingPills(){
     const p=document.createElement('div');
     p.className='yr-pill';p.textContent=yr;p.dataset.yr=yr;
     p.onclick=(e)=>{
+      _rankPeriod=''; // limpar período ao selecionar ano
       if(e.ctrlKey||e.metaKey){
         if(_rankYrs.has(yr)) _rankYrs.delete(yr); else _rankYrs.add(yr);
       } else {
         _rankYrs.clear(); _rankYrs.add(yr);
       }
       if(_rankYrs.size===ANOS12.length) _rankYrs.clear();
+      // Sync period pills visual
+      document.querySelectorAll('#rank-period-pills .yr-pill').forEach((x,i)=>{
+        x.classList.remove('yr-all','yr-sel');
+        if(i===0) x.classList.add('yr-all');
+      });
       syncRankPills(); renderRanking();
     };
     wrap.appendChild(p);
@@ -1286,34 +1483,74 @@ function syncOvPills(){
   document.querySelectorAll('#ov-yr-pills .yr-pill').forEach(p=>{
     const yr=p.dataset.yr;
     if(yr===''){
-      p.classList.toggle('yr-all', _ovYrs.size===0);
+      p.classList.toggle('yr-all',_ovYrs.size===0);
       p.classList.remove('yr-sel');
+    } else if(yr==='ult12'){
+      // special pill — highlight only when both current and prev year selected
+      p.classList.remove('yr-all','yr-sel');
     } else {
-      p.classList.toggle('yr-sel', _ovYrs.has(yr));
+      p.classList.toggle('yr-sel',_ovYrs.has(yr));
       p.classList.remove('yr-all');
     }
   });
 }
+function syncAnPills(){
+  document.querySelectorAll('#an-yr-pills .yr-pill').forEach(p=>{
+    const yr=p.dataset.yr;
+    if(yr===''){
+      p.classList.toggle('yr-all',_anYrs.size===0);
+      p.classList.remove('yr-sel');
+    } else {
+      p.classList.toggle('yr-sel',_anYrs.has(yr));
+      p.classList.remove('yr-all');
+    }
+  });
+}
+function initAnFilter(){
+  createPeriodFilter({
+    wrapId:'an-yr-pills',
+    yrsSet:_anYrs,
+    periodVar:'_anPeriod',
+    onApply:()=>renderAnalise()
+  });
+}
 function initOvFilter(){
   const wrap=document.getElementById('ov-yr-pills');
-  if(!wrap) return;
+  if(!wrap||wrap.children.length>0) return;
+  // Pill Todos
   const allPill=document.createElement('div');
   allPill.className='yr-pill yr-all';
   allPill.textContent='Todos';
   allPill.dataset.yr='';
-  allPill.onclick=()=>{ _ovYrs.clear(); syncOvPills(); renderOverview(); };
+  allPill.onclick=()=>{_ovYrs.clear();syncOvPills();renderOverview();};
   wrap.appendChild(allPill);
+  // Pill Últ 12m
+  const u12=document.createElement('div');
+  u12.className='yr-pill';u12.textContent='Últ. 12m';u12.dataset.yr='ult12';
+  u12.onclick=()=>{
+    const now=new Date();
+    const anoAtual=now.getFullYear();
+    _ovYrs.clear();
+    // Inclui ano atual e anterior se necessário
+    _ovYrs.add(String(anoAtual));
+    _ovYrs.add(String(anoAtual-1));
+    syncOvPills();renderOverview();
+  };
+  wrap.appendChild(u12);
+  // Pills por ano — Ctrl+clique para multi-select
   ANOS12.forEach(yr=>{
     const p=document.createElement('div');
-    p.className='yr-pill'; p.textContent=yr; p.dataset.yr=yr;
-    p.onclick=()=>{
-      if(p.shiftKey||false){
+    p.className='yr-pill';p.textContent=yr;p.dataset.yr=yr;
+    p.onclick=(e)=>{
+      if(e.ctrlKey||e.metaKey){
+        // Multi-select
         if(_ovYrs.has(yr)) _ovYrs.delete(yr); else _ovYrs.add(yr);
+        if(_ovYrs.size===0) _ovYrs.clear();
       } else {
-        _ovYrs.clear(); _ovYrs.add(yr);
+        // Single select
+        _ovYrs.clear();_ovYrs.add(yr);
       }
-      if(_ovYrs.size===ANOS12.length) _ovYrs.clear();
-      syncOvPills(); renderOverview();
+      syncOvPills();renderOverview();
     };
     wrap.appendChild(p);
   });
@@ -1327,15 +1564,14 @@ function renderPage(id){
   else if(id==='p-cashflow') renderCashflow();
   else if(id==='p-ranking') renderRanking();
   else if(id==='p-score') renderScore();
-  else if(id==='p-receita' && !_rendered[id]){ renderSimple('a1','Receita'); _rendered[id]=1; }
-  else if(id==='p-despesa' && !_rendered[id]){ renderSimple('a2','Despesa'); _rendered[id]=1; }
-  else if(id==='p-compra'  && !_rendered[id]){ renderSimple('a3','Compra de Veículo'); _rendered[id]=1; }
-  else if(id==='p-venda'   && !_rendered[id]){ renderSimple('a4','Venda De Veículo'); _rendered[id]=1; }
-  else if(id==='p-juros'   && !_rendered[id]){ renderSimple('a5','Juros'); _rendered[id]=1; }
-  else if(id==='p-lucro'   && !_rendered[id]){ renderSimple('a6','Distribuição Lucro'); _rendered[id]=1; }
-  else if(id==='p-rent'    && !_rendered[id]){ renderRent(); _rendered[id]=1; }
-  else if(id==='p-dre'     && !_rendered[id]){ initDRE(); _rendered[id]=1; }
+  else if(id==='p-analise') renderAnalise();
+  else if(id==='p-compravenda'&& !_rendered[id]){ renderCompraVenda(); _rendered[id]=1; }
+  else if(id==='p-lucro') renderSimple('a6','Distribuição Lucro');
+  else if(id==='p-rent'       && !_rendered[id]){ renderRent(); _rendered[id]=1; }
+  else if(id==='p-dre'        && !_rendered[id]){ initDRE(); _rendered[id]=1; }
   else if(id==='p-ctrl') renderCtrl();
+  else if(id==='p-fichas'     && !_rendered[id]){ renderFichas(); _rendered[id]=1; }
+  else if(id==='p-roe'        && !_rendered[id]){ renderROE(); _rendered[id]=1; }
 }
 
 // ═══════════════════════════════════════════════════
@@ -1399,12 +1635,30 @@ function initFilters(){
 // RENDER OVERVIEW — 100% dinâmico, calcula tudo a partir de _D
 // ═══════════════════════════════════════════════════
 function renderOverview(){
+  initFiltro({filtroId:'overview', wrapId:'ov-yr-pills', usarDP:false, onApply:renderOverview});
   const byTY=STATIC.byTipoYear;
-  const anosAtivos = _ovYrs.size>0 ? ANOS12.filter(y=>_ovYrs.has(y)) : ANOS12;
-  function somaTotal(t){ return anosAtivos.reduce((s,y)=>s+(byTY[t]?.[y]||0),0); }
-  const REC_RAW=somaTotal('Receita'),DESP_RAW=somaTotal('Despesa');
-  const DIST_RAW=somaTotal('Distribuição Lucro'),JUR_RAW=somaTotal('Juros');
-  const CMP_RAW=somaTotal('Compra de Veículo'),VND_RAW=somaTotal('Venda De Veículo');
+  const fn=getFiltroFn('overview');
+  // Somar por competência (I_DC)
+  function somaFiltrada(t){
+    if(!fn) return Object.values(byTY[t]||{}).reduce((a,b)=>a+b,0);
+    const F=FILTROS.overview;
+    if(F.period==='') return (F.yrs.size>0?[...F.yrs]:ANOS12).reduce((s,y)=>s+(byTY[t]?.[y]||0),0);
+    // período: somar direto dos registros
+    let soma=0;
+    for(let i=0;i<R.length;i++){
+      const row=R[i];
+      if(TIPO[row[I_TIPO]]!==t) continue;
+      const mo=MO[row[I_DC]]||'';
+      if(fn(mo)) soma+=row[I_VAL];
+    }
+    return soma;
+  }
+  const anosAtivos=FILTROS.overview.period===''&&FILTROS.overview.yrs.size>0?
+    ANOS12.filter(y=>FILTROS.overview.yrs.has(y)):ANOS12;
+  function somaTotal(t){return Object.values(byTY[t]||{}).reduce((a,b)=>a+b,0);}
+  const REC_RAW=somaFiltrada('Receita'),DESP_RAW=somaFiltrada('Despesa');
+  const DIST_RAW=somaFiltrada('Distribuição Lucro'),JUR_RAW=somaFiltrada('Juros');
+  const CMP_RAW=somaFiltrada('Compra de Veículo'),VND_RAW=somaFiltrada('Venda De Veículo');
   const REC_ABS=Math.abs(REC_RAW),DESP_ABS=Math.abs(DESP_RAW);
   const LUCRO_OP=REC_ABS-DESP_ABS,MARGEM_OP=REC_ABS>0?(LUCRO_OP/REC_ABS*100):0;
   setText('kpi-rec',fmtBR(REC_ABS));setText('kpi-cst',fmtBR(DESP_ABS));
@@ -1412,17 +1666,14 @@ function renderOverview(){
   if(lucEl){lucEl.textContent=fmtBR(LUCRO_OP);lucEl.className='kpi-value '+(LUCRO_OP>=0?'green':'red');}
   setText('kpi-mar',MARGEM_OP.toFixed(2).replace('.',',')+' %');
   setText('kpi-distluc',fmtBR(Math.abs(DIST_RAW)));
-  renderAlerts('ov-alerts',LUCRO_OP<0?[['danger','⚠ Resultado operacional negativo!']]:[]); 
   const isDark=!document.body.classList.contains('light');
   const gC=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)';
   const tC=isDark?'#5a7090':'#6a8090';
   const lblC=isDark?'#e2e8f0':'#1a2740';
   const anoAtual=new Date().getFullYear();
   const recA=byTY['Receita']||{},despA=byTY['Despesa']||{};
-  // Gráfico anual: apenas anos ativos, excluindo ano atual se "Todos"
-  const g1Anos = _ovYrs.size>0
-    ? anosAtivos
-    : ANOS12.filter(y=>parseInt(y)<anoAtual);
+  // Gráfico anual: SEMPRE estático — todos os anos incluindo atual, não muda com filtro
+  const g1Anos=ANOS12; // inclui ano atual
   const g1Vals=g1Anos.map(y=>(recA[y]||0)+(despA[y]||0));
   mkChart('ch-lucro-anual',{type:'bar',data:{labels:g1Anos,datasets:[{label:'Lucro',data:g1Vals,
     backgroundColor:g1Vals.map(v=>v>=0?'rgba(16,217,160,0.78)':'rgba(240,82,82,0.78)'),borderWidth:0,borderRadius:4}]},
@@ -1432,36 +1683,91 @@ function renderOverview(){
         color:lblC,font:{size:11,family:"'IBM Plex Mono',monospace"},padding:{bottom:4}}},
       scales:{y:{grid:{color:gC},ticks:{callback:v=>fmtK(v),color:tC,font:{size:10}}},
         x:{grid:{display:false},ticks:{color:tC,font:{size:10},autoSkip:false}}}}});
-  // Gráfico mensal: se 1 ano selecionado usa esse; caso contrário usa ano atual
-  const anoMensal = _ovYrs.size===1 ? parseInt([..._ovYrs][0]) : anoAtual;
-  const g2V=Array(12).fill(0);
-  for(let k=0;k<R.length;k++){const row=R[k];const ti=TIPO[row[I_TIPO]];const mo=MO[row[I_DC]]||'';
-    if(!mo.startsWith(String(anoMensal)))continue;
-    if(ti==='Receita'||ti==='Despesa')g2V[parseInt(mo.slice(5,7))-1]+=row[I_VAL];}
-  const g2M=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  mkChart('ch-lucro-mensal',{type:'bar',data:{labels:g2M,datasets:[{label:'Lucro',
-    data:g2V.map(v=>Math.round(v*100)/100),
+
+  // Gráfico mensal: sequência de meses conforme seleção
+  const Fov=FILTROS.overview;
+  const fnOv=getFiltroFn('overview');
+  const mesNomes=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const anoAtualStr=String(anoAtual);
+  const mesAtualNum=new Date().getMonth()+1; // 1-12
+
+  // Montar lista ordenada de meses YYYY-MM a exibir
+  let moSeq=[];
+  if(Fov.period){
+    // Últ. Nm: mês atual + N-1 anteriores em sequência
+    const n=parseInt(Fov.period.replace('ult',''));
+    for(let i=n-1;i>=0;i--){
+      const d=new Date(anoAtual,mesAtualNum-1-i,1);
+      const y=d.getFullYear(),m=d.getMonth()+1;
+      moSeq.push(y+'-'+(m<10?'0':'')+m);
+    }
+  } else if(Fov.yrs.size>0){
+    // Anos selecionados: todos os meses desses anos em sequência
+    [...Fov.yrs].sort().forEach(yr=>{
+      for(let m=1;m<=12;m++){
+        const mo=yr+'-'+(m<10?'0':'')+m;
+        moSeq.push(mo);
+      }
+    });
+  } else {
+    // Todos: usar todos os anos com movimento de Receita ou Despesa
+    const anosMovOv=new Set();
+    for(let k=0;k<R.length;k++){
+      const row=R[k];
+      const tipo=TIPO[row[I_TIPO]];
+      if(tipo!=='Receita'&&tipo!=='Despesa') continue;
+      if(Math.abs(row[I_VAL])<0.01) continue;
+      const mo=MO[row[I_DC]]||'';
+      if(mo) anosMovOv.add(mo.slice(0,4));
+    }
+    [...anosMovOv].sort().forEach(yr=>{
+      for(let m=1;m<=12;m++){
+        moSeq.push(yr+'-'+(m<10?'0':'')+m);
+      }
+    });
+  }
+
+  // Calcular valores por mês
+  const moVals={};
+  moSeq.forEach(mo=>{moVals[mo]=0;});
+  for(let k=0;k<R.length;k++){
+    const row=R[k];const ti=TIPO[row[I_TIPO]];const mo=MO[row[I_DC]]||'';
+    if(!(mo in moVals))continue;
+    if(ti==='Receita'||ti==='Despesa') moVals[mo]+=row[I_VAL];
+  }
+  const g2V=moSeq.map(mo=>Math.round((moVals[mo]||0)*100)/100);
+
+  // Labels: se sequência tem apenas 1 ano, mostrar só mês; senão MMM/AA
+  const anosSelecionados=[...new Set(moSeq.map(mo=>mo.slice(0,4)))];
+  const g2Labels=moSeq.map(mo=>{
+    const [y,m]=mo.split('-');
+    return anosSelecionados.length===1
+      ? mesNomes[parseInt(m)-1]
+      : mesNomes[parseInt(m)-1]+'/'+y.slice(2);
+  });
+
+  // Alerta resultado prévio: só se o ano atual estiver no período selecionado
+  const alertasOv2=[];
+  if(LUCRO_OP<0) alertasOv2.push(['danger','⚠ Resultado operacional negativo!']);
+  const temAnoAtual=moSeq.some(mo=>mo.startsWith(anoAtualStr));
+  if(temAnoAtual) alertasOv2.push(['warn','⚠ Resultado prévio — '+anoAtualStr+' ainda não encerrado.']);
+  renderAlerts('ov-alerts',alertasOv2);
+  // Tag "Resultado Prévio" no título do gráfico — só quando ano atual está no período
+  const previoTag=document.getElementById('ov-previo-tag');
+  if(previoTag) previoTag.style.display=temAnoAtual?'inline':'none';
+
+  const tituloMensal=Fov.period?'Últ. '+Fov.period.replace('ult','')+'m':
+    Fov.yrs.size===0?'Ano atual ('+anoAtual+')':
+    [...Fov.yrs].sort().join(' + ');
+  mkChart('ch-lucro-mensal',{type:'bar',data:{labels:g2Labels,datasets:[{label:'Lucro',
+    data:g2V,
     backgroundColor:g2V.map(v=>v>=0?'rgba(16,217,160,0.78)':'rgba(240,82,82,0.78)'),borderWidth:0,borderRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
       tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}},
-      title:{display:true,text:'Acumulado '+anoMensal+': '+fmtBR(g2V.reduce((a,b)=>a+b,0)),
+      title:{display:true,text:'Lucro Operacional Mensal — '+tituloMensal+' · Total: '+fmtBR(g2V.reduce((a,b)=>a+b,0)),
         color:lblC,font:{size:11,family:"'IBM Plex Mono',monospace"},padding:{bottom:4}}},
       scales:{y:{grid:{color:gC},ticks:{callback:v=>fmtK(v),color:tC,font:{size:10}}},
-        x:{grid:{display:false},ticks:{color:tC,font:{size:10},autoSkip:false}}}}});
-  // Saldo bancário: filtrado por anos ativos
-  const sA={};anosAtivos.forEach(y=>sA[y]=0);
-  for(let k=0;k<R.length;k++){const row=R[k];const dpi=row[I_DP];
-    if(dpi===-1||dpi>=MO.length)continue;const yr=(MO[dpi]||'').slice(0,4);
-    if(sA[yr]!==undefined)sA[yr]+=row[I_VAL];}
-  let acc=0;const g3A=[],g3V=[];
-  anosAtivos.forEach(y=>{acc+=sA[y];g3A.push(y);g3V.push(Math.round(acc*100)/100);});
-  mkChart('ch-saldo-bancario',{type:'line',data:{labels:g3A,datasets:[{label:'Saldo',data:g3V,
-    borderColor:'rgba(59,158,255,1)',backgroundColor:isDark?'rgba(59,158,255,0.10)':'rgba(59,158,255,0.15)',
-    fill:true,tension:0.4,pointRadius:4,pointHoverRadius:7,pointBackgroundColor:'rgba(59,158,255,1)',borderWidth:2}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
-      tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}}},
-      scales:{y:{grid:{color:gC},ticks:{callback:v=>fmtK(v),color:tC,font:{size:10}}},
-        x:{grid:{display:false},ticks:{color:tC,font:{size:10},autoSkip:false}}}}});
+        x:{grid:{display:false},ticks:{color:tC,font:{size:9},autoSkip:false,maxRotation:45}}}}});
   // Rosca: filtrada por anos ativos
   const rT=[{label:'Receita',val:Math.abs(REC_RAW),color:'#10d9a0'},
     {label:'Despesa',val:Math.abs(DESP_RAW),color:'#f05252'},
@@ -1476,7 +1782,7 @@ function renderOverview(){
     borderWidth:isDark?0:1,borderColor:isDark?'transparent':'rgba(255,255,255,0.6)',hoverOffset:10}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:false},
       tooltip:{callbacks:{label:c=>c.label+': '+fmtBR(c.parsed)}}}}});
-  // ─── Contas a Pagar x Receber: SEMPRE todos os anos, não usa _ovYrs ───
+  // Contas a Pagar x Receber: SEMPRE todos os anos — não usa _ovYrs
   let aRec=0,aPag=0;
   for(let k=0;k<R.length;k++){const row=R[k];if(row[I_DP]!==-1)continue;
     const v=row[I_VAL];if(v>0)aRec+=v;else aPag+=Math.abs(v);}
@@ -1487,111 +1793,313 @@ function renderOverview(){
       tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}}},
       scales:{y:{grid:{color:gC},ticks:{callback:v=>fmtK(v),color:tC,font:{size:10}}},
         x:{grid:{display:false},ticks:{color:tC,font:{size:13},autoSkip:false}}}}});
+  // SALDO BANCÁRIO: SEMPRE estático — todos os anos, não usa _ovYrs
+  const sA={};ANOS12.forEach(y=>sA[y]=0);
+  for(let k=0;k<R.length;k++){const row=R[k];const dpi=row[I_DP];
+    if(dpi===-1||dpi>=MO.length)continue;const yr=(MO[dpi]||'').slice(0,4);
+    if(sA[yr]!==undefined)sA[yr]+=row[I_VAL];}
+  let acc=0;const g3A=[],g3V=[];
+  ANOS12.forEach(y=>{acc+=sA[y];g3A.push(y);g3V.push(Math.round(acc*100)/100);});
+  mkChart('ch-saldo-bancario',{type:'line',data:{labels:g3A,datasets:[{label:'Saldo',data:g3V,
+    borderColor:'rgba(59,158,255,1)',backgroundColor:isDark?'rgba(59,158,255,0.10)':'rgba(59,158,255,0.15)',
+    fill:true,tension:0.4,pointRadius:4,pointHoverRadius:7,pointBackgroundColor:'rgba(59,158,255,1)',borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}}},
+      scales:{y:{grid:{color:gC},ticks:{callback:v=>fmtK(v),color:tC,font:{size:10}}},
+        x:{grid:{display:false},ticks:{color:tC,font:{size:10},autoSkip:false}}}}});
 }
 
 // RENDER CASHFLOW
 // ═══════════════════════════════════════════════════
+// ══ CASHFLOW STATE ══
+let _cfPeriod='mensal';
+const _cfYrs=new Set(); // cashflow year filter
+let _cfYrPeriod=''; // '' | 'ult12'
+const CF_TIPOS_OK=new Set(['Descarga','Despesa','Distribuição Lucro','Juros','Receita','Verificar']);
+
+function initCashflowPeriods(){
+  // Filtro de anos do cashflow
+  const yrWrap=document.getElementById('cf-yr-pills');
+  if(yrWrap&&yrWrap.children.length===0){
+    createPeriodFilter({
+      wrapId:'cf-yr-pills',
+      yrsSet:_cfYrs,
+      periodVar:'_cfYrPeriod',
+      onApply:()=>renderCashflow(),
+      meses3:false, meses6:false
+    });
+  }
+  // Filtro de agrupamento
+  const wrap=document.getElementById('cf-period-pills');
+  if(!wrap||wrap.children.length>0) return;
+  ['Mensal','Bimestral','Trimestral','Quadrimestral','Semestral','Anual'].forEach(p=>{
+    const pill=document.createElement('div');
+    pill.className='yr-pill'+(_cfPeriod===p.toLowerCase()?' yr-all':'');
+    pill.textContent=p;
+    pill.onclick=()=>{
+      _cfPeriod=p.toLowerCase();
+      wrap.querySelectorAll('.yr-pill').forEach(x=>{x.classList.remove('yr-all','yr-sel');});
+      pill.classList.add('yr-all');
+      renderCashflow();
+    };
+    wrap.appendChild(pill);
+  });
+}
+
 function renderCashflow(){
-  // Compute both modes
-  const allMo=MO.filter(m=>m>='2015-01');
-  const compData=allMo.map(mo=>{
-    let v=0;
-    for(let i=0;i<R.length;i++){
-      const row=R[i];
-      if(!EXCL_CC.has(CC[row[I_CC]])&&MO[row[I_DC]]===mo&&(TIPO[row[I_TIPO]]==='Receita'||TIPO[row[I_TIPO]]==='Despesa'))
-        v+=row[I_VAL];
+  initCashflowPeriods();
+  const isDark=!document.body.classList.contains('light');
+  const gC2=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)';
+  const tC2=isDark?'#5a7090':'#6a8090';
+
+  // Coletar todos os meses pagos com tipos válidos
+  const moSet=new Set();
+  // Fluxo de Caixa usa DATA DE PAGAMENTO (I_DP)
+  initFiltro({filtroId:'cashflow', wrapId:'cf-yr-pills', usarDP:true, onApply:renderCashflow});
+  const fnCf=getFiltroFn('cashflow');
+  for(let i=0;i<R.length;i++){
+    const row=R[i];
+    const tipo=TIPO[row[I_TIPO]];
+    if(CF_TIPOS_OK.has(tipo)){
+      if(row[I_DP]===-1) continue;
+      const mo=MO[row[I_DP]]||'';
+      if(mo<'2015-01') continue;
+      if(fnCf&&!fnCf(mo)) continue;
+      moSet.add(mo);
     }
-    return v;
-  });
-  const cxData=allMo.map(mo=>{
-    let v=0;
-    for(let i=0;i<R.length;i++){
-      const row=R[i];
-      if(!EXCL_CC.has(CC[row[I_CC]])&&MO[row[I_DP]]===mo&&(TIPO[row[I_TIPO]]==='Receita'||TIPO[row[I_TIPO]]==='Despesa'))
-        v+=row[I_VAL];
+    if(tipo==='Compra de Veículo'||tipo==='Venda De Veículo'){
+      const mo=MO[row[I_DC]]||'';
+      if(mo<'2015-01') continue;
+      if(fnCf&&!fnCf(mo)) continue;
+      moSet.add(mo);
     }
-    return v;
-  });
+  }
+  const allMo=[...moSet].sort();
 
-  const totalComp=compData.reduce((a,b)=>a+b,0);
-  const totalCx=cxData.reduce((a,b)=>a+b,0);
-  const diff=totalCx-totalComp;
+  // Agrupar por período
+  const grpSize={'mensal':1,'bimestral':2,'trimestral':3,'quadrimestral':4,'semestral':6,'anual':12};
+  const sz=grpSize[_cfPeriod]||1;
 
-  setText('cf-kpi-comp', fmtBR(totalComp));
-  setText('cf-kpi-cx',   fmtBR(totalCx));
-  const diffEl=document.getElementById('cf-kpi-diff');
-  if(diffEl){ diffEl.textContent=fmtBR(diff); diffEl.className='kpi-value '+(Math.abs(diff)<1000?'green':'amber'); }
+  // Agrupar meses em blocos por ano/período
+  const grouped=[];
+  if(sz===1){
+    allMo.forEach(mo=>grouped.push({label:mo,mos:[mo]}));
+  } else {
+    const byYear={};
+    allMo.forEach(mo=>{
+      const yr=mo.slice(0,4),m=parseInt(mo.slice(5,7));
+      if(!byYear[yr]) byYear[yr]=[];
+      byYear[yr].push({mo,m});
+    });
+    Object.entries(byYear).sort(([a],[b])=>a.localeCompare(b)).forEach(([yr,arr])=>{
+      arr.sort((a,b)=>a.m-b.m);
+      for(let i=0;i<arr.length;i+=sz){
+        const chunk=arr.slice(i,i+sz);
+        const first=chunk[0].m.toString().padStart(2,'0');
+        const last=chunk[chunk.length-1].m.toString().padStart(2,'0');
+        const label=sz>=12?yr:`${yr}/${first}${sz>1?'-'+last:''}`;
+        grouped.push({label,mos:chunk.map(x=>x.mo)});
+      }
+    });
+  }
 
-  // PMR/PMP simplified
-  setText('cf-pmr','~30 dias');
-  setText('cf-pmp','~15 dias');
-  setText('cf-ncg','~15 dias');
+  // Somar entradas e saídas por grupo
+  const mosIdx={};
+  allMo.forEach((mo,i)=>mosIdx[mo]=i);
 
-  // Alerts
-  const alerts=[];
-  if(totalCx<0) alerts.push(['danger','⚠ Saldo de caixa negativo!']);
-  if(Math.abs(diff)>50000) alerts.push(['warn','⚠ Diferença relevante entre Caixa e Competência: '+fmtK(Math.abs(diff))]);
-  renderAlerts('cf-alerts', alerts);
+  // Pré-computar por mês
+  const moEntradas={},moSaidas={},moCompras={},moVendas={};
+  allMo.forEach(mo=>{moEntradas[mo]=0;moSaidas[mo]=0;moCompras[mo]=0;moVendas[mo]=0;});
+  for(let i=0;i<R.length;i++){
+    const row=R[i];
+    const tipo=TIPO[row[I_TIPO]];
+    if(CF_TIPOS_OK.has(tipo)){
+      if(row[I_DP]===-1) continue;
+      const mo=MO[row[I_DP]]||'';
+      if(!(mo in moEntradas)) continue;
+      const v=row[I_VAL];
+      if(v>0) moEntradas[mo]+=v;
+      else moSaidas[mo]+=Math.abs(v);
+    }
+    if(tipo==='Compra de Veículo'||tipo==='Venda De Veículo'){
+      const mo=MO[row[I_DC]]||'';
+      if(!(mo in moCompras)) continue;
+      if(tipo==='Compra de Veículo') moCompras[mo]+=Math.abs(row[I_VAL]);
+      else moVendas[mo]+=Math.abs(row[I_VAL]);
+    }
+  }
 
-  // Chart comparativo (last 24 months)
-  const mo24=allMo.slice(-24);
-  const c24=compData.slice(-24), cx24=cxData.slice(-24);
+  const labels=grouped.map(g=>g.label);
+  const dataEnt=grouped.map(g=>Math.round(g.mos.reduce((s,mo)=>s+(moEntradas[mo]||0),0)*100)/100);
+  const dataSai=grouped.map(g=>Math.round(g.mos.reduce((s,mo)=>s+(moSaidas[mo]||0),0)*100)/100);
+  const dataCmp=grouped.map(g=>Math.round(g.mos.reduce((s,mo)=>s+(moCompras[mo]||0),0)*100)/100);
+  const dataVnd=grouped.map(g=>Math.round(g.mos.reduce((s,mo)=>s+(moVendas[mo]||0),0)*100)/100);
+
+  // Proporção de área: BAR_FRAC para barras (base), LINE_FRAC para linha de saldo (topo)
+  const BAR_FRAC = 3/4;  // ajuste aqui: ex. 2/3, 3/4, 1/2
+  const LINE_FRAC = 1 - BAR_FRAC;
+
+  // Saldo: Entradas - Saídas - Compras + Vendas (recalcula dinamicamente ao toggler legenda)
+  function calcSaldo(chart){
+    const ds=chart.data.datasets;
+    const vis=lbl=>{ const d=ds.find(x=>x.label===lbl); return d&&!chart.getDatasetMeta(ds.indexOf(d)).hidden; };
+    return dataEnt.map((_,i)=>{
+      let s=0;
+      if(vis('Entradas')) s+=dataEnt[i];
+      if(vis('Saídas'))   s-=dataSai[i];
+      if(vis('Compras'))  s-=dataCmp[i];
+      if(vis('Vendas'))   s+=dataVnd[i];
+      return Math.round(s*100)/100;
+    });
+  }
+
+  const dataSaldo=dataEnt.map((_,i)=>Math.round((dataEnt[i]-dataSai[i]-dataCmp[i]+dataVnd[i])*100)/100);
+
+  // Calcular limites dos eixos para separar visualmente barras e linha
+  function calcAxesLimits(saldo){
+    const barMax=Math.max(0,...dataEnt,...dataSai,...dataCmp,...dataVnd);
+    const barMin=0;
+    // y (barras): max esticado para reservar topo para a linha
+    const yMax=barMax/BAR_FRAC;
+    const yMin=barMin;
+    // y2 (saldo): min esticado para baixo para empurrar linha ao topo
+    const sMax=Math.max(...saldo);
+    const sMin=Math.min(...saldo);
+    const sRange=Math.max(sMax-sMin,1);
+    const y2Max=sMax+sRange*0.15;
+    const y2Min=sMin-(sRange*BAR_FRAC/LINE_FRAC);
+    return{yMax,yMin,y2Max,y2Min};
+  }
+
+  const lim=calcAxesLimits(dataSaldo);
+
   mkChart('ch-cashflow',{type:'bar',
-    data:{labels:mo24,datasets:[
-      {label:'Competência',data:c24,backgroundColor:mkRGBA(BLUE,'0.6'),borderRadius:3},
-      {label:'Caixa',data:cx24,backgroundColor:mkRGBA(GREEN,'0.6'),borderRadius:3},
+    data:{labels,datasets:[
+      {label:'Entradas',data:dataEnt,backgroundColor:mkRGBA(GREEN,'0.75'),borderRadius:3,yAxisID:'y'},
+      {label:'Saídas',data:dataSai,backgroundColor:mkRGBA(RED,'0.75'),borderRadius:3,yAxisID:'y'},
+      {label:'Compras',data:dataCmp,backgroundColor:mkRGBA(AMBER,'0.55'),borderRadius:3,yAxisID:'y'},
+      {label:'Vendas',data:dataVnd,backgroundColor:'rgba(100,180,255,0.65)',borderRadius:3,yAxisID:'y'},
+      {label:'Saldo',data:dataSaldo,type:'line',
+        borderColor:mkRGBA(AMBER,'1'),backgroundColor:'transparent',
+        borderWidth:2.5,pointRadius:4,pointHoverRadius:7,
+        pointBackgroundColor:mkRGBA(AMBER,'1'),tension:0.3,
+        yAxisID:'y2',order:0}
     ]},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{labels:{color:tc,font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtBR(c.parsed.y)}}},
-      scales:{y:{grid:{color:gc},ticks:{callback:v=>fmtK(v),color:tc,font:{size:10}}},x:{grid:{display:false},ticks:{color:tc,font:{size:9},maxRotation:45}}}
+      plugins:{
+        legend:{
+          labels:{color:tC2,font:{size:11},boxWidth:12},
+          onClick(e,legendItem,legend){
+            const chart=legend.chart;
+            const idx=legendItem.datasetIndex;
+            const meta=chart.getDatasetMeta(idx);
+            meta.hidden=!meta.hidden;
+            // Recalcular saldo e reajustar limites dos eixos
+            const saldoDs=chart.data.datasets.find(d=>d.label==='Saldo');
+            if(saldoDs){
+              saldoDs.data=calcSaldo(chart);
+              const newLim=calcAxesLimits(saldoDs.data);
+              chart.options.scales.y.max=newLim.yMax;
+              chart.options.scales.y2.max=newLim.y2Max;
+              chart.options.scales.y2.min=newLim.y2Min;
+            }
+            chart.update();
+          }
+        },
+        tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtBR(c.parsed.y)}}
+      },
+      scales:{
+        y:{grid:{color:gC2},min:lim.yMin,max:lim.yMax,
+          ticks:{callback:v=>fmtK(v),color:tC2,font:{size:10}},
+          title:{display:true,text:'Valores',color:tC2,font:{size:9}}},
+        y2:{position:'right',grid:{display:false},min:lim.y2Min,max:lim.y2Max,
+          ticks:{callback:v=>fmtK(v),color:'#f0b429',font:{size:10}},
+          title:{display:true,text:'Saldo',color:'#f0b429',font:{size:9}}},
+        x:{grid:{display:false},ticks:{color:tC2,font:{size:9},maxRotation:45,autoSkip:true,maxTicksLimit:24}}
+      }
     }});
 
-  // Saldo acumulado (caixa)
-  let acc=0;
-  const accData=cx24.map(v=>{acc+=v;return acc;});
+  // Saldo acumulado — igual ao da Visão Geral mas cor verde
+  const sA={};ANOS12.forEach(y=>sA[y]=0);
+  for(let k=0;k<R.length;k++){const row=R[k];const dpi=row[I_DP];
+    if(dpi===-1||dpi>=MO.length)continue;const yr=(MO[dpi]||'').slice(0,4);
+    if(sA[yr]!==undefined)sA[yr]+=row[I_VAL];}
+  let acc=0;const g3A=[],g3V=[];
+  ANOS12.forEach(y=>{acc+=sA[y];g3A.push(y);g3V.push(Math.round(acc*100)/100);});
   mkChart('ch-saldo',{type:'line',
-    data:{labels:mo24,datasets:[{label:'Saldo Acumulado',data:accData,borderColor:mkRGBA(GREEN,'1'),backgroundColor:mkRGBA(GREEN,'0.08'),fill:true,tension:0.3,pointRadius:0,borderWidth:2}]},
+    data:{labels:g3A,datasets:[{label:'Saldo Acumulado',data:g3V,
+      borderColor:mkRGBA(GREEN,'1'),backgroundColor:mkRGBA(GREEN,'0.08'),
+      fill:true,tension:0.4,pointRadius:4,pointHoverRadius:7,
+      pointBackgroundColor:mkRGBA(GREEN,'1'),borderWidth:2}]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtBR(c.parsed.y)}}},
-      scales:{y:{grid:{color:gc},ticks:{callback:v=>fmtK(v),color:tc,font:{size:10}}},x:{grid:{display:false},ticks:{color:tc,font:{size:9},maxRotation:45}}}
+      scales:{y:{grid:{color:gC2},ticks:{callback:v=>fmtK(v),color:tC2,font:{size:10}}},
+        x:{grid:{display:false},ticks:{color:tC2,font:{size:10},autoSkip:false}}}
     }});
+
+
 }
 
 // ═══════════════════════════════════════════════════
 // RENDER RANKING
 // ═══════════════════════════════════════════════════
 function renderRanking(){
-  const yrs=_rankYrs; // Set; empty=all
-  const ccVals=OP_CCS.map(cc=>{
+  initFiltro({filtroId:'ranking', wrapId:'rank-yr-pills', usarDP:false, onApply:renderRanking});
+  const fnRank=getFiltroFn('ranking');
+  const allCCs=[...new Set([...OP_CCS,'CONSOLIDADO'])];
+  const ccVals=allCCs.map(cc=>{
     let rec=0,cost=0,km=0;
+    const mesesComMov=new Set();
     for(let i=0;i<R.length;i++){
       const row=R[i];
       if(CC[row[I_CC]]!==cc) continue;
       const mo=MO[row[I_DC]]||'';
-      if(yrs.size>0 && !yrs.has(mo.slice(0,4))) continue;
+      if(fnRank&&!fnRank(mo)) continue;
       const tipo=TIPO[row[I_TIPO]];
-      if(tipo==='Receita') rec+=row[I_VAL];
-      else if(tipo==='Despesa') cost+=row[I_VAL];
+      const val=row[I_VAL];
+      if(tipo==='Receita'){rec+=val;if(Math.abs(val)>0.01)mesesComMov.add(mo);}
+      else if(tipo==='Despesa'){cost+=val;if(Math.abs(val)>0.01)mesesComMov.add(mo);}
       km+=row[I_KM];
     }
-    return {cc,rec,cost,luc:rec+cost,km,drv:(DRV[cc]||['—'])[0]};
-  }).filter(c=>Math.abs(c.rec)>0.01||Math.abs(c.cost)>0.01).sort((a,b)=>b.luc-a.luc);
+    const luc=rec+cost;
+    const nMeses=mesesComMov.size||1;
+    const anualizado=luc/nMeses*12;
+    return {cc,rec,cost,luc,km,nMeses,anualizado,drv:(DRV[cc]||['—'])[0]};
+  }).filter(c=>Math.abs(c.rec)>0.01||Math.abs(c.cost)>0.01);
+  // CONSOLIDADO sempre último
+  const consolidado=ccVals.find(c=>c.cc==='CONSOLIDADO');
+  const outros=ccVals.filter(c=>c.cc!=='CONSOLIDADO').sort((a,b)=>b.luc-a.luc);
+  const sorted=consolidado?[...outros,consolidado]:outros;
+  const ccVals_=sorted;
 
-  const maxAbs=Math.max(...ccVals.map(c=>Math.abs(c.luc)));
+  // Totalizador
+  const totRec=ccVals_.reduce((s,c)=>s+c.rec,0);
+  const totCost=ccVals_.reduce((s,c)=>s+c.cost,0);
+  const totLuc=totRec+totCost;
+  const totEl=document.getElementById('rank-tot-rec');
+  if(totEl) totEl.textContent=fmtBR(totRec);
+  const costEl=document.getElementById('rank-tot-cost');
+  if(costEl) costEl.textContent=fmtBR(Math.abs(totCost));
+  const lucEl2=document.getElementById('rank-tot-luc');
+  if(lucEl2){lucEl2.textContent=fmtBR(totLuc);lucEl2.className='kpi-value '+(totLuc>=0?'green':'red');}
+
+  const maxAbs=Math.max(...ccVals_.map(c=>Math.abs(c.luc)));
   const el=document.getElementById('rank-list');
   el.innerHTML='';
-  ccVals.forEach((c,i)=>{
-    const isTop=i<3, isBot=i>=ccVals.length-3;
+  ccVals_.forEach((c,i)=>{
+    const isConsolidado=c.cc==='CONSOLIDADO';
+    const isTop=!isConsolidado&&i<3, isBot=!isConsolidado&&i>=ccVals_.length-(consolidado?4:3);
     const cls=isTop?'top':isBot?'bot':'';
-    const badgeCls=c.luc>=0?'good':'bad';
     const pct=maxAbs>0?Math.abs(c.luc)/maxAbs*100:0;
     const barColor=c.luc>=0?'var(--green)':'var(--red)';
+    const anualizadoStr=isConsolidado?'':
+      ` · <span style="color:var(--text3);font-size:10px;">Anualizado: <span style="color:${c.anualizado>=0?'var(--blue)':'var(--red)'}">${fmtBR(c.anualizado)}</span> (${c.nMeses}m)</span>`;
     el.innerHTML+=`
       <div class="rank-item">
         <div class="rank-pos ${cls}">${i+1}</div>
         <div class="rank-info">
           <div class="rank-name">${c.cc}</div>
-          <div class="rank-detail">Receitas: ${fmtBR(c.rec)} · Despesas: ${fmtBR(Math.abs(c.cost))}</div>
+          <div class="rank-detail">Receitas: ${fmtBR(c.rec)} · Despesas: ${fmtBR(Math.abs(c.cost))}${anualizadoStr}</div>
         </div>
         <div style="text-align:right">
           <div class="rank-val" style="color:${c.luc>=0?'var(--green)':'var(--red)'}">${fmtBR(c.luc)}</div>
@@ -1605,77 +2113,319 @@ function renderRanking(){
 // RENDER SCORE
 // ═══════════════════════════════════════════════════
 function renderScore(){
-  const scYrSel=document.getElementById('sc-yr');
-  const scYr=scYrSel?scYrSel.value:'';
-  const ccVals=OP_CCS.map(cc=>{
-    let rec=0,cost=0,km=0,lts=0,months=new Set();
+  initFiltro({filtroId:'score', wrapId:'sc-yr-pills', usarDP:false, onApply:renderScore});
+  const fnScore=getFiltroFn('score');
+  const isDark=!document.body.classList.contains('light');
+  const gCS=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)';
+  const tCS=isDark?'#5a7090':'#6a8090';
+  const now=new Date();
+  const anoAtualSc=now.getFullYear(), mesAtualSc=now.getMonth()+1;
+
+  // ── Calcular métricas por placa ─────────────────────────
+  const ccData=OP_CCS.map(cc=>{
+    let rec=0,despVeic=0,comissao=0,ajuda=0,lts=0;
+    let kmMin=Infinity,kmMax=-Infinity;
+    const mesesMov=new Set();
+    // Dados mensais para sazonalidade e tendência
+    const porMes={};
+
     for(let i=0;i<R.length;i++){
       const row=R[i];
       if(CC[row[I_CC]]!==cc) continue;
-      const tipo=TIPO[row[I_TIPO]];
       const mo=MO[row[I_DC]]||'';
-      if(scYr && mo.slice(0,4)!==scYr) continue;
-      if(tipo==='Receita'){rec+=row[I_VAL];months.add(mo);}
-      else if(tipo==='Despesa') cost+=row[I_VAL];
-      km+=row[I_KM]; lts+=row[I_LTS];
-    }
-    const luc=rec+cost;
-    const margin=rec>0?(luc/rec)*100:0;
-    const cpkm=km>0?Math.abs(cost/km)*1000:0; // cost per 1000km
-    const consist=months.size;
-    // Score 0-100
-    let score=0;
-    score += Math.min(40, luc>0?40:Math.max(0,40+(luc/10000)*2));
-    score += Math.min(30, margin>20?30:Math.max(0,margin*1.5));
-    score += Math.min(30, consist>20?30:(consist/20)*30);
-    score=Math.round(score);
-    const grade=score>=75?'A':score>=55?'B':score>=35?'C':'D';
-    return {cc,rec,cost,luc,margin,cpkm,consist,score,grade,drv:(DRV[cc]||['—'])[0]};
-  }).sort((a,b)=>b.score-a.score);
+      if(!mo) continue;
+      if(fnScore&&!fnScore(mo)) continue;
+      const tipo=TIPO[row[I_TIPO]];
+      const cat=CAT[row[I_CAT]]||'';
+      const val=row[I_VAL];
+      const km=row[I_KM]||0;
+      const lt=row[I_LTS]||0;
 
-  // Score cards
+      if(tipo==='Receita'){
+        rec+=val;
+        if(Math.abs(val)>0.01) mesesMov.add(mo);
+        if(!porMes[mo]) porMes[mo]={rec:0,desp:0};
+        porMes[mo].rec+=val;
+      } else if(tipo==='Despesa'){
+        if(cat==='COMISSÃO') comissao+=Math.abs(val);
+        else if(cat==='AJUDA DE CUSTO') ajuda+=Math.abs(val);
+        else despVeic+=Math.abs(val);
+        if(Math.abs(val)>0.01) mesesMov.add(mo);
+        if(!porMes[mo]) porMes[mo]={rec:0,desp:0};
+        porMes[mo].desp+=Math.abs(val);
+      }
+      if(km>0){ if(km<kmMin)kmMin=km; if(km>kmMax)kmMax=km; }
+      if(lt>0) lts+=lt;
+    }
+
+    const kmRodado=kmMax>kmMin&&kmMin!==Infinity?kmMax-kmMin:0;
+    const temCombustivel=lts>0;
+    const kml=temCombustivel&&kmRodado>0?kmRodado/lts:0;
+    const cpkm=kmRodado>0?despVeic/kmRodado:0;
+    const rpkm=kmRodado>0?rec/kmRodado:0;
+    const luc=rec-despVeic-comissao-ajuda;
+    const margem=rec>0?((rec-despVeic-comissao-ajuda)/rec)*100:0;
+    const nMeses=mesesMov.size;
+
+    // Preço médio litro (lançamentos COMBUSTIVEL com LTS>0)
+    let totalPagoCombustivel=0, totalLtsComValor=0;
+    for(let i=0;i<R.length;i++){
+      const row=R[i];
+      if(CC[row[I_CC]]!==cc) continue;
+      const mo=MO[row[I_DC]]||'';
+      if(fnScore&&!fnScore(mo)) continue;
+      const cat=CAT[row[I_CAT]]||'';
+      if(cat==='COMBUSTIVEL'&&row[I_LTS]>0&&Math.abs(row[I_VAL])>0){
+        totalPagoCombustivel+=Math.abs(row[I_VAL]);
+        totalLtsComValor+=row[I_LTS];
+      }
+    }
+    const precoLitro=totalLtsComValor>0?totalPagoCombustivel/totalLtsComValor:0;
+
+    // Tendência: comparar últimos 3 meses com 3 anteriores
+    const mesesOrdenados=Object.keys(porMes).sort();
+    let tendencia=0;
+    if(mesesOrdenados.length>=6){
+      const ultimos3=mesesOrdenados.slice(-3);
+      const anteriores3=mesesOrdenados.slice(-6,-3);
+      const lucUlt=ultimos3.reduce((s,m)=>s+(porMes[m].rec-porMes[m].desp),0);
+      const lucAnt=anteriores3.reduce((s,m)=>s+(porMes[m].rec-porMes[m].desp),0);
+      tendencia=lucAnt!==0?((lucUlt-lucAnt)/Math.abs(lucAnt))*100:0;
+    }
+
+    // Dados mensais para mini-gráfico (últimos 12 meses)
+    const miniMeses=mesesOrdenados.slice(-12);
+    const miniVals=miniMeses.map(m=>(porMes[m].rec-porMes[m].desp));
+
+    return {cc,rec,despVeic,comissao,ajuda,luc,margem,kmRodado,kml,cpkm,rpkm,
+      nMeses,temCombustivel,precoLitro,tendencia,miniMeses,miniVals,lts};
+  }).filter(c=>Math.abs(c.rec)>0.01||c.kmRodado>0);
+
+  // ── Médias da frota ─────────────────────────────────────
+  const frota=ccData.filter(c=>c.kmRodado>0);
+  const avgCpkm=frota.length?frota.reduce((s,c)=>s+c.cpkm,0)/frota.length:0;
+  const avgRpkm=frota.length?frota.reduce((s,c)=>s+c.rpkm,0)/frota.length:0;
+  const avgKml=frota.filter(c=>c.temCombustivel).length?
+    frota.filter(c=>c.temCombustivel).reduce((s,c)=>s+c.kml,0)/frota.filter(c=>c.temCombustivel).length:0;
+
+  // ── SOF 2.0 Score ───────────────────────────────────────
+  ccData.forEach(c=>{
+    // Pilar 1: Resultado Econômico 45pts
+    // 1a. Margem líquida 25pts
+    let p1a=0;
+    if(c.margem>25)p1a=25;
+    else if(c.margem>15)p1a=20;
+    else if(c.margem>8)p1a=14;
+    else if(c.margem>0)p1a=7;
+
+    // 1b. Receita/km vs média frota 20pts
+    let p1b=0;
+    if(avgRpkm>0&&c.rpkm>0){
+      const ratioR=c.rpkm/avgRpkm;
+      if(ratioR>1.2)p1b=20;
+      else if(ratioR>1.0)p1b=16;
+      else if(ratioR>0.8)p1b=11;
+      else if(ratioR>0.6)p1b=6;
+    }
+
+    // Pilar 2: Eficiência Operacional 35pts
+    // 2a. Custo/km vs média frota 20pts (carretas: +10pts redistribuídos)
+    let p2a=0;
+    if(avgCpkm>0&&c.cpkm>0){
+      const ratioC=c.cpkm/avgCpkm;
+      if(ratioC<0.8)p2a=20;
+      else if(ratioC<0.95)p2a=16;
+      else if(ratioC<1.1)p2a=11;
+      else if(ratioC<1.3)p2a=5;
+    }
+
+    // 2b. km/l 15pts (0 para carretas, redistribuído)
+    let p2b=0;
+    if(c.temCombustivel&&c.kml>0){
+      if(c.kml>3.2)p2b=15;
+      else if(c.kml>2.5)p2b=11;
+      else if(c.kml>1.8)p2b=7;
+      else if(c.kml>1.2)p2b=3;
+    }
+
+    // Redistribuir 15pts de combustível para carretas
+    if(!c.temCombustivel){
+      p2a=Math.min(30,p2a+10); // extra 10pts em custo/km
+    }
+
+    // Pilar 3: Consistência 20pts
+    // 3a. Regularidade 10pts
+    const Fsc=FILTROS.score;
+    let mesesPeriodo=12;
+    if(Fsc.period){
+      mesesPeriodo=parseInt(Fsc.period.replace('ult',''));
+    } else if(Fsc.yrs.size>0){
+      mesesPeriodo=Fsc.yrs.size*12;
+    }
+    const p3a=Math.min(10,Math.round((c.nMeses/Math.max(mesesPeriodo,1))*10));
+
+    // 3b. Tendência 10pts
+    let p3b=7; // padrão estável
+    if(c.tendencia>10)p3b=10;
+    else if(c.tendencia>=-10)p3b=7;
+    else if(c.tendencia>=-20)p3b=4;
+    else p3b=0;
+    // Se dados insuficientes para tendência, usar regularidade dobrada
+    if(c.miniMeses.length<6) p3b=p3a;
+
+    c.score=Math.round(p1a+p1b+p2a+p2b+p3a+p3b);
+    c.grade=c.score>=90?'A+':c.score>=75?'A':c.score>=60?'B':c.score>=45?'C':c.score>=30?'D':'F';
+    c.gradeColor=c.grade==='A+'?'var(--green)':c.grade==='A'?'#10d9a0':
+      c.grade==='B'?'var(--blue)':c.grade==='C'?'var(--amber)':
+      c.grade==='D'?'#ff8c42':'var(--red)';
+  });
+
+  // ── 6 cards de destaque ──────────────────────────────────
+  const comComb=ccData.filter(c=>c.temCombustivel&&c.kml>0);
+  const comKm=ccData.filter(c=>c.kmRodado>0);
+  if(comComb.length){
+    const bestKml=comComb.reduce((a,b)=>b.kml>a.kml?b:a);
+    const worstKml=comComb.reduce((a,b)=>b.kml<a.kml?b:a);
+    setText('sc-best-kml',bestKml.kml.toFixed(2)+' km/l');
+    setText('sc-best-kml-placa',bestKml.cc);
+    setText('sc-worst-kml',worstKml.kml.toFixed(2)+' km/l');
+    setText('sc-worst-kml-placa',worstKml.cc);
+  }
+  if(comKm.length){
+    const bestRpkm=comKm.reduce((a,b)=>b.rpkm>a.rpkm?b:a);
+    const worstRpkm=comKm.reduce((a,b)=>b.rpkm<a.rpkm?b:a);
+    const bestCpkm=comKm.filter(c=>c.cpkm>0).reduce((a,b)=>b.cpkm<a.cpkm?b:a,comKm[0]);
+    const worstCpkm=comKm.reduce((a,b)=>b.cpkm>a.cpkm?b:a);
+    setText('sc-best-rpkm','R$ '+bestRpkm.rpkm.toFixed(2).replace('.',','));
+    setText('sc-best-rpkm-placa',bestRpkm.cc);
+    setText('sc-worst-rpkm','R$ '+worstRpkm.rpkm.toFixed(2).replace('.',','));
+    setText('sc-worst-rpkm-placa',worstRpkm.cc);
+    setText('sc-best-cpkm','R$ '+bestCpkm.cpkm.toFixed(2).replace('.',','));
+    setText('sc-best-cpkm-placa',bestCpkm.cc);
+    setText('sc-worst-cpkm','R$ '+worstCpkm.cpkm.toFixed(2).replace('.',','));
+    setText('sc-worst-cpkm-placa',worstCpkm.cc);
+  }
+
+  // ── Alertas automáticos ──────────────────────────────────
+  const alerts=[];
+  const prejuizo=ccData.filter(c=>c.luc<0);
+  if(prejuizo.length) alerts.push(['danger','⚠ Prejuízo operacional: '+prejuizo.map(c=>c.cc).join(', ')]);
+  const gradeF=ccData.filter(c=>c.grade==='F');
+  if(gradeF.length) alerts.push(['danger','🔴 Operação insustentável (F): '+gradeF.map(c=>c.cc).join(', ')]);
+  const altoCusto=ccData.filter(c=>c.cpkm>avgCpkm*1.3&&c.kmRodado>0);
+  if(altoCusto.length) alerts.push(['warn','⚠ Custo/km crítico (+30% da média): '+altoCusto.map(c=>c.cc).join(', ')]);
+  const baixoKml=ccData.filter(c=>c.temCombustivel&&c.kml>0&&c.kml<1.5);
+  if(baixoKml.length) alerts.push(['warn','⚠ Consumo crítico (<1,5 km/l): '+baixoKml.map(c=>c.cc).join(', ')]);
+  const tendQueda=ccData.filter(c=>c.tendencia<-20&&c.miniMeses.length>=6);
+  if(tendQueda.length) alerts.push(['warn','📉 Tendência de queda (>20%): '+tendQueda.map(c=>c.cc).join(', ')]);
+  renderAlerts('sc-alerts',alerts);
+
+  // ── Cards por veículo ────────────────────────────────────
+  ccData.sort((a,b)=>b.score-a.score);
   const grid=document.getElementById('score-grid');
   grid.innerHTML='';
-  ccVals.forEach(c=>{
-    const scoreColor=c.grade==='A'?'var(--green)':c.grade==='B'?'var(--blue)':c.grade==='C'?'var(--amber)':'var(--red)';
+
+  ccData.forEach(c=>{
+    const cpkmOk=avgCpkm>0&&c.cpkm>0&&c.cpkm<=avgCpkm;
+    const kmlOk=avgKml>0&&c.kml>0&&c.kml>=avgKml;
+    const tendIcon=c.tendencia>10?'↑':c.tendencia<-10?'↓':'→';
+    const tendColor=c.tendencia>10?'var(--green)':c.tendencia<-10?'var(--red)':'var(--text3)';
+
+    // Mini gráfico inline (sparkline) como barras CSS
+    const maxMini=Math.max(...c.miniVals.map(Math.abs),1);
+    const sparkHTML=c.miniVals.length>0?`
+      <div style="display:flex;align-items:flex-end;gap:1px;height:28px;margin-top:8px;">
+        ${c.miniVals.map(v=>`<div style="flex:1;height:${Math.max(2,Math.round(Math.abs(v)/maxMini*28))}px;
+          background:${v>=0?'rgba(16,217,160,0.6)':'rgba(240,82,82,0.6)'};border-radius:1px;"></div>`).join('')}
+      </div>`:'';
+
     grid.innerHTML+=`
-      <div class="score-card">
+      <div class="score-card" style="border-top:2px solid ${c.gradeColor};">
         <div class="score-top">
           <div>
             <div class="score-cc">${c.cc}</div>
+            <div style="font-size:10px;color:var(--text3);font-family:var(--mono);">${c.kmRodado.toLocaleString('pt-BR')} km · ${c.nMeses}m</div>
           </div>
-          <div class="score-badge ${c.grade}">${c.grade}</div>
+          <div style="text-align:right;">
+            <div class="score-badge ${c.grade}" style="background:${c.gradeColor}22;color:${c.gradeColor};border-color:${c.gradeColor};">${c.grade}</div>
+            <div style="font-size:10px;color:${tendColor};margin-top:2px;">${tendIcon} ${Math.abs(c.tendencia).toFixed(0)}%</div>
+          </div>
         </div>
         <div class="score-bar-row">
-          <div class="score-bar-label"><span>Lucro</span><span style="color:${c.luc>=0?'var(--green)':'var(--red)'}">${fmtK(c.luc)}</span></div>
-          <div class="score-bar-outer"><div class="score-bar-inner" style="width:${Math.min(100,c.score)}%;background:${scoreColor}"></div></div>
+          <div class="score-bar-label"><span>Receita/km</span><span style="color:var(--blue);">R$ ${c.rpkm.toFixed(2).replace('.',',')}</span></div>
+          <div class="score-bar-outer"><div class="score-bar-inner" style="width:${Math.min(100,avgRpkm>0?c.rpkm/avgRpkm*50:0)}%;background:var(--blue)"></div></div>
         </div>
         <div class="score-bar-row">
-          <div class="score-bar-label"><span>Margem</span><span>${fmtPct(c.margin)}</span></div>
-          <div class="score-bar-outer"><div class="score-bar-inner" style="width:${Math.min(100,Math.max(0,c.margin))}%;background:var(--blue)"></div></div>
+          <div class="score-bar-label"><span>Custo/km</span><span style="color:${cpkmOk?'var(--green)':'var(--red)'};">R$ ${c.cpkm.toFixed(2).replace('.',',')}</span></div>
+          <div class="score-bar-outer"><div class="score-bar-inner" style="width:${Math.min(100,avgCpkm>0?c.cpkm/avgCpkm*50:0)}%;background:${cpkmOk?'var(--green)':'var(--red)'}"></div></div>
+        </div>
+        ${c.temCombustivel?`
+        <div class="score-bar-row">
+          <div class="score-bar-label"><span>km/litro</span><span style="color:${kmlOk?'var(--green)':'var(--amber)'};">${c.kml.toFixed(2).replace('.',',')} km/l</span></div>
+          <div class="score-bar-outer"><div class="score-bar-inner" style="width:${Math.min(100,c.kml/5*100)}%;background:${kmlOk?'var(--green)':'var(--amber)'}"></div></div>
         </div>
         <div class="score-bar-row">
-          <div class="score-bar-label"><span>Score</span><span style="color:${scoreColor}">${c.score}/100</span></div>
-          <div class="score-bar-outer"><div class="score-bar-inner" style="width:${c.score}%;background:${scoreColor}"></div></div>
+          <div class="score-bar-label"><span>Preço médio litro</span><span style="color:var(--text2);">R$ ${c.precoLitro.toFixed(2).replace('.',',')}</span></div>
+        </div>`:'<div style="font-size:10px;color:var(--text3);padding:4px 0;">Sem combustível (carreta)</div>'}
+        <div class="score-bar-row">
+          <div class="score-bar-label"><span>Margem</span><span style="color:${c.margem>0?'var(--green)':'var(--red)'};">${c.margem.toFixed(1).replace('.',',')}%</span></div>
+          <div class="score-bar-outer"><div class="score-bar-inner" style="width:${Math.min(100,Math.max(0,c.margem))}%;background:${c.margem>0?'var(--green)':'var(--red)'}"></div></div>
         </div>
+        <div style="margin-top:10px;padding:8px;background:var(--bg3);border-radius:6px;">
+          <div style="font-size:9px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;margin-bottom:4px;">Custo do Motorista</div>
+          <div style="display:flex;gap:16px;font-size:11px;font-family:var(--mono);">
+            <span>Comissão: <span style="color:var(--amber);">${fmtBR(c.comissao)}</span></span>
+            <span>Ajuda custo: <span style="color:var(--amber);">${fmtBR(c.ajuda)}</span></span>
+          </div>
+          ${c.rec>0?`<div style="font-size:10px;color:var(--text3);margin-top:2px;">
+            ${((c.comissao+c.ajuda)/c.rec*100).toFixed(1)}% da receita</div>`:''}
+        </div>
+        <div class="score-bar-row" style="margin-top:6px;">
+          <div class="score-bar-label"><span>Score SOF 2.0</span><span style="color:${c.gradeColor};font-weight:700;">${c.score}/100</span></div>
+          <div class="score-bar-outer"><div class="score-bar-inner" style="width:${c.score}%;background:${c.gradeColor}"></div></div>
+        </div>
+        ${sparkHTML}
       </div>`;
   });
 
-  // Alerts
-  const alerts=[];
-  const prejuizo=ccVals.filter(c=>c.luc<0);
-  if(prejuizo.length) alerts.push(['danger','⚠ Veículos com prejuízo: '+prejuizo.map(c=>c.cc).join(', ')]);
-  const gradeD=ccVals.filter(c=>c.grade==='D');
-  if(gradeD.length) alerts.push(['warn','⚠ Score crítico (D): '+gradeD.map(c=>c.cc).join(', ')]);
-  const avgMargin=ccVals.reduce((a,b)=>a+b.margin,0)/ccVals.length;
-  const lowMargin=ccVals.filter(c=>c.margin<avgMargin*0.5&&c.rec>0);
-  if(lowMargin.length) alerts.push(['warn','⚠ Margem abaixo da média: '+lowMargin.map(c=>c.cc).join(', ')]);
-  renderAlerts('sc-alerts',alerts);
+  // ── Gráficos comparativos ────────────────────────────────
+  const sorted=[...ccData].sort((a,b)=>a.cpkm-b.cpkm);
+  mkChart('ch-cpkm',{type:'bar',
+    data:{labels:sorted.map(c=>c.cc),datasets:[
+      {label:'R$/km',data:sorted.map(c=>parseFloat(c.cpkm.toFixed(3))),
+        backgroundColor:sorted.map(c=>c.cpkm<=avgCpkm?mkRGBA(GREEN,'0.78'):mkRGBA(RED,'0.78')),
+        borderWidth:0,borderRadius:4},
+      {label:'Média',type:'line',data:sorted.map(()=>parseFloat(avgCpkm.toFixed(3))),
+        borderColor:mkRGBA(AMBER,'1'),backgroundColor:'transparent',
+        borderWidth:2,pointRadius:0}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:tCS,font:{size:11},boxWidth:12}},
+        tooltip:{callbacks:{label:c=>c.dataset.label+': R$ '+c.parsed.y.toFixed(2)}}},
+      scales:{y:{grid:{color:gCS},ticks:{callback:v=>'R$ '+v.toFixed(2),color:tCS,font:{size:10}}},
+        x:{grid:{display:false},ticks:{color:tCS,font:{size:10},autoSkip:false}}}}});
 
-  // Chart
+  const sortedKml=[...ccData].filter(c=>c.temCombustivel&&c.kml>0).sort((a,b)=>b.kml-a.kml);
+  if(sortedKml.length){
+    mkChart('ch-kml',{type:'bar',
+      data:{labels:sortedKml.map(c=>c.cc),datasets:[
+        {label:'km/l',data:sortedKml.map(c=>parseFloat(c.kml.toFixed(2))),
+          backgroundColor:sortedKml.map(c=>c.kml>=avgKml?mkRGBA(GREEN,'0.78'):mkRGBA(AMBER,'0.78')),
+          borderWidth:0,borderRadius:4},
+        {label:'Média',type:'line',data:sortedKml.map(()=>parseFloat(avgKml.toFixed(2))),
+          borderColor:mkRGBA(BLUE,'1'),backgroundColor:'transparent',
+          borderWidth:2,pointRadius:0}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:tCS,font:{size:11},boxWidth:12}},
+          tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toFixed(2)+' km/l'}}},
+        scales:{y:{grid:{color:gCS},ticks:{callback:v=>v.toFixed(1)+' km/l',color:tCS,font:{size:10}}},
+          x:{grid:{display:false},ticks:{color:tCS,font:{size:10},autoSkip:false}}}}});
+  }
+
   mkChart('ch-placa-lucro',barCfg(
-    ccVals.map(c=>c.cc),
-    ccVals.map(c=>c.luc),
+    ccData.map(c=>c.cc),
+    ccData.map(c=>c.luc),
     mkRGBA(GREEN,'0.75'),mkRGBA(RED,'0.75')
   ));
 }
@@ -1684,6 +2434,11 @@ function renderScore(){
 // RENDER SIMPLE ANALYSES (01-06)
 // ═══════════════════════════════════════════════════
 function renderSimple(prefix, tipoName){
+  // Init filter for Distribuição Lucro
+  if(tipoName==='Distribuição Lucro'){
+    initFiltro({filtroId:'lucro', wrapId:'luc-filter-pills', usarDP:false,
+      onApply:()=>renderSimple('a6','Distribuição Lucro')});
+  }
   const byYr={};
   ANOS12.forEach(y=>byYr[y]=0);
   Object.entries(STATIC.byTipoYear[tipoName]||{}).forEach(([y,v])=>byYr[y]=v);
@@ -1696,8 +2451,8 @@ function renderSimple(prefix, tipoName){
   let bestYr='—',bestVal=0;
   ANOS12.forEach((y,i)=>{ if(Math.abs(vals[i])>Math.abs(bestVal)){bestVal=vals[i];bestYr=y;} });
 
-  setText(prefix+'-tot', fmtBR(total));
-  setText(prefix+'-best', bestYr+' '+fmtBR(bestVal));
+  setText(prefix+'-tot', fmtBR(tipoName==='Distribuição Lucro'?Math.abs(total):total));
+  setText(prefix+'-best', bestYr+' — '+fmtBR(bestVal));
   setText(prefix+'-2026', fmtBR(byYr['2026']));
 
   const posC=tipoName==='Receita'||tipoName==='Venda De Veículo'?mkRGBA(GREEN,'0.75'):tipoName==='Distribuição Lucro'?mkRGBA(AMBER,'0.75'):mkRGBA(RED,'0.75');
@@ -1717,15 +2472,30 @@ function renderSimple(prefix, tipoName){
       scales:{y:{grid:{color:gc},ticks:{callback:v=>fmtK(v),color:tc,font:{size:10}}},x:{grid:{display:false},ticks:{color:tc,font:{size:10},autoSkip:false}}}}
   });
 
-  // Gráfico mensal — ano atual
+  // Gráfico mensal — dinâmico para Dist.Lucro, ano atual para os demais
   const anoAtualStr = String(new Date().getFullYear());
   const meses=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   const moVals = [0,0,0,0,0,0,0,0,0,0,0,0];
+  const Fluc=tipoName==='Distribuição Lucro'?FILTROS.lucro:null;
+  const moFiltro=tipoName==='Distribuição Lucro'?getFiltroFn('lucro'):null;
+  const anoLabel=tipoName==='Distribuição Lucro'?
+    (Fluc&&Fluc.period?'Últ. '+Fluc.period.replace('ult','')+'m':
+     Fluc&&Fluc.yrs.size===1?'Meses de '+[...Fluc.yrs][0]:
+     Fluc&&Fluc.yrs.size>1?'Acumulado '+[...Fluc.yrs].sort().join('+'):
+     'Ano atual ('+anoAtualStr+')')
+    :'';
+  const elLucLabel=document.getElementById('luc-mo-label');
+  if(elLucLabel&&tipoName==='Distribuição Lucro') elLucLabel.textContent=anoLabel||'ano atual';
   for(let i=0;i<R.length;i++){
     const row=R[i];
     if(TIPO[row[I_TIPO]]!==tipoName) continue;
     const mo=MO[row[I_DC]]||'';
-    if(!mo.startsWith(anoAtualStr)) continue;
+    if(tipoName==='Distribuição Lucro'){
+      if(moFiltro){if(!moFiltro(mo))continue;}
+      else if(!mo.startsWith(anoAtualStr)) continue;
+    } else {
+      if(!mo.startsWith(anoAtualStr)) continue;
+    }
     const mIdx=parseInt(mo.slice(5,7),10)-1;
     if(mIdx>=0 && mIdx<12) moVals[mIdx]+=row[I_VAL];
   }
@@ -1749,6 +2519,8 @@ function renderSimple(prefix, tipoName){
 // RENDER RENTABILIDADE
 // ═══════════════════════════════════════════════════
 function renderRent(){
+  initFiltro({filtroId:'rent', wrapId:'rent-yr-pills', usarDP:false, onApply:renderRent});
+  const fnRent=getFiltroFn('rent');
   const ryVals=ANOS12.slice(0,-1).map(y=>STATIC.rentByYear[y]||0);
   const r2026mo=['01','02','03','04','05','06','07','08','09','10','11'].map(m=>{
     let v=0;
@@ -1765,7 +2537,7 @@ function renderRent(){
   const best=ryVals.reduce((b,v,i)=>v>b.v?{v,i}:b,{v:-Infinity,i:0});
 
   setText('r7-tot', fmtBR(ryVals.reduce((a,b)=>a+b,0)));
-  setText('r7-best', ANOS12[best.i]+' '+fmtBR(best.v));
+  setText('r7-best', ANOS12[best.i]+' — '+fmtBR(best.v));
   setText('r8-tot', fmtBR(acum2026));
 
   mkChart('ch-r7',barCfg(ANOS12.slice(0,-1),ryVals,mkRGBA(GREEN,'0.75'),mkRGBA(RED,'0.75')));
@@ -1918,7 +2690,7 @@ function exportDRE(){
 // RANKING YEAR FILTER INIT
 // ═══════════════════════════════════════════════════
 function initRankingFilter(){
-  initRankingPills();
+  // Substituído por initFiltro em renderRanking
 }
 
 
@@ -2037,6 +2809,857 @@ function renderCtrl(){
 }
 
 // ═══════════════════════════════════════════════════
+// RESULTADO FINANCEIRO (Receitas + Despesas + Juros)
+// ═══════════════════════════════════════════════════
+function renderAnalise(){
+  initFiltro({filtroId:'analise', wrapId:'an-yr-pills', usarDP:false, onApply:renderAnalise});
+  const fnAn=getFiltroFn('analise');
+  const Fan=FILTROS.analise;
+  const byTY=STATIC.byTipoYear;
+  const recVals=ANOS12.map(y=>byTY['Receita']?.[y]||0);
+  const despVals=ANOS12.map(y=>Math.abs(byTY['Despesa']?.[y]||0));
+  const jurVals=ANOS12.map(y=>byTY['Juros']?.[y]||0);
+  let totRec=0,totDesp=0,totJur=0;
+  if(fnAn){
+    for(let i=0;i<R.length;i++){
+      const row=R[i];const mo=MO[row[I_DC]]||'';
+      if(!fnAn(mo))continue;
+      const tipo=TIPO[row[I_TIPO]],v=row[I_VAL];
+      if(tipo==='Receita')totRec+=v;
+      else if(tipo==='Despesa')totDesp+=Math.abs(v);
+      else if(tipo==='Juros')totJur+=v;
+    }
+  } else {
+    totRec=recVals.reduce((a,b)=>a+b,0);
+    totDesp=despVals.reduce((a,b)=>a+b,0);
+    totJur=jurVals.reduce((a,b)=>a+b,0);
+  }
+  setText('an-rec',fmtBR(totRec));
+  setText('an-desp',fmtBR(totDesp));
+  setText('an-jur',fmtBR(Math.abs(totJur)));
+  const totLuc=totRec-totDesp+totJur;
+  const totMarg=totRec>0?(totLuc/totRec*100):0;
+  const lucEl=document.getElementById('an-luc');
+  if(lucEl){lucEl.textContent=fmtBR(totLuc);lucEl.className='kpi-value '+(totLuc>=0?'green':'red');}
+  setText('an-marg',(totMarg>=0?'+':'')+totMarg.toFixed(1).replace('.',',')+' %');
+
+  const isDark=!document.body.classList.contains('light');
+  const gCA=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)';
+  const tCA=isDark?'#5a7090':'#6a8090';
+
+  // Gráfico anual — destacar anos ativos
+  const recColors=ANOS12.map(y=>_anYrs.size===0||_anYrs.has(y)?mkRGBA(GREEN,'0.78'):mkRGBA(GREEN,'0.25'));
+  const despColors=ANOS12.map(y=>_anYrs.size===0||_anYrs.has(y)?mkRGBA(RED,'0.78'):mkRGBA(RED,'0.25'));
+  const jurColors=ANOS12.map(y=>_anYrs.size===0||_anYrs.has(y)?mkRGBA(AMBER,'0.78'):mkRGBA(AMBER,'0.25'));
+  // Linha de Lucro Financeiro anual
+  const lucValsYr=ANOS12.map((_,i)=>Math.round((recVals[i]-despVals[i]+jurVals[i])*100)/100);
+  const barMaxYr=Math.max(0,...recVals,...despVals);
+  const BAR_FRAC_AN=3/4;
+  const yMaxYr=barMaxYr/BAR_FRAC_AN;
+  const sMaxYr=Math.max(...lucValsYr), sMinYr=Math.min(...lucValsYr);
+  const sRangeYr=Math.max(sMaxYr-sMinYr,1);
+  const y2MaxYr=sMaxYr+sRangeYr*0.15;
+  const y2MinYr=sMinYr-(sRangeYr*BAR_FRAC_AN/(1-BAR_FRAC_AN));
+
+  mkChart('ch-analise-yr',{type:'bar',
+    data:{labels:ANOS12,datasets:[
+      {label:'Receitas',data:recVals,backgroundColor:recColors,borderRadius:3,yAxisID:'y'},
+      {label:'Despesas',data:despVals,backgroundColor:despColors,borderRadius:3,yAxisID:'y'},
+      {label:'Juros',data:jurVals.map(v=>Math.abs(v)),backgroundColor:jurColors,borderRadius:3,yAxisID:'y'},
+      {label:'Lucro',data:lucValsYr,type:'line',
+        borderColor:mkRGBA(AMBER,'1'),backgroundColor:'transparent',
+        borderWidth:2.5,pointRadius:4,pointHoverRadius:7,
+        pointBackgroundColor:mkRGBA(AMBER,'1'),tension:0.3,
+        yAxisID:'y2',order:0}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:tCA,font:{size:11},boxWidth:12}},
+        tooltip:{callbacks:{label:c=>{
+          if(c.dataset.label==='Lucro'){
+            const marg=recVals[c.dataIndex]>0?(c.parsed.y/recVals[c.dataIndex]*100):0;
+            return 'Lucro: '+fmtBR(c.parsed.y)+' ('+marg.toFixed(1).replace('.',',')+'%)';
+          }
+          return c.dataset.label+': '+fmtBR(c.parsed.y);
+        }}}},
+      scales:{
+        y:{grid:{color:gCA},min:0,max:yMaxYr,ticks:{callback:v=>fmtK(v),color:tCA,font:{size:10}}},
+        y2:{position:'right',grid:{display:false},min:y2MinYr,max:y2MaxYr,
+          ticks:{callback:v=>fmtK(v),color:'#f0b429',font:{size:10}}},
+        x:{grid:{display:false},ticks:{color:tCA,font:{size:10},autoSkip:false}}}
+    }});
+
+  // Gráfico mensal — sequência dinâmica igual à Visão Geral
+  const anoAtualStr=String(new Date().getFullYear());
+  const mesAtualNumAn=new Date().getMonth()+1;
+
+  // Montar lista de meses YYYY-MM do período
+  let moSeqAn=[];
+  if(Fan.period){
+    const n=parseInt(Fan.period.replace('ult',''));
+    for(let i=n-1;i>=0;i--){
+      const d=new Date(new Date().getFullYear(),new Date().getMonth()-i,1);
+      const y=d.getFullYear(),m=d.getMonth()+1;
+      moSeqAn.push(y+'-'+(m<10?'0':'')+m);
+    }
+  } else if(Fan.yrs.size>0){
+    [...Fan.yrs].sort().forEach(yr=>{
+      for(let m=1;m<=12;m++){
+        moSeqAn.push(yr+'-'+(m<10?'0':'')+m);
+      }
+    });
+  } else {
+    // Todos: usar todos os anos com movimento de Receita, Despesa ou Juros
+    const anosMovAn=new Set();
+    for(let k=0;k<R.length;k++){
+      const row=R[k];
+      const tipo=TIPO[row[I_TIPO]];
+      if(tipo!=='Receita'&&tipo!=='Despesa'&&tipo!=='Juros') continue;
+      if(Math.abs(row[I_VAL])<0.01) continue;
+      const mo=MO[row[I_DC]]||'';
+      if(mo) anosMovAn.add(mo.slice(0,4));
+    }
+    [...anosMovAn].sort().forEach(yr=>{
+      for(let m=1;m<=12;m++){
+        moSeqAn.push(yr+'-'+(m<10?'0':'')+m);
+      }
+    });
+  }
+
+  // Calcular valores por mês na sequência
+  const mesNomesAn=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const moRecV={},moDespV={},moJurV={};
+  moSeqAn.forEach(mo=>{moRecV[mo]=0;moDespV[mo]=0;moJurV[mo]=0;});
+  for(let i=0;i<R.length;i++){
+    const row=R[i];
+    const mo=MO[row[I_DC]]||'';
+    if(!(mo in moRecV)) continue;
+    const tipo=TIPO[row[I_TIPO]],v=row[I_VAL];
+    if(tipo==='Receita') moRecV[mo]+=v;
+    else if(tipo==='Despesa') moDespV[mo]+=v;
+    else if(tipo==='Juros') moJurV[mo]+=v;
+  }
+
+  // Labels: só mês se 1 ano, mês/AA se múltiplos anos
+  const anosSeqAn=[...new Set(moSeqAn.map(mo=>mo.slice(0,4)))];
+  const labelsAn=moSeqAn.map(mo=>{
+    const [y,m]=mo.split('-');
+    return anosSeqAn.length===1?mesNomesAn[parseInt(m)-1]:mesNomesAn[parseInt(m)-1]+'/'+y.slice(2);
+  });
+  const dataRec=moSeqAn.map(mo=>Math.round((moRecV[mo]||0)*100)/100);
+  const dataDesp=moSeqAn.map(mo=>Math.round(Math.abs(moDespV[mo]||0)*100)/100);
+  const dataJur=moSeqAn.map(mo=>Math.round(Math.abs(moJurV[mo]||0)*100)/100);
+
+  const dataLuc=moSeqAn.map((_,i)=>Math.round((dataRec[i]-dataDesp[i]+dataJur[i])*100)/100);
+  const barMaxMo=Math.max(0,...dataRec,...dataDesp);
+  const BAR_FRAC_MO=3/4;
+  const yMaxMo=barMaxMo/BAR_FRAC_MO;
+  const sMaxMo=Math.max(...dataLuc), sMinMo=Math.min(...dataLuc);
+  const sRangeMo=Math.max(sMaxMo-sMinMo,1);
+  const y2MaxMo=sMaxMo+sRangeMo*0.15;
+  const y2MinMo=sMinMo-(sRangeMo*BAR_FRAC_MO/(1-BAR_FRAC_MO));
+
+  mkChart('ch-analise-mo',{type:'bar',
+    data:{labels:labelsAn,datasets:[
+      {label:'Receitas',data:dataRec,backgroundColor:mkRGBA(GREEN,'0.75'),borderRadius:3,yAxisID:'y'},
+      {label:'Despesas',data:dataDesp,backgroundColor:mkRGBA(RED,'0.75'),borderRadius:3,yAxisID:'y'},
+      {label:'Juros',data:dataJur,backgroundColor:mkRGBA(AMBER,'0.75'),borderRadius:3,yAxisID:'y'},
+      {label:'Lucro',data:dataLuc,type:'line',
+        borderColor:mkRGBA(AMBER,'1'),backgroundColor:'transparent',
+        borderWidth:2.5,pointRadius:4,pointHoverRadius:7,
+        pointBackgroundColor:mkRGBA(AMBER,'1'),tension:0.3,
+        yAxisID:'y2',order:0}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:tCA,font:{size:11},boxWidth:12}},
+        tooltip:{callbacks:{label:c=>{
+          if(c.dataset.label==='Lucro'){
+            const marg=dataRec[c.dataIndex]>0?(c.parsed.y/dataRec[c.dataIndex]*100):0;
+            return 'Lucro: '+fmtBR(c.parsed.y)+' ('+marg.toFixed(1).replace('.',',')+'%)';
+          }
+          return c.dataset.label+': '+fmtBR(c.parsed.y);
+        }}}},
+      scales:{
+        y:{grid:{color:gCA},min:0,max:yMaxMo,ticks:{callback:v=>fmtK(v),color:tCA,font:{size:10}}},
+        y2:{position:'right',grid:{display:false},min:y2MinMo,max:y2MaxMo,
+          ticks:{callback:v=>fmtK(v),color:'#f0b429',font:{size:10}}},
+        x:{grid:{display:false},ticks:{color:tCA,font:{size:10},autoSkip:false}}}
+    }});
+}
+
+// ═══════════════════════════════════════════════════
+// COMPRAS x VENDAS
+// ═══════════════════════════════════════════════════
+let _cvAnoSel=null;
+function renderCompraVenda(){
+  initFiltro({filtroId:'compravenda', wrapId:'cv-yr-pills', usarDP:false, onApply:renderCompraVenda});
+  const fnCV=getFiltroFn('compravenda');
+  const Fcv=FILTROS.compravenda;
+  const byTY=STATIC.byTipoYear;
+  // Totais respeitando filtro
+  function somaCV(tipo){
+    if(!fnCV) return Math.abs(Object.values(byTY[tipo]||{}).reduce((a,b)=>a+b,0));
+    let s=0;
+    for(let i=0;i<R.length;i++){
+      const row=R[i];
+      if(TIPO[row[I_TIPO]]!==tipo) continue;
+      const mo=MO[row[I_DC]]||'';
+      if(!fnCV(mo)) continue;
+      s+=Math.abs(row[I_VAL]);
+    }
+    return s;
+  }
+  const cmpVals=ANOS12.map(y=>Math.abs(byTY['Compra de Veículo']?.[y]||0));
+  const vndVals=ANOS12.map(y=>byTY['Venda De Veículo']?.[y]||0);
+  setText('cv-tot-cmp',fmtBR(somaCV('Compra de Veículo')));
+  setText('cv-tot-vnd',fmtBR(somaCV('Venda De Veículo')));
+
+  const isDark=!document.body.classList.contains('light');
+  const gCV=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)';
+  const tCV=isDark?'#5a7090':'#6a8090';
+
+  if(!_cvAnoSel) _cvAnoSel=String(new Date().getFullYear());
+
+  mkChart('ch-cv-yr',{type:'bar',
+    data:{labels:ANOS12,datasets:[
+      {label:'Compras',data:cmpVals,backgroundColor:mkRGBA(RED,'0.75'),borderRadius:3},
+      {label:'Vendas',data:vndVals,backgroundColor:mkRGBA(GREEN,'0.75'),borderRadius:3},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:tCV,font:{size:11},boxWidth:12}},
+        tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtBR(c.parsed.y)}}},
+      scales:{y:{grid:{color:gCV},ticks:{callback:v=>fmtK(v),color:tCV,font:{size:10}}},
+        x:{grid:{display:false},ticks:{color:tCV,font:{size:10},autoSkip:false}}}
+    }});
+
+  renderCompraVendaMensal();
+}
+
+function renderCompraVendaMensal(){
+  const isDark=!document.body.classList.contains('light');
+  const gCV=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)';
+  const tCV=isDark?'#5a7090':'#6a8090';
+  const Fcv=FILTROS.compravenda;
+  const fnCV=getFiltroFn('compravenda');
+  const now=new Date();
+  const anoAtualCV=now.getFullYear(),mesAtualCV=now.getMonth()+1;
+
+  // Montar sequência de meses igual ao padrão dos outros gráficos
+  let moSeqCV=[];
+  if(Fcv.period){
+    const n=parseInt(Fcv.period.replace('ult',''));
+    for(let i=n-1;i>=0;i--){
+      const d=new Date(anoAtualCV,mesAtualCV-1-i,1);
+      const y=d.getFullYear(),m=d.getMonth()+1;
+      moSeqCV.push(y+'-'+(m<10?'0':'')+m);
+    }
+  } else if(Fcv.yrs.size>0){
+    [...Fcv.yrs].sort().forEach(yr=>{
+      for(let m=1;m<=12;m++){
+        moSeqCV.push(yr+'-'+(m<10?'0':'')+m);
+      }
+    });
+  } else {
+    // Todos — usar todos os anos com movimento de Compra ou Venda
+    const anosComMov=new Set();
+    for(let i=0;i<R.length;i++){
+      const row=R[i];
+      const tipo=TIPO[row[I_TIPO]];
+      if(tipo!=='Compra de Veículo'&&tipo!=='Venda De Veículo') continue;
+      if(Math.abs(row[I_VAL])<0.01) continue;
+      const mo=MO[row[I_DC]]||'';
+      if(mo) anosComMov.add(mo.slice(0,4));
+    }
+    [...anosComMov].sort().forEach(yr=>{
+      for(let m=1;m<=12;m++){
+        moSeqCV.push(yr+'-'+(m<10?'0':'')+m);
+      }
+    });
+  }
+
+  const mesNomesCV=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const moCmp={},moVnd={};
+  moSeqCV.forEach(mo=>{moCmp[mo]=0;moVnd[mo]=0;});
+  for(let i=0;i<R.length;i++){
+    const row=R[i];
+    const mo=MO[row[I_DC]]||'';
+    if(!(mo in moCmp)) continue;
+    const tipo=TIPO[row[I_TIPO]];
+    if(tipo==='Compra de Veículo') moCmp[mo]+=Math.abs(row[I_VAL]);
+    else if(tipo==='Venda De Veículo') moVnd[mo]+=row[I_VAL];
+  }
+
+  // Filtrar apenas meses com movimento
+  const moSeqFiltrado=moSeqCV.filter(mo=>(moCmp[mo]||0)+(moVnd[mo]||0)>0.01);
+  // Se não tiver nenhum, mostrar sequência completa mesmo assim
+  const moFinal=moSeqFiltrado.length>0?moSeqFiltrado:moSeqCV;
+
+  const anosSeqCV=[...new Set(moFinal.map(mo=>mo.slice(0,4)))];
+  const labelsCV=moFinal.map(mo=>{
+    const [y,m]=mo.split('-');
+    return anosSeqCV.length===1?mesNomesCV[parseInt(m)-1]:mesNomesCV[parseInt(m)-1]+'/'+y.slice(2);
+  });
+
+  mkChart('ch-cv-mo',{type:'bar',
+    data:{labels:labelsCV,datasets:[
+      {label:'Compras',data:moFinal.map(mo=>moCmp[mo]),backgroundColor:mkRGBA(RED,'0.75'),borderRadius:3},
+      {label:'Vendas',data:moFinal.map(mo=>moVnd[mo]),backgroundColor:mkRGBA(GREEN,'0.75'),borderRadius:3},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:tCV,font:{size:11},boxWidth:12}},
+        tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtBR(c.parsed.y)}}},
+      scales:{y:{grid:{color:gCV},ticks:{callback:v=>fmtK(v),color:tCV,font:{size:10}}},
+        x:{grid:{display:false},ticks:{color:tCV,font:{size:10},autoSkip:false}}}
+    }});
+}
+
+// ═══════════════════════════════════════════════════
+// PATRIMÔNIO — FICHAS DOS VEÍCULOS
+// ═══════════════════════════════════════════════════
+const SOCIO_COR_PAT={Rogerio:'#f05252',Emerson:'#10d9a0',Denis:'#f0b429',Vanderlei:'#a78bfa',Guilherme:'#FF7C24'};
+function socioCorPat(n){return SOCIO_COR_PAT[n]||'#94a3b8';}
+
+// Ícones estilizados por sócio
+const SOCIO_ICON={
+  Rogerio:`<svg width="28" height="28" viewBox="0 0 130 196" xmlns="http://www.w3.org/2000/svg">
+    <defs><clipPath id="sc-r"><path d="M65,2 L128,35 L128,125 L65,194 L2,125 L2,35 Z"/></clipPath></defs>
+    <path d="M65,2 L128,35 L128,125 L65,194 L2,125 L2,35 Z" fill="white" stroke="#111" stroke-width="6"/>
+    <g clip-path="url(#sc-r)">
+      <rect x="0" y="0" width="130" height="66" fill="#cc0000"/>
+      <rect x="0" y="66" width="130" height="66" fill="#111111"/>
+    </g>
+    <path d="M65,2 L128,35 L128,125 L65,194 L2,125 L2,35 Z" fill="none" stroke="#111" stroke-width="6"/>
+    <line x1="2" y1="66" x2="128" y2="66" stroke="white" stroke-width="4" clip-path="url(#sc-r)"/>
+    <line x1="2" y1="132" x2="128" y2="132" stroke="white" stroke-width="4" clip-path="url(#sc-r)"/>
+    <text x="65" y="109" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="30" font-weight="900" fill="white" letter-spacing="2">SPFC</text>
+  </svg>`,
+  Emerson:`<svg width="28" height="28" viewBox="0 0 176 210" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="88" cy="100" rx="88" ry="105" fill="#0d5c20" stroke="#063d12" stroke-width="3"/>
+    <ellipse cx="88" cy="100" rx="76" ry="93" fill="white"/>
+    <ellipse cx="88" cy="100" rx="64" ry="80" fill="#1a7a35"/>
+    <text x="88" y="133" text-anchor="middle" font-family="Times New Roman,serif" font-size="80" font-weight="bold" fill="white">P</text>
+    <text x="88" y="15" text-anchor="middle" font-family="Arial" font-size="11" fill="#0d5c20">★ ★ ★</text>
+  </svg>`
+};
+function socioIcon(n){return SOCIO_ICON[n]||'';}
+
+function renderFichas(){
+  if(!window._PAT){renderFichasMsg('Carregando patrimônio...');loadPatrimonio().then(renderFichas);return;}
+  const DATA=window._PAT;
+  const avEl=document.getElementById('fichas-aviso');
+  if(avEl) avEl.textContent='⚠ '+DATA.meta.aviso+' · Ref.: '+DATA.meta.referencia_valores;
+
+  // Quadro total por sócio
+  const totais={},cnt={};
+  DATA.sociedade.forEach(v=>v.socios.forEach(s=>{
+    totais[s.nome]=(totais[s.nome]||0)+s.valor;
+    cnt[s.nome]=(cnt[s.nome]||0)+1;
+  }));
+  const lista=Object.entries(totais).sort((a,b)=>b[1]-a[1]);
+  const maxV=lista[0]?.[1]||1;
+  const tGrid=document.getElementById('fichas-total-grid');
+  if(tGrid) tGrid.innerHTML=lista.map(([nome,val],i)=>{
+    const isRog=nome==='Rogerio';
+    const isEme=nome==='Emerson';
+    const bgExtra=isRog?'background:rgba(240,82,82,0.08);':isEme?'background:rgba(16,217,160,0.05);':'';
+    const iconHtml=socioIcon(nome)?`<span style="float:right">${socioIcon(nome)}</span>`:'';
+    return `<div class="kpi-card" style="border-top:2px solid ${socioCorPat(nome)};${bgExtra}">
+      <div class="kpi-label">#${i+1} — ${nome} (${cnt[nome]} veíc.) ${iconHtml}</div>
+      <div class="kpi-value" style="color:${isRog?'#ffffff':socioCorPat(nome)}">${fmtBR(val)}</div>
+      <div class="kpi-delta">Participação estimada</div>
+    </div>`;
+  }).join('');
+
+  // Cards de veículos
+  const grid=document.getElementById('fichas-grid');
+  if(!grid) return;
+  grid.innerHTML=DATA.sociedade.map(v=>{
+    const sociosHTML=v.socios.map(s=>{
+      const isRog=s.nome==='Rogerio';
+      const isEme=s.nome==='Emerson';
+      const bgStyle=isRog?'background:rgba(240,82,82,0.15);border-radius:6px;padding:4px 6px;':
+                    isEme?'background:rgba(16,217,160,0.1);border-radius:6px;padding:4px 6px;':'padding:4px 6px;';
+      const pctStyle=isRog?'color:#ffffff;font-weight:700;':
+                     isEme?'color:#10d9a0;font-weight:700;':`color:${socioCorPat(s.nome)};font-weight:700;`;
+      const valStyle=isRog?'color:#ffffff;':isEme?'color:#10d9a0;':`color:${socioCorPat(s.nome)};`;
+      return `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;${bgStyle}">
+        <div style="display:flex;align-items:center;gap:6px;min-width:100px;">
+          ${socioIcon(s.nome)?`<span title="${s.nome}">${socioIcon(s.nome)}</span>`:''}
+          <div style="font-size:14px;font-weight:600;color:var(--text);">${s.nome}</div>
+        </div>
+        <div style="flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;border-radius:3px;width:${s.percentual}%;background:${socioCorPat(s.nome)};"></div>
+        </div>
+        <div style="min-width:110px;text-align:right;">
+          <div style="font-size:12px;font-family:var(--mono);${pctStyle}">${s.percentual.toFixed(3)}%</div>
+          <div style="font-size:11px;font-family:var(--mono);${valStyle}">${fmtBR(s.valor)}</div>
+        </div>
+      </div>`;
+    }).join('');
+    const pctRog=v.socios.find(s=>s.nome==='Rogerio')?.percentual||0;
+    const benef=v.diretriz_rogerio.beneficiarios.map(b=>`${b.nome} (${b.percentual.toFixed(3)}%)`).join(' · ');
+    return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+      <div style="background:var(--bg3);padding:14px 16px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;">
+          <div style="font-family:var(--mono);font-size:17px;font-weight:700;color:var(--green);letter-spacing:1px;">${v.placa}</div>
+          <div style="font-size:10px;padding:4px 10px;border-radius:5px;font-family:var(--mono);font-weight:600;background:var(--green2);color:var(--green);border:1px solid rgba(16,217,160,0.3);white-space:nowrap;">Vlr. aprox. ${fmtBR(v.vlr_mercado)}</div>
+        </div>
+        <div style="font-size:11px;color:var(--text3);">Proprietário conforme registro no Detran em nome de: <span style="color:var(--text2);">${v.dono_legal}</span></div>
+      </div>
+      <div style="padding:14px 16px;">
+        ${v.observacao?`<div style="font-size:11px;color:var(--text2);margin-bottom:14px;padding:9px 12px;background:var(--bg3);border-radius:7px;border-left:2px solid var(--text3);font-style:italic;">📋 ${v.observacao}</div>`:`<div style="font-size:11px;color:var(--text3);margin-bottom:14px;padding:9px 12px;background:var(--bg3);border-radius:7px;border-left:2px dashed var(--bg4);font-style:italic;">Sem observação registrada para este veículo.</div>`}
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Participação Econômica</div>
+        ${sociosHTML}
+        ${pctRog>0?`<div style="margin-top:12px;padding:10px 12px;background:var(--bg3);border-radius:7px;border-left:2px solid var(--purple);font-size:10px;color:var(--text2);line-height:1.7;"><div style="font-size:9px;color:var(--purple);font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">📋 Diretrizes de Transferência — Rogério (${pctRog.toFixed(3)}%)</div>A participação de Rogério deve ser dividida igualmente entre: ${benef}</div>`:''}
+        <div style="margin-top:6px;padding:10px 12px;background:var(--bg3);border-radius:7px;border-left:2px solid var(--bg4);font-size:10px;color:var(--text3);line-height:1.7;"><div style="font-size:9px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">Demais Sócios</div>${v.diretriz_outros}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderFichasMsg(msg){
+  const g=document.getElementById('fichas-grid');
+  if(g) g.innerHTML=`<div style="color:var(--text3);font-size:13px;font-family:var(--mono);">${msg}</div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// PATRIMÔNIO — ROE POR VEÍCULO
+// ═══════════════════════════════════════════════════
+let _roeCharts={};
+const _roeYrs=new Set();
+let _roePeriod='';
+function syncRoePills(){
+  document.querySelectorAll('#roe-yr-pills .yr-pill').forEach(p=>{
+    p.classList.remove('yr-all','yr-sel');
+    const pd=p.dataset.pd,yr=p.dataset.yr;
+    if(!pd&&!yr){if(_roeYrs.size===0&&!_roePeriod)p.classList.add('yr-all');}
+    else if(pd){if(_roePeriod===pd)p.classList.add('yr-all');}
+    else if(yr){if(_roeYrs.has(yr)&&!_roePeriod)p.classList.add('yr-sel');}
+  });
+}
+function renderROE(){
+  if(!window._PAT){loadPatrimonio().then(renderROE);return;}
+  const DATA=window._PAT;
+  // Init year pills usando anos do patrimônio.json
+  const yrWrap=document.getElementById('roe-yr-pills');
+  if(yrWrap&&!yrWrap.dataset.init){
+    yrWrap.dataset.init='1';
+    const Froe=FILTROS.roe;
+    function syncRoeLocal(){
+      yrWrap.querySelectorAll('.yr-pill').forEach(p=>{
+        p.classList.remove('yr-all','yr-sel');
+        const pd=p.dataset.pd,yr=p.dataset.yr;
+        if(!pd&&!yr){if(Froe.yrs.size===0&&!Froe.period)p.classList.add('yr-all');}
+        else if(pd){if(Froe.period===pd)p.classList.add('yr-all');}
+        else if(yr){if(Froe.yrs.has(yr)&&!Froe.period)p.classList.add('yr-sel');}
+      });
+    }
+    const allP=document.createElement('div');
+    allP.className='yr-pill yr-all';allP.textContent='Todos';
+    allP.onclick=()=>{Froe.yrs.clear();Froe.period='';syncRoeLocal();renderROE();};
+    yrWrap.appendChild(allP);
+    const anos=[...new Set(DATA.historico.map(r=>r.ano))].sort();
+    anos.forEach(yr=>{
+      const p=document.createElement('div');p.className='yr-pill';p.textContent=yr;p.dataset.yr=String(yr);
+      p.onclick=(e)=>{
+        Froe.period='';
+        const yrS=String(yr);
+        if(e.ctrlKey||e.metaKey||_isTouchDevice){if(Froe.yrs.has(yrS))Froe.yrs.delete(yrS);else Froe.yrs.add(yrS);}
+        else{Froe.yrs.clear();Froe.yrs.add(yrS);}
+        syncRoeLocal();renderROE();
+      };
+      yrWrap.appendChild(p);
+    });
+    [['ult3','Últ. 3m'],['ult6','Últ. 6m'],['ult12','Últ. 12m']].forEach(([pd,lbl])=>{
+      const p=document.createElement('div');p.className='yr-pill';p.textContent=lbl;p.dataset.pd=pd;
+      p.onclick=()=>{Froe.yrs.clear();Froe.period=pd;syncRoeLocal();renderROE();};
+      yrWrap.appendChild(p);
+    });
+    syncRoeLocal();
+  }
+  // Populate placa select once - REMOVED, auto-filter by period
+  const placaSelVal='todas'; // always show all placas with data in period
+
+  // Filter rows
+  const Froe2=FILTROS.roe;
+  const now=new Date();
+  const anoAtualRoe=now.getFullYear(),mesAtualRoe=now.getMonth()+1;
+  let rows=[...DATA.historico];
+  if(Froe2.period){
+    const n=parseInt(Froe2.period.replace('ult',''));
+    const limSeq=anoAtualRoe*12+mesAtualRoe-n;
+    // ROE é anual — incluir anos que têm pelo menos 1 mês no período
+    rows=rows.filter(r=>(r.ano*12+12)>limSeq);
+  } else if(Froe2.yrs.size>0){
+    rows=rows.filter(r=>Froe2.yrs.has(String(r.ano)));
+  }
+  if(placaSelVal!=='todas') rows=rows.filter(r=>r.placa===placaSelVal);
+
+  // Destroy existing charts
+  Object.values(_roeCharts).forEach(c=>{try{c.destroy();}catch(e){}});
+  _roeCharts={};
+
+  const porPlaca={};
+  rows.forEach(r=>{if(!porPlaca[r.placa])porPlaca[r.placa]=[];porPlaca[r.placa].push(r);});
+
+  // Ordenar placas pelo ROE médio (maior → menor) — dinâmico pelo filtro
+  const placasOrdenadas=Object.keys(porPlaca).sort((a,b)=>{
+    const roeA=porPlaca[a].reduce((s,r)=>s+r.roe,0)/porPlaca[a].length;
+    const roeB=porPlaca[b].reduce((s,r)=>s+r.roe,0)/porPlaca[b].length;
+    return roeB-roeA;
+  });
+
+  const isDark=!document.body.classList.contains('light');
+  const gCR=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)';
+  const tCR=isDark?'#5a7090':'#6a8090';
+
+  const grid=document.getElementById('roe-grid');
+  if(!grid) return;
+  grid.innerHTML='';
+
+  placasOrdenadas.forEach(placa=>{
+    const dados=porPlaca[placa];
+    dados.sort((a,b)=>a.ano-b.ano);
+    const anos=dados.map(r=>r.ano);
+    const roes=dados.map(r=>parseFloat((r.roe*100).toFixed(2)));
+    const cores=roes.map(v=>v>=0?mkRGBA(GREEN,'0.78'):mkRGBA(RED,'0.78'));
+    const melhor=dados.reduce((m,r)=>Math.abs(r.roe)>Math.abs(m.roe)?r:m,dados[0]);
+    const cid='ch-roe-'+placa.replace(/[^a-z0-9]/gi,'-');
+    const tRows=dados.map(r=>`<tr><td>${r.ano}</td><td>${fmtBR(r.vlr_mercado)}</td><td class="${r.lucro>=0?'green':'red'}">${fmtBR(r.lucro)}</td><td class="${r.roe>=0?'green':'red'}">${(r.roe*100).toFixed(2)}%</td></tr>`).join('');
+    const card=document.createElement('div');
+    card.className='chart-card';
+    card.innerHTML=`
+      <div style="font-family:var(--mono);font-size:17px;font-weight:700;color:var(--green);letter-spacing:1px;">${placa}</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:12px;">Melhor ROE: ${melhor.ano} · <span class="${melhor.roe>=0?'green':'red'}">${(melhor.roe*100).toFixed(2)}%</span></div>
+      <div style="height:180px;margin-bottom:12px;"><canvas id="${cid}"></canvas></div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono);">
+        <thead><tr style="color:var(--text3);font-size:10px;border-bottom:1px solid var(--border);">
+          <th style="text-align:left;padding:5px 8px;">Ano</th><th style="text-align:left;padding:5px 8px;">Vlr.Mercado</th><th style="text-align:left;padding:5px 8px;">Lucro</th><th style="text-align:left;padding:5px 8px;">ROE</th>
+        </tr></thead>
+        <tbody>${tRows}</tbody>
+      </table>`;
+    grid.appendChild(card);
+    setTimeout(()=>{
+      const ctx=document.getElementById(cid);
+      if(!ctx) return;
+      _roeCharts[cid]=new Chart(ctx,{type:'bar',
+        data:{labels:anos,datasets:[{data:roes,backgroundColor:cores,borderWidth:0,borderRadius:4}]},
+        options:{responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y.toFixed(2)+'%'}}},
+          scales:{y:{grid:{color:gCR},ticks:{callback:v=>v+'%',color:tCR,font:{size:10}}},
+            x:{grid:{display:false},ticks:{color:tCR,font:{size:10}}}}}});
+    },50);
+  });
+
+  // Ranking ROE
+  const label=Froe2.period?'Últ. '+Froe2.period.replace('ult','')+'m':
+    Froe2.yrs.size===0?'Todos os anos':
+    Froe2.yrs.size===1?'Ano '+[...Froe2.yrs][0]:
+    'Anos '+[...Froe2.yrs].sort().join(', ');
+  const rankTitle=document.getElementById('roe-rank-title');
+  if(rankTitle) rankTitle.textContent='Ranking ROE — '+label;
+  const ranking=Object.entries(porPlaca).map(([placa,dados])=>{
+    const roe=dados.reduce((s,r)=>s+r.roe,0)/dados.length;
+    const lucro=dados.reduce((s,r)=>s+r.lucro,0);
+    return {placa,roe,lucro};
+  }).sort((a,b)=>b.roe-a.roe);
+  const maxROE=Math.max(...ranking.map(r=>Math.abs(r.roe)));
+  const rankEl=document.getElementById('roe-ranking');
+  if(rankEl) rankEl.innerHTML=ranking.map((r,i)=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text3);min-width:24px;">#${i+1}</div>
+      <div style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--green);min-width:90px;">${r.placa}</div>
+      <div style="flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;">
+        <div style="height:100%;border-radius:3px;width:${maxROE>0?Math.abs(r.roe)/maxROE*100:0}%;background:${r.roe>=0?'var(--green)':'var(--red)'};"></div>
+      </div>
+      <div style="font-family:var(--mono);font-size:12px;min-width:72px;text-align:right;font-weight:600;color:${r.roe>=0?'var(--green)':'var(--red)'};">${(r.roe*100).toFixed(2)}%</div>
+      <div style="font-size:11px;color:var(--text3);min-width:110px;text-align:right;font-family:var(--mono);color:${r.lucro>=0?'var(--green)':'var(--red)'};">${fmtBR(r.lucro)}</div>
+    </div>`).join('');
+
+  // ── Análise de Decisão — Manter ou Vender ───────────────
+  renderROEDecisao(DATA);
+}
+
+function renderROEDecisao(DATA){
+  const grid=document.getElementById('roe-decisao-grid');
+  if(!grid) return;
+
+  // Agrupar histórico por placa
+  const porPlaca={};
+  DATA.historico.forEach(r=>{
+    if(!porPlaca[r.placa]) porPlaca[r.placa]=[];
+    porPlaca[r.placa].push(r);
+  });
+
+  grid.innerHTML='';
+
+  Object.entries(porPlaca).forEach(([placa,dados])=>{
+    dados.sort((a,b)=>a.ano-b.ano);
+    const comValor=dados.filter(r=>r.vlr_mercado>0);
+    if(comValor.length<2){
+      // Dados insuficientes
+      grid.innerHTML+=`
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;">
+          <div style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--green);">${placa}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:6px;">⚠ Dados insuficientes para análise de depreciação (mínimo 2 anos com valor de mercado)</div>
+        </div>`;
+      return;
+    }
+
+    // Calcular depreciação anual média
+    const taxasDeprec=[];
+    for(let i=1;i<comValor.length;i++){
+      const prev=comValor[i-1].vlr_mercado;
+      const curr=comValor[i].vlr_mercado;
+      if(prev>0) taxasDeprec.push((curr-prev)/prev*100);
+    }
+    const taxaMediaDeprec=taxasDeprec.reduce((a,b)=>a+b,0)/taxasDeprec.length;
+
+    // ROE médio dos últimos 3 anos disponíveis
+    const ultimos=dados.slice(-3).filter(r=>r.roe!==0);
+    const roeMedia=ultimos.length?ultimos.reduce((s,r)=>s+r.roe,0)/ultimos.length:0;
+
+    // Resultado líquido real = ROE médio - depreciação
+    const liquidoReal=roeMedia*100+taxaMediaDeprec; // taxaDeprec é negativa se deprecia
+
+    // Projeção próximo ano
+    const ultimoValor=comValor[comValor.length-1].vlr_mercado;
+    const projecao=ultimoValor*(1+taxaMediaDeprec/100);
+
+    // Decisão
+    let decisao, decisaoColor, decisaoIcon;
+    if(liquidoReal>5){ decisao='Manter'; decisaoColor='var(--green)'; decisaoIcon='✅'; }
+    else if(liquidoReal>0){ decisao='Avaliar'; decisaoColor='var(--amber)'; decisaoIcon='⚠️'; }
+    else { decisao='Considerar venda'; decisaoColor='var(--red)'; decisaoIcon='🔴'; }
+
+    const anoUltimoValor=comValor[comValor.length-1].ano;
+
+    grid.innerHTML+=`
+      <div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid ${decisaoColor};border-radius:var(--radius);padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--green);">${placa}</div>
+          <div style="font-size:11px;font-weight:700;color:${decisaoColor};">${decisaoIcon} ${decisao}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;font-family:var(--mono);">
+          <div><span style="color:var(--text3);">ROE médio</span><br><span style="color:${roeMedia>=0?'var(--green)':'var(--red)'};font-weight:600;">${(roeMedia*100).toFixed(2)}%</span></div>
+          <div><span style="color:var(--text3);">Deprec. média/ano</span><br><span style="color:${taxaMediaDeprec>=0?'var(--green)':'var(--red)'};font-weight:600;">${taxaMediaDeprec.toFixed(1)}%</span></div>
+          <div><span style="color:var(--text3);">Resultado líquido</span><br><span style="color:${liquidoReal>=0?'var(--green)':'var(--red)'};font-weight:600;">${liquidoReal.toFixed(1)}% a.a.</span></div>
+          <div><span style="color:var(--text3);">Projeção ${anoUltimoValor+1}</span><br><span style="color:var(--text2);font-weight:600;">${fmtBR(projecao)}</span></div>
+        </div>
+        <div style="margin-top:8px;font-size:10px;color:var(--text3);">
+          ${comValor.length} anos de dados · último valor: ${fmtBR(ultimoValor)} (${anoUltimoValor})
+          ${taxasDeprec.length<3?' · ⚠ Poucos dados, projeção estimada':''}
+        </div>
+      </div>`;
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// LOAD PATRIMÔNIO JSON
+// ═══════════════════════════════════════════════════
+async function loadPatrimonio(){
+  if(window._PAT) return window._PAT;
+  try{
+    const res=await fetch('patrimonio.json');
+    if(!res.ok) throw new Error('patrimonio.json não encontrado');
+    window._PAT=await res.json();
+    return window._PAT;
+  }catch(e){
+    console.warn('patrimônio.json não carregado:',e.message);
+    window._PAT={meta:{aviso:'Arquivo patrimônio.json não encontrado.',referencia_valores:'—'},sociedade:[],historico:[]};
+    return window._PAT;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// FILTRO PERÍODO — componente unificado
+// Selecionado=azul · Hover=verde · Normal=cinza
+// ═══════════════════════════════════════════════════
+
+// Estado global de cada filtro: { yrs: Set, period: '' | 'ult3' | 'ult6' | 'ult12' }
+// Cada tela tem o seu próprio objeto de estado
+// Detectar dispositivo touch (celular/tablet)
+const _isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+const FILTROS = {
+  overview:     { yrs: new Set(), period: '' },
+  cashflow:     { yrs: new Set(), period: '' },
+  ranking:      { yrs: new Set(), period: '' },
+  analise:      { yrs: new Set(), period: '' },
+  compravenda:  { yrs: new Set(), period: '' },
+  lucro:        { yrs: new Set(), period: '' },
+  rent:         { yrs: new Set(), period: '' },
+  score:        { yrs: new Set(), period: '' },
+  roe:          { yrs: new Set(), period: '' },
+};
+
+// Retorna os anos que têm movimento (para pills dinâmicas)
+function getAnosComMovimento(usarDP=false){
+  const campo=usarDP?I_DP:I_DC;
+  const anos=new Set();
+  for(let i=0;i<R.length;i++){
+    const idx=R[i][campo];
+    if(idx===-1||idx>=MO.length) continue;
+    const yr=(MO[idx]||'').slice(0,4);
+    if(yr>='2015') anos.add(yr);
+  }
+  return [...anos].sort();
+}
+
+// Cria o filtro de período num container
+// config: { filtroId, wrapId, usarDP, onApply }
+function initFiltro(config){
+  const { filtroId, wrapId, usarDP=false, onApply } = config;
+  const wrap = document.getElementById(wrapId);
+  if(!wrap) return;
+  if(wrap.dataset.init) return; // já inicializado
+  wrap.dataset.init='1';
+
+  const F = FILTROS[filtroId];
+  const anos = getAnosComMovimento(usarDP);
+
+  function syncPills(){
+    wrap.querySelectorAll('.yr-pill').forEach(p=>{
+      p.classList.remove('yr-all','yr-sel');
+      const pd=p.dataset.pd, yr=p.dataset.yr;
+      if(pd){
+        if(F.period===pd) p.classList.add('yr-all');
+      } else if(yr===''){
+        if(F.yrs.size===0 && F.period==='') p.classList.add('yr-all');
+      } else {
+        if(F.yrs.has(yr) && F.period==='') p.classList.add('yr-sel');
+      }
+    });
+  }
+
+  function selectPeriod(pd){
+    F.yrs.clear(); F.period=pd;
+    syncPills(); onApply();
+  }
+  function selectAno(yr, multi){
+    F.period='';
+    // Desktop com Ctrl ou celular (touch): sempre toggle multi-seleção
+    // Desktop sem Ctrl: seleciona só aquele
+    if(multi||_isTouchDevice){
+      if(F.yrs.has(yr)) F.yrs.delete(yr); else F.yrs.add(yr);
+      if(F.yrs.size===0){/* nada selecionado = mantém vazio = todos */}
+    } else {
+      F.yrs.clear(); F.yrs.add(yr);
+    }
+    syncPills(); onApply();
+  }
+  function selectTodos(){
+    F.yrs.clear(); F.period='';
+    syncPills(); onApply();
+  }
+
+  wrap.innerHTML='';
+  // Todos
+  const pAll=document.createElement('div');
+  pAll.className='yr-pill yr-all'; pAll.textContent='Todos'; pAll.dataset.yr='';
+  pAll.onclick=selectTodos;
+  wrap.appendChild(pAll);
+  // Anos
+  anos.forEach(yr=>{
+    const p=document.createElement('div');
+    p.className='yr-pill'; p.textContent=yr; p.dataset.yr=yr;
+    p.onclick=(e)=>selectAno(yr, e.ctrlKey||e.metaKey);
+    wrap.appendChild(p);
+  });
+  // Períodos
+  [['ult3','Últ. 3m'],['ult6','Últ. 6m'],['ult12','Últ. 12m']].forEach(([pd,lbl])=>{
+    const p=document.createElement('div');
+    p.className='yr-pill'; p.textContent=lbl; p.dataset.pd=pd;
+    p.onclick=()=>selectPeriod(pd);
+    wrap.appendChild(p);
+  });
+  syncPills();
+}
+
+// Retorna função de teste para um mês 'YYYY-MM' dado o estado do filtro
+// usarDP: false=competência, true=pagamento (só Fluxo de Caixa)
+function getFiltroFn(filtroId){
+  const F=FILTROS[filtroId];
+  const now=new Date();
+  const anoAtual=now.getFullYear();
+  const mesAtual=now.getMonth()+1; // 1-12
+  const limSup=anoAtual*12+mesAtual; // limite superior = mês atual (inclusive)
+
+  if(F.period===''){
+    if(F.yrs.size===0) return null; // Todos — sem filtro, tudo
+    // Ano selecionado: tudo daquele ano, sem limite de mês
+    return (mo)=>F.yrs.has(mo.slice(0,4));
+  }
+  // Últ. 3/6/12m: limite inferior E superior (mês atual)
+  const n=parseInt(F.period.replace('ult',''));
+  const limInf=anoAtual*12+mesAtual-n; // exclusive
+  return (mo)=>{
+    const [y,m]=mo.split('-').map(Number);
+    const seq=y*12+m;
+    return seq>limInf && seq<=limSup;
+  };
+}
+
+// Reset filtro (para goHome)
+function resetFiltro(filtroId){
+  const F=FILTROS[filtroId];
+  F.yrs.clear(); F.period='';
+  // Limpar dataset.init para re-renderizar pills
+  const wrapMap={
+    overview:'ov-yr-pills', cashflow:'cf-yr-pills', ranking:'rank-yr-pills',
+    analise:'an-yr-pills', compravenda:'cv-yr-pills', lucro:'luc-filter-pills',
+    rent:'rent-yr-pills', score:'sc-yr-pills', roe:'roe-yr-pills'
+  };
+  const wrap=document.getElementById(wrapMap[filtroId]);
+  if(wrap){ wrap.dataset.init=''; wrap.innerHTML=''; }
+}
+
+// ═══════════════════════════════════════════════════
+// PERMISSÕES POR USUÁRIO
+// ═══════════════════════════════════════════════════
+const PERMISSOES = {
+  // grupos bloqueados por usuário (nome em maiúsculas)
+  'TESTE': ['nav-group-patrimonio'],
+  'CURY':  ['nav-group-patrimonio'],
+};
+
+function aplicarPermissoes(){
+  const user=(sessionStorage.getItem('dashlog_user')||'').toUpperCase();
+  const bloqueados=PERMISSOES[user]||[];
+  bloqueados.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display='none';
+  });
+  // Se página atual for bloqueada, redirecionar para home
+  const paginaAtual=document.querySelector('.page.active');
+  if(paginaAtual){
+    const pid=paginaAtual.id;
+    if(pid==='p-fichas'&&bloqueados.includes('nav-group-patrimonio')) goHome();
+  }
+}
+function initPrefs(){
+  // Tema: padrão escuro
+  const savedTheme=localStorage.getItem('dashlog_theme')||'dark';
+  document.body.classList.toggle('light',savedTheme==='light');
+  const btnD=document.getElementById('btn-dark');
+  const btnL=document.getElementById('btn-light');
+  if(btnD){btnD.classList.toggle('t-active-dark',savedTheme==='dark');}
+  if(btnL){btnL.classList.toggle('t-active-light',savedTheme==='light');}
+
+  // Menus: padrão todos recolhidos
+  const savedNav=JSON.parse(localStorage.getItem('dashlog_nav')||'{}');
+  document.querySelectorAll('.nav-label').forEach(label=>{
+    const key=label.textContent.trim();
+    const expanded=savedNav[key]==='1'; // '1'=expandido, ausente ou '0'=recolhido
+    if(!expanded){
+      label.classList.add('collapsed');
+      const items=label.nextElementSibling;
+      if(items) items.classList.add('collapsed');
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', async ()=>{
@@ -2044,6 +3667,8 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   if(!ok) return; // overlay permanece com mensagem de erro
   try{
     STATIC = precompute(); // agora R, CC, CAT, etc estão preenchidos
+    initPrefs();
+    aplicarPermissoes();
     initFilters();
     initRankingFilter();
     initOvFilter();
@@ -2054,6 +3679,9 @@ window.addEventListener('DOMContentLoaded', async ()=>{
     renderScore();
     renderCtrl();
     initChartInfo();
+    initTelaInfo();
+    // Pre-load patrimônio in background
+    loadPatrimonio();
   }catch(err){
     console.error(err);
     const msg = document.getElementById('dl-msg');
@@ -2092,6 +3720,45 @@ const CHART_INFO = {
   'ch-r8':            'Resultado operacional mês a mês no ano atual. Exclui as mesmas categorias não operacionais do gráfico anual.',
   'ch-r9':            'Resultado operacional acumulado por veículo no período selecionado. Verde = rentável; vermelho = operação deficitária.',
 };
+
+const TELA_INFO = {
+  'p-overview':  'Visão resumida do resultado operacional (Receitas − Despesas) ano a ano, desde o início até o último lançamento previsto. Permite filtrar por período específico e analisar o resultado mês a mês.',
+  'p-cashflow':  '⚙ Descritivo em construção.',
+  'p-ranking':   '⚙ Descritivo em construção.',
+  'p-score':     '⚙ Descritivo em construção.',
+  'p-analise':   '⚙ Descritivo em construção.',
+  'p-compravenda': '⚙ Descritivo em construção.',
+  'p-lucro':       '⚙ Descritivo em construção.',
+  'p-rent':      '⚙ Descritivo em construção.',
+  'p-dre':       '⚙ Descritivo em construção.',
+};
+
+function initTelaInfo(){
+  Object.entries(TELA_INFO).forEach(([pid, texto])=>{
+    const page = document.getElementById(pid);
+    if(!page) return;
+    const header = page.querySelector('.page-header');
+    if(!header) return;
+    if(header.querySelector('.info-btn-tela')) return;
+
+    const btn = document.createElement('button');
+    btn.className = 'info-btn info-btn-tela';
+    btn.textContent = '? Sobre esta tela';
+
+    const panel = document.createElement('div');
+    panel.className = 'info-panel';
+    panel.style.margin = '0 0 12px 0';
+    panel.textContent = texto;
+
+    btn.addEventListener('click', ()=>{
+      panel.classList.toggle('open');
+      btn.textContent = panel.classList.contains('open') ? '✕ Fechar' : '? Sobre esta tela';
+    });
+
+    header.appendChild(btn);
+    header.insertAdjacentElement('afterend', panel);
+  });
+}
 
 function initChartInfo(){
   Object.entries(CHART_INFO).forEach(([cid, texto])=>{
