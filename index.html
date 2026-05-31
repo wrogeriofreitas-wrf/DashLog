@@ -501,6 +501,7 @@ table.dre td.col-total{
     <div class="nav-label" onclick="toggleNav(this)">Análises</div>
     <div class="nav-items">
       <div class="nav-item" onclick="nav('p-analise',this)"><span class="nav-icon">◫</span>Resultado Financeiro</div>
+      <div class="nav-item" onclick="nav('p-pendencias',this)"><span class="nav-icon">⏳</span><span style="text-decoration:underline;text-underline-offset:3px;">Pendências Recebimento</span></div>
       <div class="nav-item" onclick="nav('p-compravenda',this)"><span class="nav-icon">⇅</span>Compras x Vendas</div>
       <div class="nav-item" onclick="nav('p-lucro',this)"><span class="nav-icon">◆</span>Dist. Lucros</div>
       <div class="nav-item" onclick="nav('p-rent',this)"><span class="nav-icon">≈</span>Rentabilidades</div>
@@ -533,7 +534,7 @@ table.dre td.col-total{
       <span style="font-size:13px;">⎋</span> Sair
     </div>
     <div style="text-align:center;margin-top:8px;font-size:10px;color:var(--text3);font-family:var(--mono);">
-      <div>Versão 1.0.2 Teste</div>
+      <div>Versão 1.0.3</div>
     </div>
   </div>
   </div>
@@ -871,6 +872,20 @@ table.dre td.col-total{
 </div>
 
 <!-- ════════════════════════════════
+     PENDÊNCIAS DE RECEBIMENTO
+════════════════════════════════ -->
+<div id="p-pendencias" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Pendências de Recebimento</div>
+      <div class="page-sub">Lançamentos com valor a receber ainda não liquidados</div>
+    </div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;align-items:center;" id="pend-yr-pills"></div>
+  <div id="pend-grid" style="display:flex;flex-direction:column;gap:16px;"></div>
+</div>
+
+<!-- ════════════════════════════════
      CONTROLE
 ════════════════════════════════ -->
 <div id="p-ctrl" class="page">
@@ -914,8 +929,8 @@ table.dre td.col-total{
 // DATA LAYER
 // ═══════════════════════════════════════════════════
 let _D = null;
-let CC, CAT, TIPO, MO, DRV, R;
-const I_CC=0,I_CAT=1,I_TIPO=2,I_DC=3,I_DP=4,I_VAL=5,I_KM=6,I_LTS=7;
+let CC, CAT, TIPO, MO, DRV, R, DESC, FORN;
+const I_CC=0,I_CAT=1,I_TIPO=2,I_DC=3,I_DP=4,I_VAL=5,I_KM=6,I_LTS=7,I_DESC=8,I_FORN=9;
 
 
 let _usuarios=[];
@@ -964,9 +979,11 @@ async function loadData(){
     const payload = JSON.parse(rawText);
     // Aceita dois formatos: {meta,d:{...}} ou o objeto _D cru
     _usuarios = payload.login || [];
+    window._payload = payload;
     _D  = payload.d || payload;
     CC  = _D.CC;  CAT = _D.CAT;  TIPO= _D.TIPO;
     MO  = _D.MO;  DRV = _D.DRV;  R   = _D.R;
+    DESC= _D.DESC||[]; FORN= _D.FORN||[];
     OP_CCS = CC.filter(c=>!EXCL_CC.has(c));
     // Injetar data do JSON em todos os page-sub de todas as telas
     if(payload.meta && payload.meta.gerado){
@@ -1565,6 +1582,7 @@ function renderPage(id){
   else if(id==='p-ranking') renderRanking();
   else if(id==='p-score') renderScore();
   else if(id==='p-analise') renderAnalise();
+  else if(id==='p-pendencias') renderPendencias();
   else if(id==='p-compravenda'&& !_rendered[id]){ renderCompraVenda(); _rendered[id]=1; }
   else if(id==='p-lucro') renderSimple('a6','Distribuição Lucro');
   else if(id==='p-rent'       && !_rendered[id]){ renderRent(); _rendered[id]=1; }
@@ -2709,6 +2727,302 @@ function initScoreFilter(){
 // ═══════════════════════════════════════════════════
 // RENDER CONTROLE — validação por competência
 // ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// PENDÊNCIAS DE RECEBIMENTO
+// ═══════════════════════════════════════════════════
+function renderPendencias(){
+  initFiltro({filtroId:'pendencias', wrapId:'pend-yr-pills', usarDP:false, onApply:()=>{
+    window._pendFilters={};
+    renderPendencias();
+  }});
+  const fnPend = getFiltroFn('pendencias');
+
+  // Data de atualização
+  let dataAtuStr = '';
+  try{
+    const meta = window._payload && window._payload.meta;
+    if(meta && meta.gerado){
+      const [dt,hr] = meta.gerado.split(' ');
+      const [y,m,d] = dt.split('-');
+      dataAtuStr = `· Dados atualizados em: ${d}/${m}/${y}${hr?' às '+hr.slice(0,5):''}`;
+    }
+  }catch(e){}
+
+  // Coletar TODOS os pendentes do período
+  const todosPendentes = [];
+  for(let i=0;i<R.length;i++){
+    const row = R[i];
+    if(row[I_DP] !== -1) continue;
+    if(row[I_VAL] <= 0)  continue;
+    const mo = row[I_DC] >= 0 ? MO[row[I_DC]] : '';
+    if(fnPend && !fnPend(mo)) continue;
+    todosPendentes.push({
+      placa: CC[row[I_CC]] || '',
+      desc:  row[I_DESC] >= 0 ? DESC[row[I_DESC]] : '—',
+      forn:  row[I_FORN] >= 0 ? FORN[row[I_FORN]] : '—',
+      val:   row[I_VAL],
+      mo
+    });
+  }
+
+  const grid = document.getElementById('pend-grid');
+  if(!grid) return;
+
+  // ── FILTRO DE PLACA (topo da tela) — padrão yr-pill ────────
+  const allPlacas = [...new Set(todosPendentes.map(r=>r.placa))].sort();
+  // Inicializar apenas na primeira vez — nunca sobreescrever seleção do usuário
+  if(!window._pendPlacaFilter) window._pendPlacaFilter = new Set(allPlacas);
+
+  let wrapPlaca = document.getElementById('pend-placa-wrap');
+  if(!wrapPlaca){
+    wrapPlaca = document.createElement('div');
+    wrapPlaca.id = 'pend-placa-wrap';
+    wrapPlaca.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;align-items:center;';
+    grid.parentElement.insertBefore(wrapPlaca, grid);
+  }
+
+  // Reconstrói as pills de placa
+  wrapPlaca.innerHTML = '';
+  const allOn = allPlacas.every(p=>window._pendPlacaFilter.has(p));
+
+  function reRenderPendencias(){
+    window._pendFilters={};
+    window._pendBuilders={};
+    const w=document.getElementById('pend-placa-wrap');
+    if(w) w.remove();
+    const g=document.getElementById('pend-grid');
+    if(g) g.innerHTML='';
+    renderPendencias();
+  }
+
+  // Pill "Todas"
+  const pillTodas = document.createElement('div');
+  pillTodas.className = 'yr-pill' + (allOn?' yr-all':'');
+  pillTodas.textContent = 'Todas';
+  pillTodas.onclick = ()=>{
+    window._pendPlacaFilter = new Set(allPlacas);
+    reRenderPendencias();
+  };
+  wrapPlaca.appendChild(pillTodas);
+
+  // Uma pill por placa
+  allPlacas.forEach(p=>{
+    const on = window._pendPlacaFilter.has(p);
+    const pill = document.createElement('div');
+    pill.className = 'yr-pill' + (!allOn && on?' yr-sel':'');
+    pill.textContent = p;
+    pill.onclick = (e)=>{
+      e.stopPropagation();
+      console.log('pill clicada:', p, 'filtro antes:', [...window._pendPlacaFilter]);
+      if(e.ctrlKey||e.metaKey){
+        if(window._pendPlacaFilter.has(p)) window._pendPlacaFilter.delete(p);
+        else window._pendPlacaFilter.add(p);
+      } else {
+        // Clique simples: se só esta está selecionada, voltar para todas
+        const somenteEsta = window._pendPlacaFilter.size===1 && window._pendPlacaFilter.has(p);
+        window._pendPlacaFilter = somenteEsta ? new Set(allPlacas) : new Set([p]);
+      }
+      if(window._pendPlacaFilter.size===0) window._pendPlacaFilter=new Set(allPlacas);
+      reRenderPendencias();
+    };
+    wrapPlaca.appendChild(pill);
+  });
+
+  // ── RENDERIZAR CARDS ────────────────────────────────────────
+  grid.innerHTML = '';
+
+  const placasFiltradas = allPlacas.filter(p=>window._pendPlacaFilter.has(p));
+  if(placasFiltradas.length === 0){
+    grid.innerHTML = '<div style="font-size:12px;color:var(--text3);font-family:var(--mono);padding:12px 0;">Nenhuma placa selecionada.</div>';
+    return;
+  }
+
+  if(!window._pendFilters) window._pendFilters = {};
+
+  placasFiltradas.forEach(placa=>{
+    const itens = todosPendentes.filter(r=>r.placa===placa).sort((a,b)=>a.mo.localeCompare(b.mo));
+    if(!itens.length) return;
+
+    const cardId  = 'pend-card-'+placa.replace(/[^a-z0-9]/gi,'-');
+    const stateKey= 'pf_'+cardId;
+
+    // Inicializar estado do filtro
+    const allDesc = [...new Set(itens.map(r=>r.desc))].sort();
+    const allForn = [...new Set(itens.map(r=>r.forn))].sort();
+    const allVal  = [...new Set(itens.map(r=>fmtBR(r.val)))].sort();
+
+    if(!window._pendFilters[stateKey]){
+      window._pendFilters[stateKey] = {
+        desc: new Set(allDesc),
+        forn: new Set(allForn),
+        val:  new Set(allVal),
+        open: null
+      };
+    }
+    const st = window._pendFilters[stateKey];
+
+    // Filtro em cascata: aplicar desc → forn → val progressivamente
+    function getFiltered(exceptCol){
+      return itens.filter(r=>{
+        const okDesc = exceptCol==='desc' || st.desc.has(r.desc);
+        const okForn = exceptCol==='forn' || st.forn.has(r.forn);
+        const okVal  = exceptCol==='val'  || st.val.has(fmtBR(r.val));
+        return okDesc && okForn && okVal;
+      });
+    }
+
+    function buildCard(){
+      const filtered = getFiltered(null);
+      const total    = filtered.reduce((s,r)=>s+r.val, 0);
+
+      // Opções disponíveis em cascata
+      const optsDesc = [...new Set(getFiltered('desc').map(r=>r.desc))].sort();
+      const optsForn = [...new Set(getFiltered('forn').map(r=>r.forn))].sort();
+      const optsVal  = [...new Set(getFiltered('val').map(r=>fmtBR(r.val)))].sort();
+
+      function dropBtn(col, label, opts, set){
+        const someOff = opts.some(v=>!set.has(v));
+        return `<button onclick="event.stopPropagation();pendToggleDrop('${stateKey}','${col}','${cardId}')"
+          style="font-size:10px;font-family:var(--mono);white-space:nowrap;cursor:pointer;padding:3px 8px;border-radius:4px;
+                 color:${someOff?'var(--amber)':'var(--text2)'};
+                 background:${someOff?'rgba(248,171,18,0.12)':'transparent'};
+                 border:1px solid ${someOff?'var(--amber)':'var(--border)'};">
+          ${label} ${someOff?'⚑':''} ▾
+        </button>`;
+      }
+
+      function dropPanel(col, opts, set){
+        if(st.open !== col) return '';
+        const allOn = opts.every(v=>set.has(v));
+        const rows = opts.map(v=>`
+          <label style="display:flex;align-items:center;gap:7px;cursor:pointer;padding:4px 0;color:var(--text2);font-size:11px;">
+            <input type="checkbox" ${set.has(v)?'checked':''} onclick="event.stopPropagation();pendToggleVal('${stateKey}','${col}','${cardId}','${v.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;')}',this.checked)">
+            ${v}
+          </label>`).join('');
+        return `<div onclick="event.stopPropagation()" id="pend-drop-${cardId}-${col}"
+          style="position:absolute;z-index:200;top:calc(100% + 4px);left:0;
+                 background:var(--bg2);border:1px solid var(--border);border-radius:6px;
+                 padding:8px 12px;min-width:200px;max-height:260px;overflow-y:auto;
+                 box-shadow:0 4px 16px rgba(0,0,0,.4);font-family:var(--mono);">
+          <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-weight:600;color:var(--text);font-size:11px;border-bottom:0.5px solid var(--border);padding-bottom:6px;margin-bottom:4px;">
+            <input type="checkbox" ${allOn?'checked':''} onclick="event.stopPropagation();pendSelectAll('${stateKey}','${col}','${cardId}',this.checked)">
+            Selecionar todos
+          </label>
+          ${rows}
+        </div>`;
+      }
+
+      const linhas = filtered.length === 0
+        ? `<div style="font-size:11px;color:var(--text3);padding:8px 0;">Nenhum lançamento com os filtros selecionados.</div>`
+        : filtered.map(r=>`
+          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:center;
+                      font-size:11px;font-family:var(--mono);padding:5px 0;
+                      border-bottom:0.5px solid var(--border);">
+            <span style="color:var(--text);">${r.desc}</span>
+            <span style="color:var(--text2);">${r.forn}</span>
+            <span style="color:var(--green);text-align:right;min-width:110px;">${fmtBR(r.val)}</span>
+          </div>`).join('');
+
+      document.getElementById(cardId).innerHTML = `
+        <div style="margin-bottom:4px;">
+          <span style="font-size:13px;font-weight:700;color:var(--amber);">${placa}</span>
+          <span style="font-size:12px;color:var(--text);font-weight:500;"> · Valores Pendentes de Recebimento </span>
+          <span style="font-size:11px;color:var(--text2);">${dataAtuStr}</span>
+        </div>
+        <div style="font-size:11px;color:var(--text);margin-bottom:10px;font-family:var(--mono);">
+          ${filtered.length} de ${itens.length} lançamento${itens.length!==1?'s':''} · Total filtrado:
+          <span style="color:var(--green);font-weight:600;"> ${fmtBR(total)}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:center;
+                    border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:4px;">
+          <div style="position:relative;">${dropBtn('desc','Descrição',optsDesc,st.desc)}${dropPanel('desc',optsDesc,st.desc)}</div>
+          <div style="position:relative;">${dropBtn('forn','Fornecedor/Cliente',optsForn,st.forn)}${dropPanel('forn',optsForn,st.forn)}</div>
+          <div style="position:relative;text-align:right;">${dropBtn('val','Valor',optsVal,st.val)}${dropPanel('val',optsVal,st.val)}</div>
+        </div>
+        ${linhas}`;
+    }
+
+    const cardEl = document.createElement('div');
+    cardEl.className = 'chart-card';
+    cardEl.style.borderLeft = '3px solid var(--amber)';
+    cardEl.id = cardId;
+    grid.appendChild(cardEl);
+    buildCard();
+
+    if(!window._pendBuilders) window._pendBuilders = {};
+    window._pendBuilders[cardId] = buildCard;
+  });
+
+  // Fechar dropdowns ao clicar fora
+  document.removeEventListener('click', window._pendCloseDrops);
+  window._pendCloseDrops = function(){
+    let changed = false;
+    if(window._pendFilters){
+      Object.values(window._pendFilters).forEach(st=>{ if(st.open){st.open=null;changed=true;} });
+    }
+    if(changed && window._pendBuilders){
+      Object.values(window._pendBuilders).forEach(fn=>fn());
+    }
+  };
+  document.addEventListener('click', window._pendCloseDrops);
+}
+
+window.pendToggleDrop = function(stateKey, col, cardId){
+  const st = window._pendFilters[stateKey];
+  if(!st) return;
+  st.open = st.open === col ? null : col;
+  window._pendBuilders[cardId]();
+};
+
+window.pendToggleVal = function(stateKey, col, cardId, val, checked){
+  const st = window._pendFilters[stateKey];
+  if(!st) return;
+  const set = col==='desc'?st.desc:col==='forn'?st.forn:st.val;
+  checked ? set.add(val) : set.delete(val);
+  window._pendBuilders[cardId]();
+};
+
+window.pendSelectAll = function(stateKey, col, cardId, checked){
+  const st = window._pendFilters[stateKey];
+  if(!st) return;
+  const set = col==='desc'?st.desc:col==='forn'?st.forn:st.val;
+  const drop = document.getElementById('pend-drop-'+cardId+'-'+col);
+  if(!drop) return;
+  drop.querySelectorAll('input[type=checkbox]').forEach((cb,i)=>{
+    if(i===0) return; // pular o "selecionar todos"
+    const lbl = cb.parentElement.textContent.trim();
+    checked ? set.add(lbl) : set.delete(lbl);
+    cb.checked = checked;
+  });
+  window._pendBuilders[cardId]();
+};
+
+window.pendToggleDrop = function(stateKey, col, cardId){
+  const st = window._pendFilters[stateKey];
+  st.open = st.open === col ? null : col;
+  window._pendBuilders[cardId]();
+};
+
+window.pendToggleVal = function(stateKey, col, cardId, val, checked){
+  const st = window._pendFilters[stateKey];
+  const set = col==='desc'?st.desc:col==='forn'?st.forn:st.val;
+  checked ? set.add(val) : set.delete(val);
+  window._pendBuilders[cardId]();
+};
+
+window.pendSelectAll = function(stateKey, col, cardId, checked){
+  const st = window._pendFilters[stateKey];
+  const set = col==='desc'?st.desc:col==='forn'?st.forn:st.val;
+  const card = document.getElementById(cardId);
+  if(!card) return;
+  // pegar todos os valores do dropdown atual
+  card.querySelectorAll(`#pend-drop-${cardId}-${col} input[type=checkbox]:not(:first-child)`).forEach(cb=>{
+    checked ? set.add(cb.parentElement.textContent.trim()) : set.delete(cb.parentElement.textContent.trim());
+    cb.checked = checked;
+  });
+  window._pendBuilders[cardId]();
+};
+
 function renderCtrl(){
   const CTRL_TIPOS = [
     { tipoIdx: 4, label: 'Transferências' },
@@ -3486,6 +3800,7 @@ const FILTROS = {
   cashflow:     { yrs: new Set(), period: '' },
   ranking:      { yrs: new Set(), period: '' },
   analise:      { yrs: new Set(), period: '' },
+  pendencias:   { yrs: new Set(), period: '' },
   compravenda:  { yrs: new Set(), period: '' },
   lucro:        { yrs: new Set(), period: '' },
   rent:         { yrs: new Set(), period: '' },
@@ -3607,8 +3922,8 @@ function resetFiltro(filtroId){
   // Limpar dataset.init para re-renderizar pills
   const wrapMap={
     overview:'ov-yr-pills', cashflow:'cf-yr-pills', ranking:'rank-yr-pills',
-    analise:'an-yr-pills', compravenda:'cv-yr-pills', lucro:'luc-filter-pills',
-    rent:'rent-yr-pills', score:'sc-yr-pills', roe:'roe-yr-pills'
+    analise:'an-yr-pills', pendencias:'pend-yr-pills', compravenda:'cv-yr-pills',
+    lucro:'luc-filter-pills', rent:'rent-yr-pills', score:'sc-yr-pills', roe:'roe-yr-pills'
   };
   const wrap=document.getElementById(wrapMap[filtroId]);
   if(wrap){ wrap.dataset.init=''; wrap.innerHTML=''; }
