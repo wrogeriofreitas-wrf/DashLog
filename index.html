@@ -308,6 +308,12 @@ table.dre td.col-total{
 .c-pos{color:var(--green);font-family:var(--mono);}
 .c-neg{color:var(--red);font-family:var(--mono);}
 .c-zero{color:var(--text3);font-family:var(--mono);}
+table.dre tbody tr.drec-info-sep td{
+  padding:10px 12px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--text3);background:rgba(255,255,255,0.02);border-top:0.5px solid var(--border2);text-align:left;
+}
+table.dre tbody tr.drec-info td{color:var(--text3);font-style:italic;}
+table.dre tbody tr.drec-info td:first-child{color:var(--text3);}
 
 /* ═══════ SECTION BUTTONS ═══════ */
 .sec-section{margin-bottom:24px;}
@@ -1045,7 +1051,7 @@ async function loadData(){
 // STATE LAYER
 // ═══════════════════════════════════════════════════
 // ★ VERSÃO DO SITE — fonte única; exibida no topo de todas as telas e na sidebar
-const APP_VERSAO = '14/06/2026 - 15:04';
+const APP_VERSAO = '14/06/2026 - 15:49';
 
 const STATE = {
   mode: 'comp',   // 'comp' | 'cx'
@@ -1059,6 +1065,7 @@ const STATE = {
   rank_yr: '',
   rankSort: 'luc',
   drec_yr: 'TODOS',
+  drec_grouped: false,
 };
 
 // Excluir CCs não operacionais
@@ -2702,20 +2709,24 @@ function renderDRE(){
 }
 
 // ─── DRE CONSOLIDADA (todos os centros de custo) ───
-function drecCellSum(cc, cat){
-  const yr=STATE.drec_yr;
-  const ccd=STATIC.dreData[cc]; if(!ccd) return 0;
-  let s=0;
-  if(yr==='TODOS'){
-    ANOS12.forEach(y=>{ const a=ccd[y]&&ccd[y][cat]; if(a) for(let i=0;i<12;i++) s+=a[i]; });
-  } else {
-    const a=ccd[yr]&&ccd[yr][cat]; if(a) for(let i=0;i<12;i++) s+=a[i];
+// CCs especiais (não são placas operacionais), exibidos sempre ao final:
+const DREC_ESP = ['CONSOLIDADO','VERIFICAR','IMOBILIZADO','DISTRIBUIÇÃO LUCRO'];
+// Quais entram na apuração do resultado (TOTAL) e quais são só informativo
+const DREC_RESULT_ESP = new Set(['CONSOLIDADO','VERIFICAR']); // afetam o resultado
+const DREC_INFO_ESP   = new Set(['IMOBILIZADO','DISTRIBUIÇÃO LUCRO']); // só informativo
+
+// Agrega lançamentos por CC e categoria, respeitando o ano selecionado
+function drecAgg(){
+  const yr=STATE.drec_yr, agg={};
+  for(let i=0;i<R.length;i++){
+    const row=R[i];
+    const mo=MO[row[I_DC]]||''; if(!mo) continue;
+    if(yr!=='TODOS' && mo.slice(0,4)!==yr) continue;
+    const cc=CC[row[I_CC]], cat=CAT[row[I_CAT]];
+    (agg[cc]||(agg[cc]={}));
+    agg[cc][cat]=(agg[cc][cat]||0)+row[I_VAL];
   }
-  return s;
-}
-function drecColVal(cat, col){
-  if(col==='CONSOLIDADO'){ let s=0; OP_CCS.forEach(cc=>s+=drecCellSum(cc,cat)); return s; }
-  return drecCellSum(col, cat);
+  return agg;
 }
 function initDREC(){
   const byrs=document.getElementById('drec-yr-btns');
@@ -2729,56 +2740,114 @@ function initDREC(){
   });
   renderDREC();
 }
-function drecGroups(){
+// Monta colunas, categorias e função de valor com base no agregado e no estado
+function drecModel(){
+  const agg=drecAgg();
   const ct=STATIC.catTipo||{};
-  const cols=[...OP_CCS,'CONSOLIDADO'];
-  const has=cat=>cols.some(c=>Math.abs(drecColVal(cat,c))>0.005);
-  const all=Object.keys(ct);
-  const rec=all.filter(c=>ct[c]==='Receita'&&has(c)).sort((a,b)=>a==='FRETE'?-1:b==='FRETE'?1:a.localeCompare(b));
-  const desp=all.filter(c=>ct[c]==='Despesa'&&has(c)).sort();
-  const jur=all.filter(c=>ct[c]==='Juros'&&has(c)).sort();
-  return {cols,rec,desp,jur};
+  const ccTem=cc=>agg[cc]&&Object.values(agg[cc]).some(v=>Math.abs(v)>0.005);
+  // Placas operacionais com lançamento, em ordem alfabética
+  const placas=[...OP_CCS].filter(ccTem).sort((a,b)=>a.localeCompare(b));
+  // Especiais com lançamento, na ordem fixa
+  const esp=DREC_ESP.filter(ccTem);
+  // CCs que entram no resultado total
+  const resultCCs=[...placas, ...esp.filter(c=>DREC_RESULT_ESP.has(c))];
+
+  // valor de uma categoria numa coluna
+  const v=(col,cat)=>{
+    if(col==='PLACAS') return placas.reduce((s,cc)=>s+((agg[cc]||{})[cat]||0),0);
+    if(col==='TOTAL')  return resultCCs.reduce((s,cc)=>s+((agg[cc]||{})[cat]||0),0);
+    if(col==='TOTAL_INFO') { let s=0; for(const cc in agg) s+=(agg[cc][cat]||0); return s; }
+    return (agg[col]||{})[cat]||0;
+  };
+  // categorias presentes por tipo
+  const cats=new Set(); Object.values(agg).forEach(o=>Object.keys(o).forEach(c=>cats.add(c)));
+  const has=cat=>[...placas,...esp,'TOTAL'].some(col=>Math.abs(v(col,cat))>0.005);
+  const byTipo=t=>[...cats].filter(c=>ct[c]===t&&has(c));
+  const rec=byTipo('Receita').sort((a,b)=>a==='FRETE'?-1:b==='FRETE'?1:a.localeCompare(b));
+  const desp=byTipo('Despesa').sort();
+  const jur=byTipo('Juros').sort();
+  const imob=byTipo('Compra de Veículo').concat(byTipo('Venda De Veículo')).sort();
+  const dist=byTipo('Distribuição Lucro').sort();
+  return {agg,placas,esp,resultCCs,v,rec,desp,jur,imob,dist};
 }
 function renderDREC(){
-  document.getElementById('drec-title').textContent='DRE Consolidada — Ano: '+STATE.drec_yr;
-  const {cols,rec,desp,jur}=drecGroups();
-  const th=c=>'<th'+(c==='CONSOLIDADO'?' class="col-total"':'')+'>'+c+'</th>';
-  document.getElementById('drec-head').innerHTML='<tr><th>Categoria</th>'+cols.map(th).join('')+'</tr>';
-  const td=(v,tot)=>'<td'+(tot?' class="col-total"':'')+'>'+fmtDRE(Math.round(v*100)/100)+'</td>';
-  const sumCats=(cats,col)=>cats.reduce((s,cat)=>s+drecColVal(cat,col),0);
+  const grouped=STATE.drec_grouped;
+  document.getElementById('drec-title').textContent='DRE Consolidada — Ano: '+STATE.drec_yr+(grouped?' · placas agrupadas':'');
+  const m=drecModel();
+  // Sequência de colunas exibidas
+  const placaCols = grouped ? ['PLACAS'] : m.placas;
+  const cols = [...placaCols, ...m.esp, 'TOTAL'];
+  const isTot=c=>c==='TOTAL';
+  const label=c=>c==='PLACAS'?'PLACAS (todas)':c==='TOTAL'?'TOTAL':c==='DISTRIBUIÇÃO LUCRO'?'DIST. LUCRO':c;
 
+  // Botão agrupar/expandir
+  const btn='<button class="btn-export" style="margin-bottom:10px" onclick="STATE.drec_grouped=!STATE.drec_grouped;renderDREC();">'+(grouped?'▦ Expandir placas':'▤ Agrupar placas')+'</button>';
+
+  const th=c=>'<th'+(isTot(c)?' class="col-total"':'')+'>'+label(c)+'</th>';
+  document.getElementById('drec-head').innerHTML='<tr><th>Conta</th>'+cols.map(th).join('')+'</tr>';
+
+  const td=(val,c)=>'<td'+(isTot(c)?' class="col-total"':'')+'>'+fmtDRE(Math.round(val*100)/100)+'</td>';
+  const sum=(cats,c)=>cats.reduce((s,cat)=>s+m.v(c,cat),0);
   const rows=[];
-  // Receita (detalhe + subtotal)
-  rec.forEach(cat=>{ rows.push('<tr><td style="padding-left:18px">'+cat+'</td>'+cols.map(c=>td(drecColVal(cat,c),c==='CONSOLIDADO')).join('')+'</tr>'); });
-  rows.push('<tr class="total-row"><td>RECEITA</td>'+cols.map(c=>td(sumCats(rec,c),c==='CONSOLIDADO')).join('')+'</tr>');
-  // Despesas (custos diretos do veículo)
-  desp.forEach(cat=>{ rows.push('<tr><td style="padding-left:18px">'+cat+'</td>'+cols.map(c=>td(drecColVal(cat,c),c==='CONSOLIDADO')).join('')+'</tr>'); });
-  // Resultado Operacional = Receita + Despesas
-  const oper={}; cols.forEach(c=>oper[c]=sumCats(rec,c)+sumCats(desp,c));
-  rows.push('<tr class="total-row"><td>RESULTADO OPERACIONAL</td>'+cols.map(c=>td(oper[c],c==='CONSOLIDADO')).join('')+'</tr>');
-  // Juros (resultado financeiro)
-  if(jur.length){
-    jur.forEach(cat=>{ rows.push('<tr><td style="padding-left:18px">'+cat+'</td>'+cols.map(c=>td(drecColVal(cat,c),c==='CONSOLIDADO')).join('')+'</tr>'); });
+  const detail=(cat)=>'<tr><td style="padding-left:18px">'+cat+'</td>'+cols.map(c=>td(m.v(c,cat),c)).join('')+'</tr>';
+  const subtotal=(name,fn)=>'<tr class="total-row"><td>'+name+'</td>'+cols.map(c=>td(fn(c),c)).join('')+'</tr>';
+
+  // RECEITA
+  m.rec.forEach(cat=>rows.push(detail(cat)));
+  rows.push(subtotal('RECEITA',c=>sum(m.rec,c)));
+  // DESPESAS (custos diretos)
+  m.desp.forEach(cat=>rows.push(detail(cat)));
+  // RESULTADO OPERACIONAL
+  const oper=c=>sum(m.rec,c)+sum(m.desp,c);
+  rows.push(subtotal('RESULTADO OPERACIONAL',oper));
+  // JUROS
+  m.jur.forEach(cat=>rows.push(detail(cat)));
+  // RESULTADO LÍQUIDO
+  const liq=c=>oper(c)+sum(m.jur,c);
+  rows.push(subtotal('RESULTADO LÍQUIDO',liq));
+  // MARGEM LÍQUIDA %
+  rows.push('<tr><td>Margem Líquida %</td>'+cols.map(c=>{const r=sum(m.rec,c);const mg=Math.abs(r)>0.005?liq(c)/r*100:NaN;return '<td'+(isTot(c)?' class="col-total"':'')+'>'+fmtPct(mg)+'</td>';}).join('')+'</tr>');
+
+  // ─── INFORMATIVO (não afeta o resultado) ───
+  if(m.imob.length||m.dist.length){
+    rows.push('<tr class="drec-info-sep"><td colspan="'+(cols.length+1)+'">Informativo — não afeta o resultado</td></tr>');
+    const infoDetail=(cat)=>'<tr class="drec-info"><td style="padding-left:18px">'+cat+'</td>'+cols.map(c=>{
+      // No TOTAL, informativo soma todos os CCs (inclui Imobilizado/Dist.Lucro)
+      const val=isTot(c)?m.v('TOTAL_INFO',cat):m.v(c,cat);
+      return td(val,c);
+    }).join('')+'</tr>';
+    m.imob.forEach(cat=>rows.push(infoDetail(cat)));
+    m.dist.forEach(cat=>rows.push(infoDetail(cat)));
   }
-  // Resultado Líquido = Operacional + Juros
-  const liq={}; cols.forEach(c=>liq[c]=oper[c]+sumCats(jur,c));
-  rows.push('<tr class="total-row"><td>RESULTADO LÍQUIDO</td>'+cols.map(c=>td(liq[c],c==='CONSOLIDADO')).join('')+'</tr>');
-  // Margem Líquida %
-  rows.push('<tr><td>Margem Líquida %</td>'+cols.map(c=>{const r=sumCats(rec,c);const m=Math.abs(r)>0.005?liq[c]/r*100:NaN;return '<td'+(c==='CONSOLIDADO'?' class="col-total"':'')+'>'+fmtPct(m)+'</td>';}).join('')+'</tr>');
+
   document.getElementById('drec-body').innerHTML=rows.join('');
+  // injeta o botão acima da tabela (uma vez)
+  const bar=document.querySelector('#p-dre-consol .dre-head-bar');
+  if(bar){ let holder=document.getElementById('drec-btn-holder'); if(!holder){holder=document.createElement('div');holder.id='drec-btn-holder';bar.parentNode.insertBefore(holder,bar.nextSibling);} holder.innerHTML=btn; }
 }
 function exportDREC(){
-  const {cols,rec,desp,jur}=drecGroups();
-  const out=[['Categoria',...cols]];
-  const line=(label,fn)=>out.push([label,...cols.map(c=>fn(c).toFixed(2))]);
-  rec.forEach(cat=>line(cat,c=>drecColVal(cat,c)));
-  line('RECEITA',c=>rec.reduce((s,x)=>s+drecColVal(x,c),0));
-  desp.forEach(cat=>line(cat,c=>drecColVal(cat,c)));
-  const oper=c=>rec.reduce((s,x)=>s+drecColVal(x,c),0)+desp.reduce((s,x)=>s+drecColVal(x,c),0);
+  const m=drecModel();
+  const grouped=STATE.drec_grouped;
+  const placaCols = grouped ? ['PLACAS'] : m.placas;
+  const cols = [...placaCols, ...m.esp, 'TOTAL'];
+  const lbl=c=>c==='PLACAS'?'PLACAS (todas)':c==='DISTRIBUIÇÃO LUCRO'?'DIST. LUCRO':c;
+  const out=[['Conta',...cols.map(lbl)]];
+  const line=(name,fn)=>out.push([name,...cols.map(c=>fn(c).toFixed(2))]);
+  const sum=(cats,c)=>cats.reduce((s,cat)=>s+m.v(c,cat),0);
+  m.rec.forEach(cat=>line(cat,c=>m.v(c,cat)));
+  line('RECEITA',c=>sum(m.rec,c));
+  m.desp.forEach(cat=>line(cat,c=>m.v(c,cat)));
+  const oper=c=>sum(m.rec,c)+sum(m.desp,c);
   line('RESULTADO OPERACIONAL',oper);
-  jur.forEach(cat=>line(cat,c=>drecColVal(cat,c)));
-  const liq=c=>oper(c)+jur.reduce((s,x)=>s+drecColVal(x,c),0);
+  m.jur.forEach(cat=>line(cat,c=>m.v(c,cat)));
+  const liq=c=>oper(c)+sum(m.jur,c);
   line('RESULTADO LIQUIDO',liq);
+  if(m.imob.length||m.dist.length){
+    out.push(['Informativo - nao afeta o resultado']);
+    const infoVal=(cat,c)=>c==='TOTAL'?m.v('TOTAL_INFO',cat):m.v(c,cat);
+    m.imob.forEach(cat=>line(cat,c=>infoVal(cat,c)));
+    m.dist.forEach(cat=>line(cat,c=>infoVal(cat,c)));
+  }
   exportCSV(out,'dre-consolidada-'+STATE.drec_yr+'.csv');
 }
 
