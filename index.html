@@ -2,11 +2,13 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="theme-color" content="#080d14">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>DashLog</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 /* ═══════════════════════════════════════
    DESIGN TOKENS
@@ -19,8 +21,8 @@
   --border:   rgba(255,255,255,0.07);
   --border2:  rgba(255,255,255,0.12);
   --text:     #e2e8f0;
-  --text2:    #7a8ea8;
-  --text3:    #4a5e72;
+  --text2:    #cbd5e1;
+  --text3:    #cbd5e1;
   --green:    #10d9a0;
   --green2:   rgba(16,217,160,0.12);
   --red:      #f05252;
@@ -47,7 +49,7 @@ body.light{
   --border:   rgba(0,0,0,0.10);
   --border2:  rgba(0,0,0,0.18);
   --text:     #1a2740;
-  --text2:    #4a6080;
+  --text2:    #5a7090;
   --text3:    #7a90aa;
   --green:    #0b9e74;
   --green2:   rgba(11,158,116,0.12);
@@ -339,6 +341,8 @@ table.dre td.col-total{
   cursor:pointer;font-size:18px;
 }
 @media(max-width:768px){
+  /* Grids de cartões largos: 1 coluna no celular (evita estouro horizontal) */
+  #roe-grid, #fichas-grid{grid-template-columns:1fr !important;}
   .hamburger{display:flex;}
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
@@ -348,6 +352,7 @@ table.dre td.col-total{
   .score-grid{grid-template-columns:1fr 1fr;}
 }
 @media(max-width:480px){
+  #roe-decisao-grid, #ctrl-cards{grid-template-columns:1fr !important;}
   .kpi-grid{grid-template-columns:1fr 1fr;}
   .score-grid{grid-template-columns:1fr;}
   .filter-bar{flex-direction:column;align-items:stretch;}
@@ -501,7 +506,7 @@ table.dre td.col-total{
     <div class="nav-label" onclick="toggleNav(this)">Análises</div>
     <div class="nav-items">
       <div class="nav-item" onclick="nav('p-analise',this)"><span class="nav-icon">◫</span>Resultado Financeiro</div>
-      <div class="nav-item" onclick="nav('p-pendencias',this)"><span class="nav-icon">⏳</span><span style="text-decoration:underline;text-underline-offset:3px;">Pendências Recebimento</span></div>
+      <div class="nav-item" onclick="nav('p-pendencias',this)"><span class="nav-icon">⧗</span><span style="text-decoration:underline;text-underline-offset:3px;">Pendências Recebimento</span></div>
       <div class="nav-item" onclick="nav('p-compravenda',this)"><span class="nav-icon">⇅</span>Compras x Vendas</div>
       <div class="nav-item" onclick="nav('p-lucro',this)"><span class="nav-icon">◆</span>Dist. Lucros</div>
       <div class="nav-item" onclick="nav('p-rent',this)"><span class="nav-icon">≈</span>Rentabilidades</div>
@@ -518,7 +523,7 @@ table.dre td.col-total{
     <div class="nav-label" onclick="toggleNav(this)">Controle</div>
     <div class="nav-items">
       <div class="nav-item" onclick="nav('p-ctrl',this)" id="nav-ctrl">
-        <span class="nav-icon">⚠</span>Cartões Controle
+        <span class="nav-icon">⚠︎</span>Cartões Controle
         <span class="nav-badge" id="ctrl-badge">3</span>
       </div>
     </div>
@@ -526,7 +531,7 @@ table.dre td.col-total{
   <div class="nav-group" id="nav-group-patrimonio">
     <div class="nav-label" onclick="toggleNav(this)">Patrimônio</div>
     <div class="nav-items">
-      <div class="nav-item" onclick="nav('p-fichas',this)"><span class="nav-icon">📋</span>Fichas dos Veículos</div>
+      <div class="nav-item" onclick="nav('p-fichas',this)"><span class="nav-icon">▤</span>Fichas dos Veículos</div>
     </div>
   </div>
   </div><!-- /nav-groups -->
@@ -534,7 +539,7 @@ table.dre td.col-total{
       <span style="font-size:13px;">⎋</span> Sair
     </div>
     <div style="text-align:center;margin-top:8px;font-size:10px;color:var(--text3);font-family:var(--mono);">
-      <div>Versão 1.0.3</div>
+      <div id="app-versao"></div>
     </div>
   </div>
   </div>
@@ -972,7 +977,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 async function loadData(){
   const msgEl = document.getElementById('dl-msg');
   try{
-    const resp = await fetch('./dados.json', {cache: 'no-cache'});
+    const resp = await fetch('./dados.json?v=' + Date.now(), {cache: 'no-cache'});
     if(!resp.ok) throw new Error('HTTP ' + resp.status);
     const buf = await resp.arrayBuffer();
     const rawText = new TextDecoder('windows-1252').decode(buf);
@@ -985,6 +990,7 @@ async function loadData(){
     MO  = _D.MO;  DRV = _D.DRV;  R   = _D.R;
     DESC= _D.DESC||[]; FORN= _D.FORN||[];
     OP_CCS = CC.filter(c=>!EXCL_CC.has(c));
+    OP_CCS_SET = new Set(OP_CCS);
     // Injetar data do JSON em todos os page-sub de todas as telas
     if(payload.meta && payload.meta.gerado){
       const partes=payload.meta.gerado.split(' ')[0].split('-');
@@ -994,7 +1000,7 @@ async function loadData(){
       document.querySelectorAll('.page-sub').forEach(el=>{
         if(!el.id&&!el.dataset.nodate){
           el.dataset.origText=el.dataset.origText||el.innerHTML;
-          el.innerHTML=el.dataset.origText+' <em style="font-size:10px;color:var(--text3);font-weight:400;"> · Dados atualizados em: '+dataHora+'</em>';
+          el.innerHTML=el.dataset.origText+' <em style="font-size:10px;color:var(--text3);font-weight:400;"> · Dados atualizados em: '+dataHora+' · Versão do site: '+APP_VERSAO+'</em>';
         }
       });
     }
@@ -1013,6 +1019,9 @@ async function loadData(){
 // ═══════════════════════════════════════════════════
 // STATE LAYER
 // ═══════════════════════════════════════════════════
+// ★ VERSÃO DO SITE — fonte única; exibida no topo de todas as telas e na sidebar
+const APP_VERSAO = '14/06/2026 - 13:29';
+
 const STATE = {
   mode: 'comp',   // 'comp' | 'cx'
   from: '',       // YYYY-MM
@@ -1028,10 +1037,18 @@ const STATE = {
 // Excluir CCs não operacionais
 const EXCL_CC = new Set(['CONSOLIDADO','DISTRIBUIÇÃO LUCRO','IMOBILIZADO','VERIFICAR']);
 let OP_CCS = []; // populado em loadData() após CC ser carregado
+let OP_CCS_SET = new Set(); // versão Set para buscas O(1) em loops
 
 // ═══════════════════════════════════════════════════
 // UTILITIES
 // ═══════════════════════════════════════════════════
+// Escape de HTML — protege contra valores com <, >, &, aspas vindos da planilha
+function esc(s){
+  return String(s==null?'':s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 function fmtBR(v, decimals=2){
   if(v===null||v===undefined) return '—';
   const neg=v<0, abs=Math.abs(v);
@@ -1207,9 +1224,6 @@ function precompute(){
     });
   });
 
-  const now=new Date();
-  const limSupStatic=now.getFullYear()*12+now.getMonth()+1; // usado só no rentByYear/dreData
-
   for(let i=0;i<R.length;i++){
     const row=R[i];
     const cc  = CC[row[I_CC]];
@@ -1220,20 +1234,17 @@ function precompute(){
     const yr  = mo.slice(0,4);
     const mes = parseInt(mo.slice(5,7))-1; // 0-indexed
 
-    // byTipoYear e rentByYear: sem limite superior — mostra todos os lançamentos
-    const isFuturo = false; // sem restrição de data futura
-
-    // byTipoYear: COM limite superior — exclui meses futuros
-    if(!isFuturo && tipos.includes(tipo) && byTipoYear[tipo][yr]!==undefined)
+    // byTipoYear e rentByYear: SEM limite superior — inclui meses futuros
+    // com lançamentos previstos (decisão da sessão de 19/mai)
+    if(tipos.includes(tipo) && byTipoYear[tipo][yr]!==undefined)
       byTipoYear[tipo][yr]+=val;
 
-    // rentByYear e rentByCC: também com limite superior
-    if(!isFuturo && !EXCL_RENT.has(cc) && mo && rentByYear[yr]!==undefined){
+    if(!EXCL_RENT.has(cc) && mo && rentByYear[yr]!==undefined){
       rentByYear[yr]+=val;
       if(rentByCC[cc] && rentByCC[cc][yr]!==undefined) rentByCC[cc][yr]+=val;
     }
 
-    if(OP_CCS.includes(cc) && dreData[cc][yr] && dreData[cc][yr][cat] && mes>=0 && mes<12)
+    if(OP_CCS_SET.has(cc) && dreData[cc][yr] && dreData[cc][yr][cat] && mes>=0 && mes<12)
       dreData[cc][yr][cat][mes]+=val;
   }
 
@@ -1319,6 +1330,8 @@ function setTheme(t){
   document.getElementById('btn-dark').classList.toggle('t-dark', true);
   document.getElementById('btn-light').classList.toggle('t-light', true);
   localStorage.setItem('dashlog_theme', t);
+  const mTheme=document.querySelector('meta[name="theme-color"]');
+  if(mTheme) mTheme.setAttribute('content', t==='light' ? '#f0f4f8' : '#080d14');
   // re-render charts for color update
   _cache=null; _cacheKey='';
   renderOverview();
@@ -1686,7 +1699,7 @@ function renderOverview(){
   setText('kpi-distluc',fmtBR(Math.abs(DIST_RAW)));
   const isDark=!document.body.classList.contains('light');
   const gC=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)';
-  const tC=isDark?'#5a7090':'#6a8090';
+  const tC=isDark?'#cbd5e1':'#4a6080';
   const lblC=isDark?'#e2e8f0':'#1a2740';
   const anoAtual=new Date().getFullYear();
   const recA=byTY['Receita']||{},despA=byTY['Despesa']||{};
@@ -1868,7 +1881,7 @@ function renderCashflow(){
   initCashflowPeriods();
   const isDark=!document.body.classList.contains('light');
   const gC2=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)';
-  const tC2=isDark?'#5a7090':'#6a8090';
+  const tC2=isDark?'#cbd5e1':'#4a6080';
 
   // Coletar todos os meses pagos com tipos válidos
   const moSet=new Set();
@@ -2135,7 +2148,7 @@ function renderScore(){
   const fnScore=getFiltroFn('score');
   const isDark=!document.body.classList.contains('light');
   const gCS=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)';
-  const tCS=isDark?'#5a7090':'#6a8090';
+  const tCS=isDark?'#cbd5e1':'#4a6080';
   const now=new Date();
   const anoAtualSc=now.getFullYear(), mesAtualSc=now.getMonth()+1;
 
@@ -2172,7 +2185,7 @@ function renderScore(){
         if(!porMes[mo]) porMes[mo]={rec:0,desp:0};
         porMes[mo].desp+=Math.abs(val);
       }
-      if(km>0){ if(km<kmMin)kmMin=km; if(km>kmMax)kmMax=km; }
+      if(cat==='COMBUSTIVEL'&&km>0){ if(km<kmMin)kmMin=km; if(km>kmMax)kmMax=km; }
       if(lt>0) lts+=lt;
     }
 
@@ -2897,7 +2910,7 @@ function renderPendencias(){
         const rows = opts.map(v=>`
           <label style="display:flex;align-items:center;gap:7px;cursor:pointer;padding:4px 0;color:var(--text2);font-size:11px;">
             <input type="checkbox" ${set.has(v)?'checked':''} onclick="event.stopPropagation();pendToggleVal('${stateKey}','${col}','${cardId}','${v.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;')}',this.checked)">
-            ${v}
+            ${esc(v)}
           </label>`).join('');
         return `<div onclick="event.stopPropagation()" id="pend-drop-${cardId}-${col}"
           style="position:absolute;z-index:200;top:calc(100% + 4px);left:0;
@@ -2918,8 +2931,8 @@ function renderPendencias(){
           <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:center;
                       font-size:11px;font-family:var(--mono);padding:5px 0;
                       border-bottom:0.5px solid var(--border);">
-            <span style="color:var(--text);">${r.desc}</span>
-            <span style="color:var(--text2);">${r.forn}</span>
+            <span style="color:var(--text);">${esc(r.desc)}</span>
+            <span style="color:var(--text2);">${esc(r.forn)}</span>
             <span style="color:var(--green);text-align:right;min-width:110px;">${fmtBR(r.val)}</span>
           </div>`).join('');
 
@@ -2997,32 +3010,6 @@ window.pendSelectAll = function(stateKey, col, cardId, checked){
   window._pendBuilders[cardId]();
 };
 
-window.pendToggleDrop = function(stateKey, col, cardId){
-  const st = window._pendFilters[stateKey];
-  st.open = st.open === col ? null : col;
-  window._pendBuilders[cardId]();
-};
-
-window.pendToggleVal = function(stateKey, col, cardId, val, checked){
-  const st = window._pendFilters[stateKey];
-  const set = col==='desc'?st.desc:col==='forn'?st.forn:st.val;
-  checked ? set.add(val) : set.delete(val);
-  window._pendBuilders[cardId]();
-};
-
-window.pendSelectAll = function(stateKey, col, cardId, checked){
-  const st = window._pendFilters[stateKey];
-  const set = col==='desc'?st.desc:col==='forn'?st.forn:st.val;
-  const card = document.getElementById(cardId);
-  if(!card) return;
-  // pegar todos os valores do dropdown atual
-  card.querySelectorAll(`#pend-drop-${cardId}-${col} input[type=checkbox]:not(:first-child)`).forEach(cb=>{
-    checked ? set.add(cb.parentElement.textContent.trim()) : set.delete(cb.parentElement.textContent.trim());
-    cb.checked = checked;
-  });
-  window._pendBuilders[cardId]();
-};
-
 function renderCtrl(){
   const CTRL_TIPOS = [
     { tipoIdx: 4, label: 'Transferências' },
@@ -3030,19 +3017,20 @@ function renderCtrl(){
     { tipoIdx: 5, label: 'Descarga' },
   ];
 
-  function getByMonth(tipoIdx){
-    const byMo = {};
-    for(let i=0;i<R.length;i++){
-      const row = R[i];
-      if(row[I_TIPO] !== tipoIdx) continue;
-      const moI = row[I_DC];
-      if(moI < 0) continue;
-      const mo = MO[moI];
-      if(!mo) continue;
-      byMo[mo] = (byMo[mo]||0) + row[I_VAL];
-    }
-    return byMo;
+  // Uma única varredura de R para todos os tipos (antes: 1 varredura por tipo)
+  const _byMoAll = {};
+  CTRL_TIPOS.forEach(({tipoIdx})=>{ _byMoAll[tipoIdx] = {}; });
+  for(let i=0;i<R.length;i++){
+    const row = R[i];
+    const t = row[I_TIPO];
+    if(!(t in _byMoAll)) continue;
+    const moI = row[I_DC];
+    if(moI < 0) continue;
+    const mo = MO[moI];
+    if(!mo) continue;
+    _byMoAll[t][mo] = (_byMoAll[t][mo]||0) + row[I_VAL];
   }
+  function getByMonth(tipoIdx){ return _byMoAll[tipoIdx]; }
 
   function fmtMo(mo){
     const [y,m] = mo.split('-');
@@ -3159,7 +3147,7 @@ function renderAnalise(){
 
   const isDark=!document.body.classList.contains('light');
   const gCA=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)';
-  const tCA=isDark?'#5a7090':'#6a8090';
+  const tCA=isDark?'#cbd5e1':'#4a6080';
 
   // Gráfico anual — destacar anos ativos
   const recColors=ANOS12.map(y=>_anYrs.size===0||_anYrs.has(y)?mkRGBA(GREEN,'0.78'):mkRGBA(GREEN,'0.25'));
@@ -3329,7 +3317,7 @@ function renderCompraVenda(){
 
   const isDark=!document.body.classList.contains('light');
   const gCV=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)';
-  const tCV=isDark?'#5a7090':'#6a8090';
+  const tCV=isDark?'#cbd5e1':'#4a6080';
 
   if(!_cvAnoSel) _cvAnoSel=String(new Date().getFullYear());
 
@@ -3351,7 +3339,7 @@ function renderCompraVenda(){
 function renderCompraVendaMensal(){
   const isDark=!document.body.classList.contains('light');
   const gCV=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)';
-  const tCV=isDark?'#5a7090':'#6a8090';
+  const tCV=isDark?'#cbd5e1':'#4a6080';
   const Fcv=FILTROS.compravenda;
   const fnCV=getFiltroFn('compravenda');
   const now=new Date();
@@ -3625,7 +3613,7 @@ function renderROE(){
 
   const isDark=!document.body.classList.contains('light');
   const gCR=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)';
-  const tCR=isDark?'#5a7090':'#6a8090';
+  const tCR=isDark?'#cbd5e1':'#4a6080';
 
   const grid=document.getElementById('roe-grid');
   if(!grid) return;
@@ -3774,7 +3762,7 @@ function renderROEDecisao(DATA){
 async function loadPatrimonio(){
   if(window._PAT) return window._PAT;
   try{
-    const res=await fetch('patrimonio.json');
+    const res=await fetch('patrimonio.json?v=' + Date.now());
     if(!res.ok) throw new Error('patrimonio.json não encontrado');
     window._PAT=await res.json();
     return window._PAT;
@@ -3982,17 +3970,16 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   if(!ok) return; // overlay permanece com mensagem de erro
   try{
     STATIC = precompute(); // agora R, CC, CAT, etc estão preenchidos
+    const vEl=document.getElementById('app-versao'); if(vEl) vEl.textContent='Versão '+APP_VERSAO;
     initPrefs();
     aplicarPermissoes();
     initFilters();
     initRankingFilter();
     initOvFilter();
     initScoreFilter();
-    renderOverview();
-    renderCashflow();
-    renderRanking();
-    renderScore();
-    renderCtrl();
+    renderOverview();              // tela inicial (visível)
+    renderCtrl();                  // mantido no boot: alimenta o badge da nav
+    // Demais telas renderizam ao serem abertas (lazy) via renderPage()
     initChartInfo();
     initTelaInfo();
     // Pre-load patrimônio in background
@@ -4038,14 +4025,18 @@ const CHART_INFO = {
 
 const TELA_INFO = {
   'p-overview':  'Visão resumida do resultado operacional (Receitas − Despesas) ano a ano, desde o início até o último lançamento previsto. Permite filtrar por período específico e analisar o resultado mês a mês.',
-  'p-cashflow':  '⚙ Descritivo em construção.',
-  'p-ranking':   '⚙ Descritivo em construção.',
-  'p-score':     '⚙ Descritivo em construção.',
-  'p-analise':   '⚙ Descritivo em construção.',
-  'p-compravenda': '⚙ Descritivo em construção.',
-  'p-lucro':       '⚙ Descritivo em construção.',
-  'p-rent':      '⚙ Descritivo em construção.',
-  'p-dre':       '⚙ Descritivo em construção.',
+  'p-cashflow':  'Movimentações pelo regime de caixa: entradas e saídas consideradas pela data de pagamento (e não de competência). O saldo do gráfico unificado calcula Entradas − Saídas − Compras + Vendas e é recalculado conforme as séries ativadas na legenda.',
+  'p-ranking':   'Compara o resultado operacional (Receitas − Despesas) de cada veículo no período selecionado, ordenado do mais lucrativo ao mais deficitário. Útil para identificar quais placas sustentam a operação e quais merecem revisão.',
+  'p-score':     'Score Operacional de Frota (SOF): nota consolidada por veículo a partir dos indicadores de resultado, acompanhada de alertas automáticos sobre pontos que merecem atenção.',
+  'p-analise':   'Visão financeira completa pela data de competência: Receitas, Despesas e Juros, com Lucro Financeiro e Margem Líquida. Diferente da Visão Geral, que mostra apenas o resultado operacional (Margem Operacional).',
+  'p-compravenda': 'Histórico de aquisições e vendas de veículos, com os valores investidos e desinvestidos por período e o saldo entre compras e vendas.',
+  'p-lucro':       'Valores de lucro distribuídos aos sócios ao longo do tempo, organizados por período.',
+  'p-rent':      'Resultado acumulado por ano considerando apenas a operação. Exclui os centros de custo Consolidado, Distribuição de Lucro, Imobilizado e Verificar.',
+  'p-dre':       'Demonstrativo de resultado mês a mês por categoria, para a placa e o ano selecionados. Despesas aparecem entre parênteses; a coluna Total consolida o ano; — indica mês sem lançamento.',
+  'p-pendencias': 'Lançamentos de receita com valor pendente de recebimento. Use os filtros de período e placa, e os filtros por coluna (Descrição, Fornecedor/Cliente e Valor) para investigar cada caso.',
+  'p-ctrl':      'Cartões cujos saldos deveriam ser sempre zero (Transferências, Verificar e Descarga). Qualquer valor diferente de zero indica lançamento a revisar na base de dados.',
+  'p-fichas':    'Ficha de cada veículo com a participação econômica dos sócios e as diretrizes de transferência aplicáveis.',
+  'p-roe':       'Retorno sobre o valor de mercado (ROE) de cada veículo, ano a ano. Os cartões são ordenados do maior para o menor ROE médio.',
 };
 
 function initTelaInfo(){
