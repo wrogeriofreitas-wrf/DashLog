@@ -497,7 +497,7 @@ table.dre td.col-total{
     <div class="nav-label" onclick="toggleNav(this)">Dashboard</div>
     <div class="nav-items">
       <div class="nav-item active" onclick="nav('p-overview',this)"><span class="nav-icon">◈</span>Visão Geral</div>
-      <div class="nav-item" onclick="nav('p-cashflow',this)"><span class="nav-icon">⇄</span><span style="text-decoration:underline;text-underline-offset:3px;">Fluxo de Caixa</span></div>
+      <div class="nav-item" onclick="nav('p-cashflow',this)"><span class="nav-icon">⇄</span>Fluxo de Caixa</div>
       <div class="nav-item" onclick="nav('p-ranking',this)"><span class="nav-icon">▲</span>Ranking Veículos</div>
       <div class="nav-item" onclick="nav('p-score',this)"><span class="nav-icon">◎</span><span style="text-decoration:underline;text-underline-offset:3px;">Score & Alertas</span></div>
     </div>
@@ -517,6 +517,7 @@ table.dre td.col-total{
     <div class="nav-label" onclick="toggleNav(this)">DRE</div>
     <div class="nav-items">
       <div class="nav-item" onclick="nav('p-dre',this)"><span class="nav-icon">≡</span>DRE por Placa</div>
+      <div class="nav-item" onclick="nav('p-dre-consol',this)"><span class="nav-icon">▦</span><span style="text-decoration:underline;text-underline-offset:3px;">DRE Consolidada</span></div>
     </div>
   </div>
   <div class="nav-group">
@@ -729,6 +730,10 @@ table.dre td.col-total{
     <span style="font-size:11px;color:var(--text3);font-family:var(--mono);">Período:</span>
     <div id="rank-period-pills" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
   </div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;align-items:center;">
+    <span style="font-size:11px;color:var(--text3);font-family:var(--mono);">Ordenar por:</span>
+    <div id="rank-sort-pills" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+  </div>
   <div class="kpi-grid" style="margin-bottom:16px;">
     <div class="kpi-card green"><div class="kpi-label">Total Receitas</div><div class="kpi-value green" id="rank-tot-rec">—</div></div>
     <div class="kpi-card red"><div class="kpi-label">Total Despesas</div><div class="kpi-value red" id="rank-tot-cost">—</div></div>
@@ -819,8 +824,8 @@ table.dre td.col-total{
     <div class="kpi-card purple"><div class="kpi-label">Maior distribuição</div><div class="kpi-value purple" id="a6-best">—</div></div>
     <div class="kpi-card amber"><div class="kpi-label">2026 (parcial)</div><div class="kpi-value amber" id="a6-2026">—</div></div>
   </div>
-  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Distribuição de lucros por ano (R$) — estático</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a6" role="img" aria-label="Distribuição lucros"></canvas></div></div>
   <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Distribuição de lucros por mês — <span id="luc-mo-label">ano atual</span></div><div class="chart-wrap" style="height:220px"><canvas id="ch-a6-mo" role="img" aria-label="Distribuição lucros mensal"></canvas></div></div>
+  <div class="chart-card"><div class="chart-title" style="margin-bottom:14px">Distribuição de lucros por ano (R$) — estático</div><div class="chart-wrap" style="height:280px"><canvas id="ch-a6" role="img" aria-label="Distribuição lucros"></canvas></div></div>
 </div>
 
 <!-- RENTABILIDADE -->
@@ -833,12 +838,12 @@ table.dre td.col-total{
     <div class="kpi-card amber"><div class="kpi-label">2026 acumulado</div><div class="kpi-value amber" id="r8-tot">—</div></div>
   </div>
   <div class="chart-card" style="margin-bottom:16px">
-    <div class="chart-title" style="margin-bottom:14px">Rentabilidade anual — 2015 a 2025</div>
-    <div class="chart-wrap" style="height:240px"><canvas id="ch-r7" role="img" aria-label="Rentabilidade anual"></canvas></div>
-  </div>
-  <div class="chart-card" style="margin-bottom:16px">
     <div class="chart-title" style="margin-bottom:14px">Rentabilidade 2026 — mês a mês</div>
     <div class="chart-wrap" style="height:240px"><canvas id="ch-r8" role="img" aria-label="Rentabilidade mensal 2026"></canvas></div>
+  </div>
+  <div class="chart-card" style="margin-bottom:16px">
+    <div class="chart-title" style="margin-bottom:14px">Rentabilidade anual — 2015 a 2025</div>
+    <div class="chart-wrap" style="height:240px"><canvas id="ch-r7" role="img" aria-label="Rentabilidade anual"></canvas></div>
   </div>
   <!-- ANÁLISE 09 -->
   <div class="sec-section">
@@ -870,9 +875,29 @@ table.dre td.col-total{
   </div>
   <div class="dre-wrap">
     <div class="dre-head-bar">
-      <div><div class="dre-title-txt" id="dre-title">DRE</div><div class="dre-sub-txt">Valores em R$ · Despesas entre parênteses · — sem lançamento</div></div>
+      <div><div class="dre-title-txt" id="dre-title">DRE</div></div>
     </div>
     <div class="tbl-scroll"><table class="dre"><thead id="dre-head"></thead><tbody id="dre-body"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     DRE CONSOLIDADA (todos os centros de custo)
+════════════════════════════════ -->
+<div id="p-dre-consol" class="page">
+  <div class="page-header">
+    <div><div class="page-title">DRE Consolidada</div><div class="page-sub">Todos os centros de custo — em validação</div></div>
+    <button class="btn-export" onclick="exportDREC()">⬇ Exportar CSV</button>
+  </div>
+  <div class="sec-section">
+    <div class="sec-label">Ano</div>
+    <div class="btn-row" id="drec-yr-btns"></div>
+  </div>
+  <div class="dre-wrap">
+    <div class="dre-head-bar">
+      <div><div class="dre-title-txt" id="drec-title">DRE Consolidada</div></div>
+    </div>
+    <div class="tbl-scroll"><table class="dre"><thead id="drec-head"></thead><tbody id="drec-body"></tbody></table></div>
   </div>
 </div>
 
@@ -1020,7 +1045,7 @@ async function loadData(){
 // STATE LAYER
 // ═══════════════════════════════════════════════════
 // ★ VERSÃO DO SITE — fonte única; exibida no topo de todas as telas e na sidebar
-const APP_VERSAO = '14/06/2026 - 13:29';
+const APP_VERSAO = '14/06/2026 - 15:04';
 
 const STATE = {
   mode: 'comp',   // 'comp' | 'cx'
@@ -1032,6 +1057,8 @@ const STATE = {
   dre_cc: 'NKK-6E12',
   rent09_yr: 'TOTAL',
   rank_yr: '',
+  rankSort: 'luc',
+  drec_yr: 'TODOS',
 };
 
 // Excluir CCs não operacionais
@@ -1210,7 +1237,7 @@ const ANOS12 = ['2015','2016','2017','2018','2019','2020','2021','2022','2023','
 const EXCL_RENT = new Set(['CONSOLIDADO','DISTRIBUIÇÃO LUCRO','IMOBILIZADO','VERIFICAR','CARRETAS']);
 
 function precompute(){
-  const byTipoYear={}, rentByYear={}, rentByCC={}, dreData={};
+  const byTipoYear={}, rentByYear={}, rentByCC={}, dreData={}, catTipo={};
   const tipos=['Receita','Despesa','Compra de Veículo','Venda De Veículo','Juros','Distribuição Lucro'];
   tipos.forEach(t=>{ byTipoYear[t]={}; ANOS12.forEach(y=>byTipoYear[t][y]=0); });
   ANOS12.forEach(y=>rentByYear[y]=0);
@@ -1234,6 +1261,8 @@ function precompute(){
     const yr  = mo.slice(0,4);
     const mes = parseInt(mo.slice(5,7))-1; // 0-indexed
 
+    catTipo[cat]=tipo;
+
     // byTipoYear e rentByYear: SEM limite superior — inclui meses futuros
     // com lançamentos previstos (decisão da sessão de 19/mai)
     if(tipos.includes(tipo) && byTipoYear[tipo][yr]!==undefined)
@@ -1248,7 +1277,7 @@ function precompute(){
       dreData[cc][yr][cat][mes]+=val;
   }
 
-  return {byTipoYear, rentByYear, rentByCC, dreData};
+  return {byTipoYear, rentByYear, rentByCC, dreData, catTipo};
 }
 
 let STATIC = null; // computado no boot, após loadData()
@@ -1600,6 +1629,7 @@ function renderPage(id){
   else if(id==='p-lucro') renderSimple('a6','Distribuição Lucro');
   else if(id==='p-rent'       && !_rendered[id]){ renderRent(); _rendered[id]=1; }
   else if(id==='p-dre'        && !_rendered[id]){ initDRE(); _rendered[id]=1; }
+  else if(id==='p-dre-consol' && !_rendered[id]){ initDREC(); _rendered[id]=1; }
   else if(id==='p-ctrl') renderCtrl();
   else if(id==='p-fichas'     && !_rendered[id]){ renderFichas(); _rendered[id]=1; }
   else if(id==='p-roe'        && !_rendered[id]){ renderROE(); _rendered[id]=1; }
@@ -2076,6 +2106,18 @@ function renderCashflow(){
 // ═══════════════════════════════════════════════════
 function renderRanking(){
   initFiltro({filtroId:'ranking', wrapId:'rank-yr-pills', usarDP:false, onApply:renderRanking});
+  // Pills de ordenação
+  const sortWrap=document.getElementById('rank-sort-pills');
+  if(sortWrap){
+    sortWrap.innerHTML='';
+    [['luc','Resultado Final'],['anualizado','Anualizado']].forEach(([key,lbl])=>{
+      const b=document.createElement('div');
+      b.className='pill'+(STATE.rankSort===key?' active-yr':'');
+      b.textContent=lbl;
+      b.onclick=()=>{STATE.rankSort=key;renderRanking();};
+      sortWrap.appendChild(b);
+    });
+  }
   const fnRank=getFiltroFn('ranking');
   const allCCs=[...new Set([...OP_CCS,'CONSOLIDADO'])];
   const ccVals=allCCs.map(cc=>{
@@ -2098,8 +2140,9 @@ function renderRanking(){
     return {cc,rec,cost,luc,km,nMeses,anualizado,drv:(DRV[cc]||['—'])[0]};
   }).filter(c=>Math.abs(c.rec)>0.01||Math.abs(c.cost)>0.01);
   // CONSOLIDADO sempre último
+  const sortKey=STATE.rankSort==='anualizado'?'anualizado':'luc';
   const consolidado=ccVals.find(c=>c.cc==='CONSOLIDADO');
-  const outros=ccVals.filter(c=>c.cc!=='CONSOLIDADO').sort((a,b)=>b.luc-a.luc);
+  const outros=ccVals.filter(c=>c.cc!=='CONSOLIDADO').sort((a,b)=>b[sortKey]-a[sortKey]);
   const sorted=consolidado?[...outros,consolidado]:outros;
   const ccVals_=sorted;
 
@@ -2114,14 +2157,14 @@ function renderRanking(){
   const lucEl2=document.getElementById('rank-tot-luc');
   if(lucEl2){lucEl2.textContent=fmtBR(totLuc);lucEl2.className='kpi-value '+(totLuc>=0?'green':'red');}
 
-  const maxAbs=Math.max(...ccVals_.map(c=>Math.abs(c.luc)));
+  const maxAbs=Math.max(...ccVals_.map(c=>Math.abs(c[sortKey])));
   const el=document.getElementById('rank-list');
   el.innerHTML='';
   ccVals_.forEach((c,i)=>{
     const isConsolidado=c.cc==='CONSOLIDADO';
     const isTop=!isConsolidado&&i<3, isBot=!isConsolidado&&i>=ccVals_.length-(consolidado?4:3);
     const cls=isTop?'top':isBot?'bot':'';
-    const pct=maxAbs>0?Math.abs(c.luc)/maxAbs*100:0;
+    const pct=maxAbs>0?Math.abs(c[sortKey])/maxAbs*100:0;
     const barColor=c.luc>=0?'var(--green)':'var(--red)';
     const anualizadoStr=isConsolidado?'':
       ` · <span style="color:var(--text3);font-size:10px;">Anualizado: <span style="color:${c.anualizado>=0?'var(--blue)':'var(--red)'}">${fmtBR(c.anualizado)}</span> (${c.nMeses}m)</span>`;
@@ -2483,8 +2526,8 @@ function renderSimple(prefix, tipoName){
   ANOS12.forEach((y,i)=>{ if(Math.abs(vals[i])>Math.abs(bestVal)){bestVal=vals[i];bestYr=y;} });
 
   setText(prefix+'-tot', fmtBR(tipoName==='Distribuição Lucro'?Math.abs(total):total));
-  setText(prefix+'-best', bestYr+' — '+fmtBR(bestVal));
-  setText(prefix+'-2026', fmtBR(byYr['2026']));
+  setText(prefix+'-best', bestYr+' — '+fmtBR(tipoName==='Distribuição Lucro'?Math.abs(bestVal):bestVal));
+  setText(prefix+'-2026', fmtBR(tipoName==='Distribuição Lucro'?Math.abs(byYr['2026']):byYr['2026']));
 
   const posC=tipoName==='Receita'||tipoName==='Venda De Veículo'?mkRGBA(GREEN,'0.75'):tipoName==='Distribuição Lucro'?mkRGBA(AMBER,'0.75'):mkRGBA(RED,'0.75');
   const negC=mkRGBA(RED,'0.75');
@@ -2656,6 +2699,87 @@ function renderDRE(){
 
   rows.push(`<tr class="total-row"><td>Total Geral</td>${totMes.map(v=>'<td>'+fmtDRE(Math.round(v*100)/100)+'</td>').join('')}<td class="col-total">${fmtDRE(Math.round(totGeral*100)/100)}</td></tr>`);
   document.getElementById('dre-body').innerHTML=rows.join('');
+}
+
+// ─── DRE CONSOLIDADA (todos os centros de custo) ───
+function drecCellSum(cc, cat){
+  const yr=STATE.drec_yr;
+  const ccd=STATIC.dreData[cc]; if(!ccd) return 0;
+  let s=0;
+  if(yr==='TODOS'){
+    ANOS12.forEach(y=>{ const a=ccd[y]&&ccd[y][cat]; if(a) for(let i=0;i<12;i++) s+=a[i]; });
+  } else {
+    const a=ccd[yr]&&ccd[yr][cat]; if(a) for(let i=0;i<12;i++) s+=a[i];
+  }
+  return s;
+}
+function drecColVal(cat, col){
+  if(col==='CONSOLIDADO'){ let s=0; OP_CCS.forEach(cc=>s+=drecCellSum(cc,cat)); return s; }
+  return drecCellSum(col, cat);
+}
+function initDREC(){
+  const byrs=document.getElementById('drec-yr-btns');
+  byrs.innerHTML='';
+  ['TODOS',...[...ANOS12].reverse()].forEach(yr=>{
+    const b=document.createElement('div');
+    b.className='pill'+(yr===STATE.drec_yr?' active-yr':'');
+    b.textContent=yr;
+    b.onclick=()=>{STATE.drec_yr=yr;document.querySelectorAll('#drec-yr-btns .pill').forEach(x=>x.classList.remove('active-yr'));b.classList.add('active-yr');renderDREC();};
+    byrs.appendChild(b);
+  });
+  renderDREC();
+}
+function drecGroups(){
+  const ct=STATIC.catTipo||{};
+  const cols=[...OP_CCS,'CONSOLIDADO'];
+  const has=cat=>cols.some(c=>Math.abs(drecColVal(cat,c))>0.005);
+  const all=Object.keys(ct);
+  const rec=all.filter(c=>ct[c]==='Receita'&&has(c)).sort((a,b)=>a==='FRETE'?-1:b==='FRETE'?1:a.localeCompare(b));
+  const desp=all.filter(c=>ct[c]==='Despesa'&&has(c)).sort();
+  const jur=all.filter(c=>ct[c]==='Juros'&&has(c)).sort();
+  return {cols,rec,desp,jur};
+}
+function renderDREC(){
+  document.getElementById('drec-title').textContent='DRE Consolidada — Ano: '+STATE.drec_yr;
+  const {cols,rec,desp,jur}=drecGroups();
+  const th=c=>'<th'+(c==='CONSOLIDADO'?' class="col-total"':'')+'>'+c+'</th>';
+  document.getElementById('drec-head').innerHTML='<tr><th>Categoria</th>'+cols.map(th).join('')+'</tr>';
+  const td=(v,tot)=>'<td'+(tot?' class="col-total"':'')+'>'+fmtDRE(Math.round(v*100)/100)+'</td>';
+  const sumCats=(cats,col)=>cats.reduce((s,cat)=>s+drecColVal(cat,col),0);
+
+  const rows=[];
+  // Receita (detalhe + subtotal)
+  rec.forEach(cat=>{ rows.push('<tr><td style="padding-left:18px">'+cat+'</td>'+cols.map(c=>td(drecColVal(cat,c),c==='CONSOLIDADO')).join('')+'</tr>'); });
+  rows.push('<tr class="total-row"><td>RECEITA</td>'+cols.map(c=>td(sumCats(rec,c),c==='CONSOLIDADO')).join('')+'</tr>');
+  // Despesas (custos diretos do veículo)
+  desp.forEach(cat=>{ rows.push('<tr><td style="padding-left:18px">'+cat+'</td>'+cols.map(c=>td(drecColVal(cat,c),c==='CONSOLIDADO')).join('')+'</tr>'); });
+  // Resultado Operacional = Receita + Despesas
+  const oper={}; cols.forEach(c=>oper[c]=sumCats(rec,c)+sumCats(desp,c));
+  rows.push('<tr class="total-row"><td>RESULTADO OPERACIONAL</td>'+cols.map(c=>td(oper[c],c==='CONSOLIDADO')).join('')+'</tr>');
+  // Juros (resultado financeiro)
+  if(jur.length){
+    jur.forEach(cat=>{ rows.push('<tr><td style="padding-left:18px">'+cat+'</td>'+cols.map(c=>td(drecColVal(cat,c),c==='CONSOLIDADO')).join('')+'</tr>'); });
+  }
+  // Resultado Líquido = Operacional + Juros
+  const liq={}; cols.forEach(c=>liq[c]=oper[c]+sumCats(jur,c));
+  rows.push('<tr class="total-row"><td>RESULTADO LÍQUIDO</td>'+cols.map(c=>td(liq[c],c==='CONSOLIDADO')).join('')+'</tr>');
+  // Margem Líquida %
+  rows.push('<tr><td>Margem Líquida %</td>'+cols.map(c=>{const r=sumCats(rec,c);const m=Math.abs(r)>0.005?liq[c]/r*100:NaN;return '<td'+(c==='CONSOLIDADO'?' class="col-total"':'')+'>'+fmtPct(m)+'</td>';}).join('')+'</tr>');
+  document.getElementById('drec-body').innerHTML=rows.join('');
+}
+function exportDREC(){
+  const {cols,rec,desp,jur}=drecGroups();
+  const out=[['Categoria',...cols]];
+  const line=(label,fn)=>out.push([label,...cols.map(c=>fn(c).toFixed(2))]);
+  rec.forEach(cat=>line(cat,c=>drecColVal(cat,c)));
+  line('RECEITA',c=>rec.reduce((s,x)=>s+drecColVal(x,c),0));
+  desp.forEach(cat=>line(cat,c=>drecColVal(cat,c)));
+  const oper=c=>rec.reduce((s,x)=>s+drecColVal(x,c),0)+desp.reduce((s,x)=>s+drecColVal(x,c),0);
+  line('RESULTADO OPERACIONAL',oper);
+  jur.forEach(cat=>line(cat,c=>drecColVal(cat,c)));
+  const liq=c=>oper(c)+jur.reduce((s,x)=>s+drecColVal(x,c),0);
+  line('RESULTADO LIQUIDO',liq);
+  exportCSV(out,'dre-consolidada-'+STATE.drec_yr+'.csv');
 }
 
 // ═══════════════════════════════════════════════════
@@ -4033,6 +4157,7 @@ const TELA_INFO = {
   'p-lucro':       'Valores de lucro distribuídos aos sócios ao longo do tempo, organizados por período.',
   'p-rent':      'Resultado acumulado por ano considerando apenas a operação. Exclui os centros de custo Consolidado, Distribuição de Lucro, Imobilizado e Verificar.',
   'p-dre':       'Demonstrativo de resultado mês a mês por categoria, para a placa e o ano selecionados. Despesas aparecem entre parênteses; a coluna Total consolida o ano; — indica mês sem lançamento.',
+  'p-dre-consol':'Demonstrativo de resultado em formato matriz: categorias nas linhas e cada placa nas colunas, mais a coluna CONSOLIDADO (soma da frota). Segue a cascata Receita → Resultado Operacional → Juros → Resultado Líquido, com a Margem Líquida ao final. Selecione o ano ou TODOS.',
   'p-pendencias': 'Lançamentos de receita com valor pendente de recebimento. Use os filtros de período e placa, e os filtros por coluna (Descrição, Fornecedor/Cliente e Valor) para investigar cada caso.',
   'p-ctrl':      'Cartões cujos saldos deveriam ser sempre zero (Transferências, Verificar e Descarga). Qualquer valor diferente de zero indica lançamento a revisar na base de dados.',
   'p-fichas':    'Ficha de cada veículo com a participação econômica dos sócios e as diretrizes de transferência aplicáveis.',
