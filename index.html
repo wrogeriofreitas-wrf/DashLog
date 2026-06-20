@@ -325,7 +325,6 @@ table.dre tbody tr.drec-info td:first-child{color:var(--text3);}
   border:0.5px solid var(--border2);background:var(--bg3);color:var(--text2);
   transition:all 0.15s;font-family:var(--mono);
 }
-.pill:hover{border-color:var(--green);color:var(--green);}
 .pill.active-yr{background:rgba(59,158,255,0.15);border-color:var(--blue);color:var(--blue);}
 .pill.active-cc{background:rgba(16,217,160,0.15);border-color:var(--green);color:var(--green);}
 .pill.active-tot{background:rgba(59,158,255,0.12);border-color:var(--blue);color:var(--blue);}
@@ -810,8 +809,8 @@ table.dre tbody tr.drec-info td:first-child{color:var(--text3);}
   <div class="page-header"><div><div class="page-title">Compras x Vendas</div><div class="page-sub">Aquisições e desinvestimentos de veículos</div></div></div>
   <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;align-items:center;" id="cv-yr-pills"></div>
   <div class="kpi-grid">
-    <div class="kpi-card red"><div class="kpi-label">Total Compras (2015–2026)</div><div class="kpi-value red" id="cv-tot-cmp">—</div></div>
-    <div class="kpi-card green"><div class="kpi-label">Total Vendas (2015–2026)</div><div class="kpi-value green" id="cv-tot-vnd">—</div></div>
+    <div class="kpi-card red"><div class="kpi-label" id="cv-lbl-cmp">Total Compras (2015–2026)</div><div class="kpi-value red" id="cv-tot-cmp">—</div></div>
+    <div class="kpi-card green"><div class="kpi-label" id="cv-lbl-vnd">Total Vendas (2015–2026)</div><div class="kpi-value green" id="cv-tot-vnd">—</div></div>
   </div>
   <div class="chart-card">
     <div class="chart-title" style="margin-bottom:14px">Compras × Vendas — Mês a Mês</div>
@@ -841,10 +840,10 @@ table.dre tbody tr.drec-info td:first-child{color:var(--text3);}
   <div class="kpi-grid">
     <div class="kpi-card green"><div class="kpi-label">Acumulado 2015–2025</div><div class="kpi-value green" id="r7-tot">—</div></div>
     <div class="kpi-card green"><div class="kpi-label">Melhor ano</div><div class="kpi-value green" id="r7-best">—</div></div>
-    <div class="kpi-card amber"><div class="kpi-label">2026 acumulado</div><div class="kpi-value amber" id="r8-tot">—</div></div>
+    <div class="kpi-card amber"><div class="kpi-label" id="r8-lbl">2026 acumulado</div><div class="kpi-value amber" id="r8-tot">—</div></div>
   </div>
   <div class="chart-card" style="margin-bottom:16px">
-    <div class="chart-title" style="margin-bottom:14px">Rentabilidade 2026 — mês a mês</div>
+    <div class="chart-title" id="r8-title" style="margin-bottom:14px">Rentabilidade 2026 — mês a mês</div>
     <div class="chart-wrap" style="height:240px"><canvas id="ch-r8" role="img" aria-label="Rentabilidade mensal 2026"></canvas></div>
   </div>
   <div class="chart-card" style="margin-bottom:16px">
@@ -1051,7 +1050,7 @@ async function loadData(){
 // STATE LAYER
 // ═══════════════════════════════════════════════════
 // ★ VERSÃO DO SITE — fonte única; exibida no topo de todas as telas e na sidebar
-const APP_VERSAO = '14/06/2026 - 15:49';
+const APP_VERSAO = '20/06/2026 - 16:34';
 
 const STATE = {
   mode: 'comp',   // 'comp' | 'cx'
@@ -1313,15 +1312,15 @@ function barCfg(labels,data,posC,negC,opts={}){
 // NAVIGATION
 // ═══════════════════════════════════════════════════
 function nav(id, el){
+  // Fecha o menu sempre, antes de qualquer coisa (mobile)
+  const sb=document.getElementById('sidebar'); if(sb) sb.classList.remove('open');
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const pg=document.getElementById(id);
   if(pg) pg.classList.add('active');
   if(el) el.classList.add('active');
-  // close sidebar on mobile
-  if(window.innerWidth<=768) document.getElementById('sidebar').classList.remove('open');
-  // lazy render on first visit
-  renderPage(id);
+  // lazy render on first visit (protegido)
+  try{ renderPage(id); }catch(e){ console.error('renderPage falhou:', id, e); }
 }
 function goHome(){
   // Limpar todos os filtros de todas as telas
@@ -1624,6 +1623,13 @@ function initOvFilter(){
 function toggleSidebar(){
   document.getElementById('sidebar').classList.toggle('open');
 }
+// Fechar menu ao clicar fora
+document.addEventListener('click',(e)=>{
+  const s=document.getElementById('sidebar');
+  if(s&&s.classList.contains('open')&&!s.contains(e.target)&&e.target.id!=='ham'){
+    s.classList.remove('open');
+  }
+});
 const _rendered={};
 function renderPage(id){
   if(id==='p-overview') renderOverview();
@@ -2603,26 +2609,35 @@ function renderRent(){
   initFiltro({filtroId:'rent', wrapId:'rent-yr-pills', usarDP:false, onApply:renderRent});
   const fnRent=getFiltroFn('rent');
   const ryVals=ANOS12.slice(0,-1).map(y=>STATIC.rentByYear[y]||0);
-  const r2026mo=['01','02','03','04','05','06','07','08','09','10','11'].map(m=>{
+  // Mês a mês respeita o filtro: ano selecionado (ou ano atual em Todos)
+  const Frent=FILTROS.rent;
+  let anoMes=String(new Date().getFullYear());
+  if(Frent.period==='' && Frent.yrs.size>0) anoMes=[...Frent.yrs].sort().slice(-1)[0];
+  const mesNum=['01','02','03','04','05','06','07','08','09','10','11','12'];
+  const rMesVals=mesNum.map(m=>{
     let v=0;
     for(let i=0;i<R.length;i++){
       const row=R[i];
       if(EXCL_RENT.has(CC[row[I_CC]])) continue;
       const mo=MO[row[I_DC]]||'';
-      if(mo.startsWith('2026-'+m)) v+=row[I_VAL];
+      if(mo.slice(0,4)!==anoMes || mo.slice(5,7)!==m) continue;
+      if(fnRent && !fnRent(mo)) continue;
+      v+=row[I_VAL];
     }
     return v;
   });
-  const mes=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov'];
-  const acum2026=r2026mo.reduce((a,b)=>a+b,0);
+  const mes=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const acumMes=rMesVals.reduce((a,b)=>a+b,0);
   const best=ryVals.reduce((b,v,i)=>v>b.v?{v,i}:b,{v:-Infinity,i:0});
 
   setText('r7-tot', fmtBR(ryVals.reduce((a,b)=>a+b,0)));
   setText('r7-best', ANOS12[best.i]+' — '+fmtBR(best.v));
-  setText('r8-tot', fmtBR(acum2026));
+  setText('r8-tot', fmtBR(acumMes));
+  setText('r8-lbl', anoMes+' acumulado');
+  const elT=document.getElementById('r8-title'); if(elT) elT.textContent='Rentabilidade '+anoMes+' — mês a mês';
 
   mkChart('ch-r7',barCfg(ANOS12.slice(0,-1),ryVals,mkRGBA(GREEN,'0.75'),mkRGBA(RED,'0.75')));
-  mkChart('ch-r8',barCfg(mes,r2026mo,mkRGBA(GREEN,'0.75'),mkRGBA(RED,'0.75')));
+  mkChart('ch-r8',barCfg(mes,rMesVals,mkRGBA(GREEN,'0.75'),mkRGBA(RED,'0.75')));
 
   // Análise 09 — por placa
   const btns=document.getElementById('rent09-btns');
@@ -3507,6 +3522,9 @@ function renderCompraVenda(){
   const vndVals=ANOS12.map(y=>byTY['Venda De Veículo']?.[y]||0);
   setText('cv-tot-cmp',fmtBR(somaCV('Compra de Veículo')));
   setText('cv-tot-vnd',fmtBR(somaCV('Venda De Veículo')));
+  const perCV=labelPeriodo('compravenda');
+  setText('cv-lbl-cmp','Total Compras ('+perCV+')');
+  setText('cv-lbl-vnd','Total Vendas ('+perCV+')');
 
   const isDark=!document.body.classList.contains('light');
   const gCV=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)';
@@ -4096,6 +4114,14 @@ function getFiltroFn(filtroId){
   };
 }
 
+// Rótulo legível do período selecionado num filtro
+function labelPeriodo(filtroId){
+  const F=FILTROS[filtroId]; if(!F) return '';
+  if(F.period){ const n=parseInt(F.period.replace('ult','')); return 'Últ. '+n+' meses'; }
+  if(F.yrs.size===0) return '2015–2026';
+  return [...F.yrs].sort().join(', ');
+}
+
 // Reset filtro (para goHome)
 function resetFiltro(filtroId){
   const F=FILTROS[filtroId];
@@ -4220,7 +4246,11 @@ const TELA_INFO = {
   'p-overview':  'Visão resumida do resultado operacional (Receitas − Despesas) ano a ano, desde o início até o último lançamento previsto. Permite filtrar por período específico e analisar o resultado mês a mês.',
   'p-cashflow':  'Movimentações pelo regime de caixa: entradas e saídas consideradas pela data de pagamento (e não de competência). O saldo do gráfico unificado calcula Entradas − Saídas − Compras + Vendas e é recalculado conforme as séries ativadas na legenda.',
   'p-ranking':   'Compara o resultado operacional (Receitas − Despesas) de cada veículo no período selecionado, ordenado do mais lucrativo ao mais deficitário. Útil para identificar quais placas sustentam a operação e quais merecem revisão.',
-  'p-score':     'Score Operacional de Frota (SOF): nota consolidada por veículo a partir dos indicadores de resultado, acompanhada de alertas automáticos sobre pontos que merecem atenção.',
+  'p-score':     'Score Operacional de Frota (SOF 2.0): nota de 0 a 100 por veículo, somada a partir de 3 pilares. ' +
+    'Pilar 1 — Resultado Econômico (45 pts): margem líquida (25 pts) + receita por km comparada à média da frota (20 pts). ' +
+    'Pilar 2 — Eficiência Operacional (35 pts): custo por km comparado à média da frota (20 pts) + consumo km/litro (15 pts; carretas não pontuam em combustível e esses pontos são redistribuídos para custo/km). ' +
+    'Pilar 3 — Consistência (20 pts): regularidade dos lançamentos (10 pts) + tendência do resultado recente (10 pts). ' +
+    'A soma vira a nota: A+ (≥90), A (75–89), B (60–74), C (45–59), D (30–44), F (<30). Os alertas destacam automaticamente os pontos fracos de cada veículo.',
   'p-analise':   'Visão financeira completa pela data de competência: Receitas, Despesas e Juros, com Lucro Financeiro e Margem Líquida. Diferente da Visão Geral, que mostra apenas o resultado operacional (Margem Operacional).',
   'p-compravenda': 'Histórico de aquisições e vendas de veículos, com os valores investidos e desinvestidos por período e o saldo entre compras e vendas.',
   'p-lucro':       'Valores de lucro distribuídos aos sócios ao longo do tempo, organizados por período.',
